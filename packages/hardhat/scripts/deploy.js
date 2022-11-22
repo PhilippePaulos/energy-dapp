@@ -24,29 +24,30 @@ async function main() {
     `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
   );
 
-  console.log("Write files to front")
-  saveFrontendFiles(lock);
+  saveFrontendFiles("Lock", lock);
 
 }
 
-function saveFrontendFiles(lock) {
+function saveFrontendFiles(contractName, deployedContract) {
   const fs = require("fs");
   const contractsDir = path.join(__dirname, "..", "..", "front", "src", "contracts");
+  console.log(`Write ABI into ${contractsDir}`)
+  const chainId = hre.network.config.chainId
 
   if (!fs.existsSync(contractsDir)) {
     fs.mkdirSync(contractsDir);
   }
 
   fs.writeFileSync(
-      path.join(contractsDir, "contract-address.json"),
-      JSON.stringify({ Lock: lock.address }, undefined, 2)
+      path.join(contractsDir, "contract-addresses.json"),
+      JSON.stringify({[contractName]: {[hre.network.config.chainId]: deployedContract.address}}, undefined, 2)
   );
 
-  const LockArtifact = artifacts.readArtifactSync("Lock");
+  const artifact = artifacts.readArtifactSync(contractName);
 
   fs.writeFileSync(
-      path.join(contractsDir, "Lock.json"),
-      JSON.stringify(LockArtifact, null, 2)
+      path.join(contractsDir, `${contractName}.json`),
+      JSON.stringify(artifact, null, 2)
   );
 }
 

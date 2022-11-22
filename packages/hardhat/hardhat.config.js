@@ -9,12 +9,5 @@ module.exports = {
     hardhat: {
       chainId: 1337
     }
-  },
-  // abiExporter: [
-  //   {
-  //     path: '../../packages/front/contracts',
-  //     runOnCompile: true,
-  //     pretty: true
-  //   }
-  // ]
+  }
 };
