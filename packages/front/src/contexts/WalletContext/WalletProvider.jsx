@@ -2,6 +2,8 @@ import React, { useReducer, useCallback, useEffect } from "react";
 import Web3 from "web3";
 import WalletContext from "./WalletContext";
 import { reducer, actions, initialState } from "./state";
+import { ethers } from "ethers";
+
 
 import LockArtifact from "../../contracts/Lock.json";
 import contractAddresses from "../../contracts/contract-addresses.json";
@@ -12,6 +14,8 @@ function WalletProvider({ children }) {
   const init = useCallback(
     async (artifact, contractAddresses) => {
       if (artifact) {
+        // const provider = new ethers.providers.Web3Provider(window.ethereum);
+
         const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
         const accounts = await web3.eth.requestAccounts();
         const networkID = await web3.eth.net.getId();
@@ -24,6 +28,7 @@ function WalletProvider({ children }) {
         } catch (err) {
           console.error(err);
         }
+
         dispatch({
           type: actions.init,
           data: { artifact, web3, accounts, networkID, contract }

@@ -1,13 +1,12 @@
 require("@nomicfoundation/hardhat-toolbox");
-require('hardhat-abi-exporter');
-
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
+  defaultNetwork: "localhost",
   solidity: "0.8.17",
   networks: {
-    hardhat: {
-      chainId: 1337
+    localhost: {
+      chainId: 31337
     }
   }
 };
