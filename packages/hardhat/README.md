@@ -3,7 +3,7 @@
 
 Deployment is managed by [hardhat-deploy](https://github.com/wighawag/hardhat-deploy) plugin.
 
-####Steps
+#### Steps
 
 Run hardhat node
 ```console
