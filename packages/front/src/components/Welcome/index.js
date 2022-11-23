@@ -2,14 +2,14 @@ import { Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import useWallet from "../../contexts/WalletContext/useWallet";
 
-function Home() {
+function Welcome() {
 
     const {state: {artifact, contract, accounts}} = useWallet()
 
     const [owner, setOwner] = useState('')
 
     const fetchOwner = useCallback(async () => {
-        const owner = await contract.methods.owner().call({from: accounts[0]})
+        const owner = await contract.owner()
         setOwner(owner)
         return owner
     }, [contract])
@@ -25,4 +25,4 @@ function Home() {
     )
 }
 
-export default Home
+export default Welcome

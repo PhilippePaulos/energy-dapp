@@ -4,7 +4,7 @@ const actions = {
   
   const initialState = {
     artifact: null,
-    web3: null,
+    provider: null,
     accounts: null,
     networkID: null,
     contract: null

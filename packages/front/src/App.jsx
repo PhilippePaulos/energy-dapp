@@ -1,11 +1,11 @@
 import './App.css';
-import Home from './components/Home';
+import Welcome from './components/Welcome';
 import { WalletProvider } from './contexts/WalletContext';
 
 function App() {
   return (
     <WalletProvider >
-      <Home />
+      <Welcome />
     </WalletProvider>
   );
 }

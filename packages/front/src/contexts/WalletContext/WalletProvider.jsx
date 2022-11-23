@@ -1,37 +1,29 @@
-import React, { useReducer, useCallback, useEffect } from "react";
-import Web3 from "web3";
-import WalletContext from "./WalletContext";
-import { reducer, actions, initialState } from "./state";
 import { ethers } from "ethers";
+import React, { useCallback, useEffect, useReducer } from "react";
+import { actions, initialState, reducer } from "./state";
+import WalletContext from "./WalletContext";
 
-
-import LockArtifact from "../../contracts/Lock.json";
-import contractAddresses from "../../contracts/contract-addresses.json";
 
 function WalletProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const init = useCallback(
-    async (artifact, contractAddresses) => {
+    async (artifact) => {
       if (artifact) {
-        // const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-        const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-        const accounts = await web3.eth.requestAccounts();
-        const networkID = await web3.eth.net.getId();
-        const { abi } = artifact;
-        let address, contract;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        const networkID = (await provider.getNetwork()).chainId;
+        let contract;
         try {
-          // TODO check networkID exists in file
-          address = contractAddresses[artifact.contractName][networkID];
-          contract = new web3.eth.Contract(abi, address);
+          const contractJson = artifact[networkID][0].contracts["Lock"];
+          const { abi, address } = contractJson;
+          contract = new ethers.Contract(address, abi, provider.getSigner(0))
         } catch (err) {
           console.error(err);
         }
-
         dispatch({
           type: actions.init,
-          data: { artifact, web3, accounts, networkID, contract }
+          data: { artifact, provider, accounts, networkID, contract }
         });
       }
     }, []);
@@ -39,7 +31,8 @@ function WalletProvider({ children }) {
   useEffect(() => {
     const tryInit = async () => {
       try {
-        init(LockArtifact, contractAddresses);
+        const artifact = require("../../contracts/contracts.json")
+        init(artifact);
       } catch (err) {
         console.error(err);
       }
