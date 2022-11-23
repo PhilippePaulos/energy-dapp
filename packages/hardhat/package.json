@@ -5,7 +5,8 @@
   "author": "Philippe Paulos",
   "license": "MIT",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "deployLocal": "npx hardhat deploy --network localhost --export-all ../front/src/contracts/contracts.json"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
