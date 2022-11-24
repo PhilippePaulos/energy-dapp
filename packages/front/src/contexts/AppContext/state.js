@@ -3,9 +3,6 @@ const actions = {
   };
   
   const initialState = {
-    artifact: null,
-    provider: null,
-    accounts: null,
     networkID: null,
     contract: null
   };
