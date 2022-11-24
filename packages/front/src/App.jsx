@@ -1,10 +1,12 @@
+import { ThemeProvider } from "@emotion/react";
+import { Box, Button, CssBaseline } from '@mui/material/';
 import { chain, configureChains, createClient, defaultChains, WagmiConfig } from 'wagmi';
 import { InjectedConnector } from 'wagmi/connectors/injected';
-import { infuraProvider } from "wagmi/providers/infura";
 import { publicProvider } from 'wagmi/providers/public';
-import './App.css';
+import Navbar from "./components/Navbar";
+import { theme } from './components/theme';
 import AppProvider from './contexts/AppContext/AppProvider';
-import Welcome from './components/Welcome'
+
 
 // TODO add alchemy provider
 const { chains, provider } = configureChains([chain.hardhat, ...defaultChains], [
@@ -13,16 +15,19 @@ const { chains, provider } = configureChains([chain.hardhat, ...defaultChains], 
 
 const client = createClient({
   autoConnect: true,
-  connectors: [new InjectedConnector({chains})],
+  connectors: [new InjectedConnector({ chains })],
   provider
 });
 
 function App() {
   return (
     <WagmiConfig client={client}>
-      <AppProvider>
-        <Welcome/>
-      </AppProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppProvider>
+          <Navbar />
+        </AppProvider>
+      </ThemeProvider>
     </WagmiConfig>
   );
 }
