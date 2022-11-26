@@ -3,4 +3,8 @@ function getContractDescription(name, chainId) {
     return artifact[chainId][0].contracts[name]
 }
 
-export { getContractDescription }
+function formatAddress(address) {
+    return `${address.substring(0, 5)}...${address.substring(address.length - 4, address.length)}`
+}
+
+export { getContractDescription, formatAddress }

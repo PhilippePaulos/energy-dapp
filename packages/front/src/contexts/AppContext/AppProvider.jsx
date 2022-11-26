@@ -1,26 +1,19 @@
 import React, { useCallback, useEffect, useReducer } from "react";
-import { useContract, useNetwork, useProvider } from 'wagmi';
-import { getContractDescription } from "../../helpers/eth";
+import { useNetwork } from 'wagmi';
 import AppContext from "./AppContext";
 import { actions, initialState, reducer } from "./state";
 
 function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { chain } = useNetwork()
-  const provider = useProvider()
-  const { address, abi } = getContractDescription('Lock', chain.id)
-  const contract = useContract({
-    address: address,
-    abi: abi,
-    signerOrProvider: provider
-  })
+  // const { chain } = useNetwork()
 
   const init = useCallback(
     async () => {
-      const networkId = chain.id
+      // const networkId = chain.id
+      const networkId = null
       dispatch({
         type: actions.init,
-        data: { networkId, contract }
+        data: { networkId }
       })
     }, [])
 
