@@ -1,11 +1,12 @@
-import { AppBar, Button, Grid, Link, Toolbar, Typography } from "@mui/material"
+import { AppBar, Grid, Link, Toolbar, Typography } from "@mui/material"
 import { Box } from "@mui/system"
-import { useAccount, useConnect, useDisconnect } from "wagmi"
-import { formatAddress } from "../../helpers/eth"
 import Identicon from '@polkadot/react-identicon'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import PopoverDisconnect from "./PopoverDisconnect"
 import { useState } from "react"
+import { useAccount, useConnect } from "wagmi"
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { formatAddress } from "../../helpers/eth"
+import ButtonUI from "../ui/button"
+import PopoverDisconnect from "./PopoverDisconnect"
 
 
 
@@ -29,7 +30,7 @@ function Navbar() {
 
     const formatedAddr = isConnected ? formatAddress(address) : null
 
-    const connectBtn = <Button size="medium" variant="contained" color="action" onClick={() => connect()}>Connect</Button>
+    const connectBtn = <ButtonUI size="medium" variant="contained" onClick={() => connect()}>Connect</ButtonUI>
     const addressAvatar =
         <Box display="flex" alignItems="center" gap="4px" sx={{ cursor: "pointer" }} onClick={handleClick}>
             <Identicon className="identicon" value={address} size={20} theme="ethereum" />

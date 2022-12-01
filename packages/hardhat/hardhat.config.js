@@ -1,6 +1,8 @@
-require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-toolbox")
 require("@nomiclabs/hardhat-ethers")
-require('hardhat-deploy');
+require("hardhat-deploy")
+require("solidity-coverage");
+require('dotenv').config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -8,6 +10,17 @@ module.exports = {
   networks: {
     localhost: {
       saveDeployments: true,
+      forking: {
+        url: "https://eth-mainnet.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY
+      }
+    },
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: { mnemonic: process.env.mnemonic }
+    },
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: { mnemonic: process.env.mnemonic }
     }
   },
   namedAccounts: {
@@ -15,4 +28,4 @@ module.exports = {
       default: 0,
     }
   }
-};
+}

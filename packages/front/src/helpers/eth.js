@@ -4,7 +4,7 @@ function getContractDescription(name, chainId) {
 }
 
 function formatAddress(address) {
-    return `${address.substring(0, 5)}...${address.substring(address.length - 4, address.length)}`
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4, address.length)}`
 }
 
 export { getContractDescription, formatAddress }

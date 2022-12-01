@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import { CssBaseline } from '@mui/material/';
+import { CssBaseline, Grid } from '@mui/material/';
 import { getDefaultProvider } from "ethers";
 import { chain, configureChains, createClient, defaultChains, WagmiConfig } from 'wagmi';
 import { InjectedConnector } from 'wagmi/connectors/injected';
@@ -7,6 +7,8 @@ import { publicProvider } from 'wagmi/providers/public';
 import { Navbar } from "./components/Navbar";
 import { theme } from './components/theme';
 import AppProvider from './contexts/AppContext/AppProvider';
+import './App.css'
+import { Submission } from "./components/Submission";
 
 // // // TODO add alchemy provider
 const { chains, provider } = configureChains([chain.hardhat, ...defaultChains], [
@@ -32,6 +34,11 @@ function App() {
          <CssBaseline />
          {/* <AppProvider> */}
           <Navbar />
+          <Grid container sx={{ mx: "auto", maxWidth: "1250px" }}>
+            <Grid item xs={5} mt={2}>
+              <Submission/>
+            </Grid>        
+          </Grid>
         {/* </AppProvider> */}
       </ThemeProvider>
     </WagmiConfig>

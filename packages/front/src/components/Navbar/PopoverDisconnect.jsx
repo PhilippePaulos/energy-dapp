@@ -1,12 +1,12 @@
+import DoneIcon from '@mui/icons-material/Done'
+import LogoutIcon from '@mui/icons-material/Logout'
 import { Box, Popover, styled, Typography } from "@mui/material"
-import { borderRadius } from "@mui/system"
 import { useDisconnect } from "wagmi"
 
 const PopoverStyled = styled(Popover)({
     ".MuiPaper-root": {
         backgroundColor: "inherit",
-        borderRadius: "10px",
-        padding: "10px 0px 10px 15px",
+        border: "none"
     }
 })
 
@@ -29,17 +29,35 @@ function PopoverDisconnect(props) {
             onClose={handleClose}
             anchorOrigin={{
                 vertical: 'bottom',
-                horizontal: 'left',
+                horizontal: 'center',
             }}
-        >
-            <Box width={200} sx={{display: "flex", flexDirection: "column", textAlign:"left", }}>
-                <Typography sx={{ color: "text.secondary"}}>{address}</Typography>
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+            }}
 
-                <Typography
-                    sx={{ color: "error.main", fontWeight: "600", cursor: "pointer" }}
-                    onClick={() => handleDisconnect()}>
-                    Disconnect
-                </Typography>
+        >
+            <Box
+                className="bg-slate-700 border border-slate-600"
+                mt={0.5}
+                p={1}
+                width={150} sx={{ display: "flex", flexDirection: "column", textAlign: "left", borderRadius: "inherit"}}>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <Typography variant="p">{address}</Typography>
+                    <DoneIcon fontSize="inherit" className="text-green-500" />
+                </Box>
+
+                <Box
+                    onClick={() => handleDisconnect()}
+                    mt={1}
+                    sx={{ display: "flex", alignItems: "center", gap: "2px", color: "error.main", cursor: "pointer" }}>
+                    <LogoutIcon fontSize="inherit" />
+                    <Typography variant="p"
+                        sx={{ fontWeight: "bold" }}
+                    >
+                        Disconnect
+                    </Typography>
+                </Box>
             </Box>
         </PopoverStyled>
     )

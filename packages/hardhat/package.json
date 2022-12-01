@@ -16,13 +16,22 @@
     "@nomicfoundation/hardhat-toolbox": "^1.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.0.0",
+    "@uniswap/sdk-core": "^3.1.0",
+    "@uniswap/v3-sdk": "^3.9.0",
     "chai": "^4.2.0",
+    "dotenv": "^16.0.3",
     "ethers": "^5.4.7",
     "hardhat": "^2.11.0",
     "hardhat-abi-exporter": "^2.10.1",
     "hardhat-gas-reporter": "^1.0.8",
     "install": "^0.13.0",
     "npm": "^9.1.2",
-    "solidity-coverage": "^0.7.21"
+    "solidity-coverage": "^0.7.22"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0",
+    "@uniswap/sdk": "^3.0.3",
+    "@uniswap/v3-core": "^1.0.1",
+    "alchemy-sdk": "^2.2.3"
   }
 }

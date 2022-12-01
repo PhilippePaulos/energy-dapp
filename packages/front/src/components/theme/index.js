@@ -7,13 +7,13 @@ export const theme = createTheme({
         },
         text: {
             primary: "#ffffff",
-            secondary: "#9ca3af"
+            // secondary: "#f3f4f6"
         },
         primary: {
             main: "#211f24",
         },
         secondary: {
-            main: "#929fe4",
+            main: "#6b7280",
         },
         action: {
             main: "rgb(59 130 246/1)"
@@ -24,5 +24,17 @@ export const theme = createTheme({
     },
     typography: {
         fontFamily: "Inter, Arial, sans-serif",
+        p: {
+            fontSize: "13px"
+        }
+    },
+    components: {
+        // MuiInputLabel: {
+        //     styleOverrides: {
+        //         // animated: {
+        //         //     color: "#ffffff",
+        //         // },
+        //     },
+        // }
     }
 })
