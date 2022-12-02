@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "hardhat test",
-    "deployLocal": "npx hardhat deploy --network localhost --export-all ../front/src/contracts/contracts.json"
+    "deployLocal": "npx hardhat run deploy/01_deploy_contracts.js --network hardhat"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",

@@ -1,45 +1,73 @@
-const { network } = require("hardhat");
+const { network, ethers, artifacts } = require("hardhat");
 const {
   time,
-  } = require("@nomicfoundation/hardhat-network-helpers");
+} = require("@nomicfoundation/hardhat-network-helpers");
+const path = require("path");
 
-module.exports = async ({ getNamedAccounts, deployments }) => {
-  const { deploy } = deployments;
-  const { deployer } = await getNamedAccounts();
+async function main() {
 
-
-  const mintAmount = hre.ethers.utils.parseEther("10000");
-  const saleAmount = hre.ethers.utils.parseEther("100");
+  const mintAmount = ethers.utils.parseEther("10000");
+  const saleAmount = ethers.utils.parseEther("100");
   const rate = 1;
   const ONE_DAY_IN_SECS = 24 * 60 * 60;
   const closingTime = (await time.latest()) + ONE_DAY_IN_SECS;
-  
 
-  const engDeployer = await deploy('EngDeployer', {
-    contract: 'EngDeployer',
-    from: deployer,
-    log: true,
-    args: [mintAmount, saleAmount, rate, closingTime],
-  });
+  const EngDeployer = await ethers.getContractFactory("EngDeployer");
+  const engDeployer = await EngDeployer.deploy(mintAmount, saleAmount, rate, closingTime);
+  await engDeployer.deployed()
+  const saleAddress = await engDeployer.sale()
+  const tokenAddress = await engDeployer.token()
 
-  console.log(engDeployer);
+  await exportAbis(engDeployer.address, "EngDeployer")
+  await exportAbis(saleAddress, "Sale")
+  await exportAbis(tokenAddress, "EngToken")
 
-  // const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  // const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  // const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
-
-  // const lockedAmount = hre.ethers.utils.parseEther("0");
-
-  // const lock = await deploy('Lock', {
-  //   contract: 'Lock',
-  //   from: deployer,
-  //   log: true,
-  //   args: [unlockTime],
-  //   value: lockedAmount
-  // });
-
-  // console.log(
-  //   `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  // );
 }
-module.exports.tags = ["Lock"]
+
+/**
+ * Exports the abi of a contract to front package
+ * @param {*} contractAddress 
+ * @param {*} contract 
+ */
+async function exportAbis(contractAddress, contract) {
+  const fs = require("fs");
+  const contractsDir = path.join(__dirname, "..", "..", "front", "src", "contracts");
+
+  if (!fs.existsSync(contractsDir)) {
+    fs.mkdirSync(contractsDir);
+  }
+
+  const artifact = artifacts.readArtifactSync(contract);
+
+  let chainId = network.config.chainId;
+  let jsonData
+
+  if (fs.existsSync(path.join(contractsDir, "contracts.json"))) {
+    const fileData = fs.readFileSync("../front/src/contracts/contracts.json", "utf8")
+    jsonData = JSON.parse(fileData)
+
+    if (!jsonData.hasOwnProperty(chainId)) {
+      jsonData[chainId] = { "contracts": {} }
+    }
+  }
+  else {
+    jsonData[chainId] = { chainId: { "contracts": {} } }
+  }
+
+  jsonData[chainId]['contracts'][contract] = {
+    'address': contractAddress,
+    'abi': artifact.abi
+  }
+
+  fs.writeFileSync(
+    path.join(contractsDir, "contracts.json"),
+    JSON.stringify(jsonData, null, 2)
+  );
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
