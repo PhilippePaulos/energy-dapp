@@ -57,17 +57,12 @@ contract Sale is Ownable {
     /**
      * @dev fallback function
      */
-    fallback() external payable {
-        require(true == false);
-        // buyTokens(msg.sender);
-    }
+    fallback() external payable {}
 
     /**
      * @dev receive function
      */
-    receive() external payable {
-        buyTokens(msg.sender);
-    }
+    receive() external payable {}
    
     /**
      * @dev Buy tokens as long as the sale is open
@@ -116,5 +111,9 @@ contract Sale is Ownable {
      */
     function hasClosed() public view returns (bool) {
         return block.timestamp > closingTime;
+    }
+
+    function getRate() public view returns (uint) {
+        return rate;
     }
 }

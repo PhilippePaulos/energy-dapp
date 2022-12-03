@@ -2,12 +2,11 @@ import { AppBar, Grid, Link, Toolbar, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import Identicon from '@polkadot/react-identicon'
 import { useState } from "react"
-import { useAccount, useConnect } from "wagmi"
+import { useAccount, useConnect, useContractRead, useNetwork } from "wagmi"
 import { InjectedConnector } from 'wagmi/connectors/injected'
-import { formatAddress } from "../../helpers/eth"
+import { formatAddress, getContractDescription, getEthValue } from "../../helpers/eth"
 import ButtonUI from "../ui/button"
 import PopoverDisconnect from "./PopoverDisconnect"
-
 
 
 function Navbar() {
@@ -15,6 +14,17 @@ function Navbar() {
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     })
+    const { chain } = useNetwork()
+
+    const { abi, addr } = getContractDescription('EngToken', chain.id)
+    const { data } = useContractRead({
+        address: addr,
+        abi: abi,
+        functionName: "balanceOf",
+        args: [address],
+        watch: true
+      })    
+
     const [anchorEl, setAnchorEl] = useState(null)
 
     const handleClick = (event) => {
@@ -46,14 +56,19 @@ function Navbar() {
                     justifyContent="space-between"
                     sx={{ mx: "auto", maxWidth: "1250px", display: "flex" }}
                 >
-                    <Box>
-                        <Typography variant="h4">Energy</Typography>
+                    <Box display="flex" gap={4} alignItems="center">
+                        <Typography variant="h5">EcoEnergy DAO</Typography>
+                        <Typography sx={{"cursor": "pointer"}}>ICO</Typography>
+                        <Link href="#" color="inherit" underline="none">Whitepaper</Link>
                     </Box>
                     <Box
                         display="flex"
                         gap={4}
                         alignItems="center">
-                        <Link href="#" color="inherit" underline="none">Whitepaper</Link>
+                       
+                        <Box>
+                            <Typography>{getEthValue(data)} EED</Typography>
+                        </Box>
                         {
                             !isConnected ? connectBtn : addressAvatar
                         }

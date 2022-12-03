@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "EngDeployer": {
-        "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "addr": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
         "abi": [
           {
             "inputs": [
@@ -165,7 +165,7 @@
         ]
       },
       "Sale": {
-        "address": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968",
+        "addr": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968",
         "abi": [
           {
             "inputs": [
@@ -269,6 +269,19 @@
           {
             "inputs": [],
             "name": "closingTime",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "getRate",
             "outputs": [
               {
                 "internalType": "uint256",
@@ -391,7 +404,7 @@
         ]
       },
       "EngToken": {
-        "address": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+        "addr": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
         "abi": [
           {
             "inputs": [

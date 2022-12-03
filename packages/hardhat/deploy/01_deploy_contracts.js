@@ -51,11 +51,17 @@ async function exportAbis(contractAddress, contract) {
     }
   }
   else {
-    jsonData[chainId] = { chainId: { "contracts": {} } }
+    jsonData = {}
+    let contracts = {}
+    contracts[contract] = {}
+    let chain = {}
+    chain["contracts"] = contracts
+    jsonData[chainId] = chain
   }
+  console.log(jsonData[chainId]);
 
   jsonData[chainId]['contracts'][contract] = {
-    'address': contractAddress,
+    'addr': contractAddress,
     'abi': artifact.abi
   }
 
