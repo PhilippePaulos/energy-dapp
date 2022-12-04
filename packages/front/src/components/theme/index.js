@@ -27,14 +27,5 @@ export const theme = createTheme({
         p: {
             fontSize: "13px"
         }
-    },
-    components: {
-        // MuiInputLabel: {
-        //     styleOverrides: {
-        //         // animated: {
-        //         //     color: "#ffffff",
-        //         // },
-        //     },
-        // }
     }
 })

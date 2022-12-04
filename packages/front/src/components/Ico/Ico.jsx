@@ -10,7 +10,6 @@ import TextFieldUI from "../ui/text-field";
 
 function Ico() {
 
-    const provider = useProvider()
     const { address } = useAccount()
     const { chain } = useNetwork()
     const [amount, setAmount] = useState("")

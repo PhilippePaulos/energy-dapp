@@ -1,3 +1,11 @@
 .identicon {
     cursor: "pointer";
 }
+
+.flex1 {
+    flex: 1;
+}
+
+.MuiPaper-root .MuiList-root{
+    background-color: rgb(17 24 39);
+}
