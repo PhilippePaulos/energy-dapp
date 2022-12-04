@@ -1,53 +1,98 @@
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import { Box, FormControl, MenuItem, Typography } from "@mui/material";
-import { Contract } from 'ethers';
+import { Box, Button, FormControl, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
-import { uploadIpfsFile } from '../../../helpers/eth';
+import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { getContractDescription, uploadIpfsFile } from '../../../helpers/eth';
 import ButtonUI from "../../ui/button";
 import CenteredModal from "../../ui/CenteredModal";
 import TextFieldUI from "../../ui/text-field";
+import CircularIndeterminate from "../../ui/CircularIndeterminate";
+
 
 function CreateProjectModal(props) {
     const { open, setOpen } = props
+    const { address } = useAccount()
+    const [prepare, setPrepare] = useState(false)
+    const [loadingIpfs, setLoadingIpfs] = useState(false)
 
-    const [pictures, setPictures] = useState([])
-    const [planFile, setPlanFile] = useState("")
-    const [diagnosticFile, setDiagnosticFile] = useState("")
-    const [secteur, setSecteur] = useState(0)
+    const [values, setValues] = useState({
+        name: "",
+        description: "",
+        department: "",
+        sector: "",
+        plan: "",
+        diagnostic: "",
+        pictures: [],
+        planHash: "",
+        diagnosticHash: "",
+        picturesHash: [],
+    })
 
-    const handleChangeSecteur = (event) => {
-        setSecteur(event.target.value);
+    const { chain } = useNetwork()
+    const { abi, addr } = getContractDescription('EnergyDao', chain.id)
+
+    const { config } = usePrepareContractWrite({
+        address: addr,
+        abi: abi,
+        functionName: 'addProject',
+        args: [values.name, values.description, values.department, values.sector,
+        values.picturesHash, values.diagnosticHash, values.planHash],
+        overrides: {
+            from: address,
+            // value: ethers.utils.parseEther('5'),
+        },
+        enabled: prepare,
+    })
+
+    const { data, write } = useContractWrite(config)
+    const { isLoading, isSuccess } = useWaitForTransaction({
+        hash: data?.hash,
+      })
+
+    const handleChange = (event) => {
+        setValues({ ...values, [event.target.name]: event.target.value });
+        console.log(values);
     };
 
-    const handleUploadFiles = files => {
-        const uploaded = [...pictures]
+    const handleUploadFile = (event) => {
+        setValues({ ...values, [event.target.name]: event.target.files[0] })
+
+    }
+
+    const handleUploadFiles = (event) => {
+        const uploaded = values.pictures
+        const files = Array.prototype.slice.call(event.target.files)
         files.some((file) => {
             if (uploaded.findIndex((f) => f.name === file.name) === -1) {
                 uploaded.push(file)
             }
         })
-        setPictures(uploaded)
-    }
-
-    const handleFileEvent = (e, type) => {
-        if (type == "diagnostic") {
-            setDiagnosticFile(e.target.files[0])
-        } else if (type == "plan") {
-            setPlanFile(e.target.files[0])
-        }
-        else {
-            handleUploadFiles(Array.prototype.slice.call(e.target.files))
-        }
-
+        setValues({ ...values, [event.target.name]: uploaded })
     }
 
     const onSubmit = async () => {
-        const diagnosticHash = await uploadIpfsFile(diagnosticFile)
-        const planHash = uploadIpfsFile(planFile)
-        const promises = pictures.map((picture) => uploadIpfsFile(picture))
-        const picturesHashes = await Promise.all(promises)
-        console.log(picturesHashes);        
-        //TODO call contract
+        console.log("submit");
+        if (values.name != "" && values.sector !== "" && values.department !== "" && values.description != "" &&
+            values.diagnostic !== "" && values.plan !== "" && values.pictures.length > 0) {
+            // upload files to IPFS
+            setPrepare(true)
+            setLoadingIpfs(true)
+
+            let hash = await uploadIpfsFile(values.diagnostic)
+            setValues({ ...values, ["diagnosticHash"]: hash })
+
+            hash = await uploadIpfsFile(values.plan)
+            setValues({ ...values, ["planHash"]: hash })
+
+            const promises = values.pictures.map((picture) => uploadIpfsFile(picture))
+            setValues({ ...values, ["picturesHash"]: await Promise.all(promises) })
+            setLoadingIpfs(false)
+            write?.()
+        }
+    }
+
+    function a(){
+        console.log("loading", isLoading);
+        console.log("ipfs", loadingIpfs);
     }
 
     return (
@@ -56,61 +101,62 @@ function CreateProjectModal(props) {
             onClose={e => setOpen(false)}>
             <Box className="bg-gray-900" p={2} borderRadius={2}>
                 <FormControl sx={{ gap: "5px" }}>
-                    <Box sx={{ display: "flex", gap: "5px" }}>
-                        <TextFieldUI id="project-name" label="Nom" className="flex1" />
-                        <TextFieldUI id="project-budget" label="Budget (€)" className="flex1" />
+                    <Box width={"500px"} sx={{ display: "flex", gap: "5px" }}>
+                        <TextFieldUI id="project-name" name="name" label="Nom" className="flex1" value={values.name} onChange={handleChange} />
                     </Box>
                     <TextFieldUI
                         select
                         id="project-secteur"
+                        name="sector"
                         label="Secteur"
-                        value={secteur}
-                        onChange={handleChangeSecteur}
+                        value={values.sector}
+                        onChange={handleChange}
                     >
                         <MenuItem value={0}>Industrie</MenuItem>
                         <MenuItem value={1}>Résidentiel</MenuItem>
                         <MenuItem value={2}>Tertiaire</MenuItem>
                     </TextFieldUI>
-                    <TextFieldUI id="project-departement" label="Departement" />
-                    <TextFieldUI id="project-description" label="Description" multiline rows={4} />
+                    <TextFieldUI id="project-departement" label="Departement" name="department" value={values.department} onChange={handleChange} />
+                    <TextFieldUI id="project-description" label="Description" multiline rows={4} name="description" value={values.description} onChange={handleChange} />
 
                     <Box sx={{ display: "flex", gap: "5px", alignItems: "center" }}>
                         <ButtonUI variant="contained" component="label" htmlFor="file-upload">
                             pictures
                         </ButtonUI>
-                        {pictures.map(file => (
+                        {values.pictures.map(file => (
                             <Typography key={file.name}>
                                 {file.name}
                             </Typography>
                         ))}
-                        <input hidden onChange={(e) => handleFileEvent(e, "pictures")} accept="*" multiple type="file" id="file-upload" />
+                        <input hidden name="pictures" onChange={(e) => handleUploadFiles(e)} accept="*" multiple type="file" id="file-upload" />
                     </Box>
 
                     <Box sx={{ display: "flex", gap: "5px", alignItems: "center" }}>
                         <ButtonUI variant="contained" component="label" htmlFor="diagnostic-upload">
                             Diagnostic
                         </ButtonUI>
-                        {diagnosticFile && <><InsertDriveFileOutlinedIcon /><Typography>{diagnosticFile.name}</Typography></>}
-                        <input hidden accept="*" type="file" id="diagnostic-upload" onChange={(e) => handleFileEvent(e, "diagnostic")} />
+                        {values.diagnostic && <><Typography>{values.diagnostic.name}</Typography></>}
+                        <input hidden name="diagnostic" accept="*" type="file" id="diagnostic-upload" onChange={(e) => handleUploadFile(e)} />
                     </Box>
 
                     <Box sx={{ display: "flex", gap: "5px", alignItems: "center" }}>
                         <ButtonUI variant="contained" component="label" htmlFor="plan-upload">
-                            certification
+                            Plan
                         </ButtonUI>
-                        {planFile && <><InsertDriveFileOutlinedIcon /><Typography>{planFile.name}</Typography></>}
-                        <input hidden accept="*" type="file" id="plan-upload" onChange={(e) => handleFileEvent(e, "plan")} />
+                        {values.plan && <><Typography>{values.plan.name}</Typography></>}
+                        <input hidden name="plan" accept="*" type="file" id="plan-upload" onChange={(e) => handleUploadFile(e)} />
                     </Box>
-
                     <ButtonUI variant="contained" component="label" onClick={onSubmit}>
                         Create project
                     </ButtonUI>
-                    
+                    <ButtonUI variant="contained" component="label" onClick={() => a()}>
+                        Get
+                    </ButtonUI>
                 </FormControl>
+                <CircularIndeterminate loading={loadingIpfs || isLoading} />
             </Box>
-
-
         </CenteredModal>
+
     )
 }
 

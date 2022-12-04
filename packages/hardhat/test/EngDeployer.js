@@ -14,14 +14,14 @@ async function prepare() {
   return { mintAmount, saleAmount, rate, closingTime }
 }
 
-describe("EngDeployer", function () {
+describe("MainContract", function () {
   async function deployFixture() {
 
     const { mintAmount, saleAmount, rate, closingTime } = await prepare()
 
     const [owner, otherAccount] = await ethers.getSigners();
 
-    const Deployer = await ethers.getContractFactory("EngDeployer");
+    const Deployer = await ethers.getContractFactory("MainContract");
     const deployer = await Deployer.deploy(mintAmount, saleAmount, rate, closingTime);
     const Sale = await ethers.getContractFactory("Sale");
     const sale = Sale.attach(await deployer.sale());
@@ -51,7 +51,7 @@ describe("EngDeployer", function () {
       const { mintAmount, saleAmount, rate } = await prepare();
       const latestTime = await time.latest();
 
-      const Deployer = await ethers.getContractFactory("EngDeployer");
+      const Deployer = await ethers.getContractFactory("MainContract");
 
       await expect(Deployer.deploy(mintAmount, saleAmount, rate, latestTime)).to.be.revertedWith(
         "Closing time should be in the future"
@@ -64,7 +64,7 @@ describe("EngDeployer", function () {
       const mintAmount = hre.ethers.utils.parseEther("1");
       const saleAmount = hre.ethers.utils.parseEther("2");
 
-      const Deployer = await ethers.getContractFactory("EngDeployer");
+      const Deployer = await ethers.getContractFactory("MainContract");
 
       await expect(Deployer.deploy(mintAmount, saleAmount, rate, closingTime)).to.be.revertedWith(
         "Mint amount should be higher than sale amount"

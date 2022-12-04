@@ -12,16 +12,21 @@ async function main() {
   const ONE_DAY_IN_SECS = 24 * 60 * 60
   const closingTime = (await time.latest()) + ONE_DAY_IN_SECS
 
-  const EngDeployer = await ethers.getContractFactory("EngDeployer")
-  const engDeployer = await EngDeployer.deploy(mintAmount, saleAmount, rate, closingTime)
-  await engDeployer.deployed()
-  const saleAddress = await engDeployer.sale()
-  const tokenAddress = await engDeployer.token()
+  const MainContract = await ethers.getContractFactory("MainContract")
+  const mainContract = await MainContract.deploy(mintAmount, saleAmount, rate, closingTime)
+  await mainContract.deployed()
+  const saleAddress = await mainContract.sale()
+  const tokenAddress = await mainContract.token()
 
-  await exportAbis(engDeployer.address, "EngDeployer")
+  const EnergyDao = await ethers.getContractFactory("EnergyDao")
+  const energyDao = await EnergyDao.deploy()
+  await energyDao.deployed()
+
+  await exportAbis(mainContract.address, "MainContract")
   await exportAbis(saleAddress, "Sale")
   await exportAbis(tokenAddress, "EEDToken")
-
+  await exportAbis(energyDao.address, "EnergyDao")
+  
 }
 
 /**

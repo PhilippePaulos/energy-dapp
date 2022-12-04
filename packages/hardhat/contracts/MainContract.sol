@@ -7,11 +7,11 @@ import "./Sale.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @title EngDeployer
+ * @title MainContract
  * @dev Deployer mints the eng tokens and creates the token sale. 
  * It holds the remaining tokens
  */
-contract EngDeployer is Ownable{
+contract MainContract is Ownable{
 
     // Amount of tokens to mint
     uint256 public mintAmount;

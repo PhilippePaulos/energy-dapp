@@ -1,7 +1,7 @@
 {
   "31337": {
     "contracts": {
-      "EngDeployer": {
+      "MainContract": {
         "addr": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
         "abi": [
           {
@@ -996,6 +996,351 @@
                 "type": "bool"
               }
             ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+        ]
+      },
+      "EnergyDao": {
+        "addr": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+        "abi": [
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "craftmanAddress",
+                "type": "address"
+              }
+            ],
+            "name": "CraftmanRegistered",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "addressBeneficiary",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "description",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "department",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "enum EnergyDao.Sector",
+                    "name": "sector",
+                    "type": "uint8"
+                  },
+                  {
+                    "internalType": "string[]",
+                    "name": "photos",
+                    "type": "string[]"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "diagnostic",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "plan",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "enum EnergyDao.ProjectStatus",
+                    "name": "status",
+                    "type": "uint8"
+                  }
+                ],
+                "indexed": false,
+                "internalType": "struct EnergyDao.Project",
+                "name": "project",
+                "type": "tuple"
+              }
+            ],
+            "name": "ProjectRegistered",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "idProject",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "idQuotation",
+                "type": "uint256"
+              }
+            ],
+            "name": "QuotationToProjectRegistered",
+            "type": "event"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "_desc",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "_department",
+                "type": "uint256"
+              },
+              {
+                "internalType": "enum EnergyDao.Sector",
+                "name": "_sector",
+                "type": "uint8"
+              },
+              {
+                "internalType": "string[]",
+                "name": "_photos",
+                "type": "string[]"
+              },
+              {
+                "internalType": "string",
+                "name": "_diagnostic",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "_plan",
+                "type": "string"
+              }
+            ],
+            "name": "addProject",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_addr",
+                "type": "address"
+              }
+            ],
+            "name": "checkCraftman",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+              }
+            ],
+            "name": "checkCraftmanQuotation",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+              }
+            ],
+            "name": "checkVotersVoted",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "getData",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+              }
+            ],
+            "name": "getProject",
+            "outputs": [
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "addressBeneficiary",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "name",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "description",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "department",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "enum EnergyDao.Sector",
+                    "name": "sector",
+                    "type": "uint8"
+                  },
+                  {
+                    "internalType": "string[]",
+                    "name": "photos",
+                    "type": "string[]"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "diagnostic",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "plan",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "enum EnergyDao.ProjectStatus",
+                    "name": "status",
+                    "type": "uint8"
+                  }
+                ],
+                "internalType": "struct EnergyDao.Project",
+                "name": "",
+                "type": "tuple"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "_desc",
+                "type": "string"
+              },
+              {
+                "internalType": "uint8",
+                "name": "_price",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint8",
+                "name": "_nbWorkingDays",
+                "type": "uint8"
+              }
+            ],
+            "name": "proposeQuotationToProject",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "_addressCompany",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "_certification",
+                "type": "string"
+              }
+            ],
+            "name": "registerCraftman",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_idProject",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "_idQuotation",
+                "type": "uint256"
+              }
+            ],
+            "name": "setVote",
+            "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
           }

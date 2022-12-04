@@ -12,10 +12,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract Sale is Ownable {
     EEDToken eedToken;
-    uint public closingTime;
-    uint public rate;
+    uint256 public closingTime;
+    uint256 public rate;
     address public tokenWallet;
-    uint public weiRaised;
+    uint256 public weiRaised;
 
     /**
      * Event for token purchase logging
@@ -27,8 +27,8 @@ contract Sale is Ownable {
     event TokenPurchase(
         address purchaser,
         address beneficiary,
-        uint value,
-        uint amount
+        uint256 value,
+        uint256 amount
     );
 
     /**
@@ -40,11 +40,14 @@ contract Sale is Ownable {
      */
     constructor(
         address _tokenAddress,
-        uint _rate,
-        uint _closingTime,
+        uint256 _rate,
+        uint256 _closingTime,
         address _tokenWallet
     ) {
-        require(_closingTime >= block.timestamp, "Closing time should be in the future");
+        require(
+            _closingTime >= block.timestamp,
+            "Closing time should be in the future"
+        );
         require(_rate > 0);
         require(_tokenWallet != address(0));
         require(_tokenAddress != address(0));
@@ -63,7 +66,7 @@ contract Sale is Ownable {
      * @dev receive function
      */
     receive() external payable {}
-   
+
     /**
      * @dev Buy tokens as long as the sale is open
      * @return _tokenAmount
@@ -73,13 +76,13 @@ contract Sale is Ownable {
         payable
         returns (uint256 _tokenAmount)
     {
-        uint weiAmount = msg.value;
+        uint256 weiAmount = msg.value;
 
         require(block.timestamp <= closingTime);
         require(_beneficiary != address(0));
         require(weiAmount != 0);
 
-        uint tokens = msg.value * rate;
+        uint256 tokens = msg.value * rate;
         weiRaised = weiRaised += weiAmount;
 
         eedToken.transferFrom(tokenWallet, msg.sender, tokens);
@@ -92,7 +95,7 @@ contract Sale is Ownable {
      * @dev Checks the amount of tokens left in the allowance.
      * @return Amount of tokens left in the allowance
      */
-    function remainingTokens() public view returns (uint) {
+    function remainingTokens() public view returns (uint256) {
         return eedToken.allowance(tokenWallet, address(this));
     }
 
@@ -113,7 +116,7 @@ contract Sale is Ownable {
         return block.timestamp > closingTime;
     }
 
-    function getRate() public view returns (uint) {
+    function getRate() public view returns (uint256) {
         return rate;
     }
 }

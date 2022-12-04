@@ -65,7 +65,7 @@ contract EnergyDao {
     mapping (address => mapping (uint => bool)) craftmansQuotations;
     mapping (address => mapping (uint => bool)) voters;
 
-    event ProjectRegistered(uint projectId);
+    event ProjectRegistered(Project project);
     event CraftmanRegistered(address craftmanAddress);
     event QuotationToProjectRegistered(uint idProject, uint idQuotation);
 
@@ -119,7 +119,7 @@ contract EnergyDao {
         project.diagnostic = _diagnostic;
         project.plan = _plan;
         projectArray.push(project);
-        emit ProjectRegistered(projectArray.length-1);
+        emit ProjectRegistered(project);
     }
 
     function proposeQuotationToProject(uint _id, string calldata _desc, uint8 _price, uint8 _nbWorkingDays) external onlyCraftman {
@@ -141,9 +141,10 @@ contract EnergyDao {
     function setVote(uint _idProject, uint _idQuotation) external {
         //require(1=1, "Check that the sender as enough token stake to vote");
         require(checkVotersVoted(_idProject) == false, "You already vote for this project");
+    }
 
-
-
+    function getData() public pure returns (uint) {
+        return 1;
     }
 
 }

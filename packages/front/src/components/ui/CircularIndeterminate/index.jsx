@@ -2,6 +2,8 @@ import { Box } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 
 function CircularIndeterminate({ loading }) {
+  console.log("coucou");
+  console.log(loading);
   return (
     <>
       {

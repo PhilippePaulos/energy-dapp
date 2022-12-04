@@ -1,22 +1,17 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { ethers } from "ethers";
 import { useState } from "react";
-import { useAccount, useConnect, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite, useProvider } from "wagmi";
-import { InjectedConnector } from 'wagmi/connectors/injected';
+import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { getContractDescription, getEthValue } from "../../helpers/eth";
-
 import ButtonUI from "../ui/button";
 import CircularIndeterminate from "../ui/CircularIndeterminate";
 import TextFieldUI from "../ui/text-field";
 
 
 function Ico() {
-    const provider = useProvider()
-
     const { address } = useAccount()
     const { chain } = useNetwork()
     const [amount, setAmount] = useState("")
-    console.log(provider);
     const { abi, addr } = getContractDescription('Sale', chain.id)
 
     const { data: data1 } = useContractRead({
@@ -76,4 +71,4 @@ function Ico() {
     )
 }
 
-export default Ico;
+export default Ico

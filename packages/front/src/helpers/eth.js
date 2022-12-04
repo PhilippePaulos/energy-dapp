@@ -14,6 +14,9 @@ function getEthValue(value) {
     return ethers.utils.formatEther(value)
 }
 
+function isAllDefined(values) {
+    return Object.values(values).every(e => e !== null && e !== "")
+}
 
 // TODO do pinata stuff at backend
 const PINATA_KEY = "11ea9686eed0b13e98fd"
@@ -51,5 +54,4 @@ function openIpfsLink(hash) {
     window.open("https://gateway.pinata.cloud/ipfs/QmQ3C2j5ZzHxbdBKPFj6G7s9szwig95iy4MXHMrKcN9cvD")
 }
 
-
-export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink }
+export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined }
