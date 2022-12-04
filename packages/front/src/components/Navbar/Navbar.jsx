@@ -25,6 +25,7 @@ function Navbar() {
         args: [address],
         watch: true
     })
+
     const [anchorEl, setAnchorEl] = useState(null)
 
     const handleClick = (event) => {
@@ -35,11 +36,13 @@ function Navbar() {
         setAnchorEl(null)
     }
 
+
     const open = Boolean(anchorEl)
     const id = open ? 'disconnect-popover' : undefined
 
     const formatedAddr = isConnected ? formatAddress(address) : null
-    const tokens = isConnected ? getEthValue(data) : null
+    
+    const tokens = data ? getEthValue(data) : null
 
     const connectBtn = <ButtonUI size="medium" variant="contained" onClick={() => connect()}>Connect</ButtonUI>
     const addressAvatar =

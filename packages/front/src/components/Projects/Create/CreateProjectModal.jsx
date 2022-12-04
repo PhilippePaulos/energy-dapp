@@ -1,5 +1,6 @@
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { Box, FormControl, MenuItem, Typography } from "@mui/material";
+import { Contract } from 'ethers';
 import { useState } from "react";
 import { uploadIpfsFile } from '../../../helpers/eth';
 import ButtonUI from "../../ui/button";
@@ -45,6 +46,7 @@ function CreateProjectModal(props) {
         const planHash = uploadIpfsFile(planFile)
         const promises = pictures.map((picture) => uploadIpfsFile(picture))
         const picturesHashes = await Promise.all(promises)
+        console.log(picturesHashes);        
         //TODO call contract
     }
 

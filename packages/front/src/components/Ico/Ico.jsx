@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { ethers } from "ethers";
-import { useCallback, useEffect, useState } from "react";
-import { useAccount, useContract, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite, useProvider } from "wagmi";
+import { useState } from "react";
+import { useAccount, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { getContractDescription, getEthValue } from "../../helpers/eth";
 import ButtonUI from "../ui/button";
 import CircularIndeterminate from "../ui/CircularIndeterminate";
@@ -22,20 +22,23 @@ function Ico() {
 
     const reads = useContractReads({
         contracts: [
-          {
-            ...saleContract,
-            functionName: 'remainingTokens',
-          },
-          {
-            ...saleContract,
-            functionName: 'rate',
-          },
+            {
+                ...saleContract,
+                functionName: 'remainingTokens',
+            },
+            {
+                ...saleContract,
+                functionName: 'rate',
+            },
         ],
         watch: true,
     })
 
+    const remainingTokens = getEthValue(reads.data[0])
     const rate = reads.data[1].toNumber()
+    const tokensToBuy = amount * rate
 
+    console.log(amount > 0 && tokensToBuy <= remainingTokens);
     const { config } = usePrepareContractWrite({
         address: addr,
         abi: abi,
@@ -43,35 +46,35 @@ function Ico() {
         args: [address],
         overrides: {
             from: address,
-            value: !amount ? null : ethers.utils.parseEther(amount),
+            value: !amount ? undefined : ethers.utils.parseEther(amount),
         },
-        enabled: false,
+        enabled: amount > 0 && tokensToBuy <= remainingTokens,
     })
     const { write, isLoading } = useContractWrite(config)
 
     const onInputChange = (event) => {
-        if(/^[1-9]\d*$/.test(event.target.value)) {
+        if (/^[1-9]\d*$/.test(event.target.value)) {
             setAmount((parseFloat(event.target.value) * rate).toString());
         }
     };
 
     const handleSubmit = async (event) => {
-        console.log(amount);
+        console.log("amount", amount);
         event.preventDefault();
         write?.()
     }
 
     return (
         <Grid container>
-            <Grid item margin={"auto"} sx={{display:"flex", gap: "5px", flexDirection: "column", textAlign: "left"}}>
+            <Grid item margin={"auto"} sx={{ display: "flex", gap: "5px", flexDirection: "column", textAlign: "left" }}>
                 <Typography variant="h6">Sale Price:  1 ETH = {rate} EED</Typography>
-                <Typography variant="h6">Remaining tokens: {getEthValue(reads.data[0])}</Typography>
+                <Typography variant="h6">Remaining tokens: {remainingTokens}</Typography>
                 <Box component="form" noValidate autoComplete="off">
                     <TextFieldUI id="amount" label="EED amount" onChange={onInputChange} />
                 </Box>
                 <ButtonUI size="medium" variant="contained" onClick={(e) => handleSubmit(e)}>Buy {amount} EED</ButtonUI>
             </Grid>
-            <CircularIndeterminate loading={isLoading}/>
+            <CircularIndeterminate loading={isLoading} />
         </Grid>
     )
 }

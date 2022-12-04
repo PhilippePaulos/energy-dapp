@@ -1,19 +1,19 @@
-const { network, ethers, artifacts } = require("hardhat");
+const { network, ethers, artifacts } = require("hardhat")
 const {
   time,
-} = require("@nomicfoundation/hardhat-network-helpers");
-const path = require("path");
+} = require("@nomicfoundation/hardhat-network-helpers")
+const path = require("path")
 
 async function main() {
 
-  const mintAmount = ethers.utils.parseEther("10000");
-  const saleAmount = ethers.utils.parseEther("100");
-  const rate = 1;
-  const ONE_DAY_IN_SECS = 24 * 60 * 60;
-  const closingTime = (await time.latest()) + ONE_DAY_IN_SECS;
+  const mintAmount = ethers.utils.parseEther("10000")
+  const saleAmount = ethers.utils.parseEther("100")
+  const rate = 1
+  const ONE_DAY_IN_SECS = 24 * 60 * 60
+  const closingTime = (await time.latest()) + ONE_DAY_IN_SECS
 
-  const EngDeployer = await ethers.getContractFactory("EngDeployer");
-  const engDeployer = await EngDeployer.deploy(mintAmount, saleAmount, rate, closingTime);
+  const EngDeployer = await ethers.getContractFactory("EngDeployer")
+  const engDeployer = await EngDeployer.deploy(mintAmount, saleAmount, rate, closingTime)
   await engDeployer.deployed()
   const saleAddress = await engDeployer.sale()
   const tokenAddress = await engDeployer.token()
@@ -34,12 +34,12 @@ async function exportAbis(contractAddress, contract) {
   const contractsDir = path.join(__dirname, "..", "..", "front", "src", "contracts");
 
   if (!fs.existsSync(contractsDir)) {
-    fs.mkdirSync(contractsDir);
+    fs.mkdirSync(contractsDir)
   }
 
   const artifact = artifacts.readArtifactSync(contract);
 
-  let chainId = network.config.chainId;
+  let chainId = network.config.chainId
   let jsonData
 
   if (fs.existsSync(path.join(contractsDir, "contracts.json"))) {
@@ -58,7 +58,7 @@ async function exportAbis(contractAddress, contract) {
     chain["contracts"] = contracts
     jsonData[chainId] = chain
   }
-  console.log(jsonData[chainId]);
+  console.log(jsonData[chainId])
 
   jsonData[chainId]['contracts'][contract] = {
     'addr': contractAddress,
@@ -74,6 +74,6 @@ async function exportAbis(contractAddress, contract) {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
-    process.exit(1);
+    console.error(error)
+    process.exit(1)
   });
