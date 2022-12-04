@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { ethers } from "ethers";
 import { useState } from "react";
-import { useAccount, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
+import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { getContractDescription, getEthValue } from "../../helpers/eth";
 import ButtonUI from "../ui/button";
 import CircularIndeterminate from "../ui/CircularIndeterminate";
@@ -20,25 +20,24 @@ function Ico() {
         abi: abi,
     }
 
-    const reads = useContractReads({
+    const {data} = useContractReads({
         contracts: [
-            {
-                ...saleContract,
-                functionName: 'remainingTokens',
-            },
             {
                 ...saleContract,
                 functionName: 'rate',
             },
+            {
+                ...saleContract,
+                functionName: "remainingTokens",
+            }
         ],
         watch: true,
     })
 
-    const remainingTokens = getEthValue(reads.data[0])
-    const rate = reads.data[1].toNumber()
+    const remainingTokens = getEthValue(data[1])
+    const rate = data[0].toNumber()
     const tokensToBuy = amount * rate
 
-    console.log(amount > 0 && tokensToBuy <= remainingTokens);
     const { config } = usePrepareContractWrite({
         address: addr,
         abi: abi,

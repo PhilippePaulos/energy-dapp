@@ -47,9 +47,9 @@ async function uploadIpfsFile(file) {
     return `ipfs://${resFile.data.IpfsHash}`;
 }
 
-function getIpfsLink(hash) {
-    return `https://gateway.pinata.cloud/ipfs/${hash}`
+function openIpfsLink(hash) {
+    window.open("https://gateway.pinata.cloud/ipfs/QmQ3C2j5ZzHxbdBKPFj6G7s9szwig95iy4MXHMrKcN9cvD")
 }
 
 
-export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, getIpfsLink }
+export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink }
