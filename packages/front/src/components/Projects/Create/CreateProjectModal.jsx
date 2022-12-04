@@ -90,11 +90,6 @@ function CreateProjectModal(props) {
         }
     }
 
-    function a(){
-        console.log("loading", isLoading);
-        console.log("ipfs", loadingIpfs);
-    }
-
     return (
         <CenteredModal
             open={open}
@@ -121,7 +116,7 @@ function CreateProjectModal(props) {
 
                     <Box sx={{ display: "flex", gap: "5px", alignItems: "center" }}>
                         <ButtonUI variant="contained" component="label" htmlFor="file-upload">
-                            pictures
+                            Photos
                         </ButtonUI>
                         {values.pictures.map(file => (
                             <Typography key={file.name}>
@@ -133,7 +128,7 @@ function CreateProjectModal(props) {
 
                     <Box sx={{ display: "flex", gap: "5px", alignItems: "center" }}>
                         <ButtonUI variant="contained" component="label" htmlFor="diagnostic-upload">
-                            Diagnostic
+                            DPE
                         </ButtonUI>
                         {values.diagnostic && <><Typography>{values.diagnostic.name}</Typography></>}
                         <input hidden name="diagnostic" accept="*" type="file" id="diagnostic-upload" onChange={(e) => handleUploadFile(e)} />
@@ -148,9 +143,6 @@ function CreateProjectModal(props) {
                     </Box>
                     <ButtonUI variant="contained" component="label" onClick={onSubmit}>
                         Create project
-                    </ButtonUI>
-                    <ButtonUI variant="contained" component="label" onClick={() => a()}>
-                        Get
                     </ButtonUI>
                 </FormControl>
                 <CircularIndeterminate loading={loadingIpfs || isLoading} />

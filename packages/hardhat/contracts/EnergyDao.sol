@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity^0.8.9;
+pragma solidity ^0.8.9;
 
 contract EnergyDao {
-
-
     enum ProjectStatus {
         Registered,
         QuotationRegistrationStarted,
@@ -36,7 +34,7 @@ contract EnergyDao {
         address addressBeneficiary;
         string name;
         string description;
-        uint department;
+        uint256 department;
         Sector sector;
         string[] photos;
         string diagnostic;
@@ -54,20 +52,26 @@ contract EnergyDao {
         string name;
         string addressCompany;
         string certification;
-        uint nbProjectsValidated;
-        uint[] quotationProposed;
+        uint256 nbProjectsValidated;
+        uint256[] quotationProposed;
     }
 
     Craftman[] craftmanArray;
     Project[] projectArray;
-    mapping (address => Craftman) craftmans;
-    mapping (uint => Quotation[]) projectQuotationsArray;
-    mapping (address => mapping (uint => bool)) craftmansQuotations;
-    mapping (address => mapping (uint => bool)) voters;
+    mapping(address => Craftman) craftmans;
+    mapping(uint256 => Quotation[]) projectQuotationsArray;
+    mapping(address => mapping(uint256 => bool)) craftmansQuotations;
+    mapping(address => mapping(uint256 => bool)) voters;
 
-    event ProjectRegistered(Project project);
+    event ProjectRegistered(
+        address addressBeneficiary,
+        string name,
+        Sector sector,
+        ProjectStatus status,
+        uint256 id
+    );
     event CraftmanRegistered(address craftmanAddress);
-    event QuotationToProjectRegistered(uint idProject, uint idQuotation);
+    event QuotationToProjectRegistered(uint256 idProject, uint256 idQuotation);
 
     modifier onlyCraftman() {
         require(checkCraftman(msg.sender), "You are not a craftman");
@@ -76,10 +80,9 @@ contract EnergyDao {
 
     // ::::::::::::: GETTERS ::::::::::::: //
 
-    function getProject(uint _id) public view returns (Project memory) {
+    function getProject(uint256 _id) public view returns (Project memory) {
         return projectArray[_id];
     }
-
 
     // ::::::::::::: CHECKERS ::::::::::::: //
 
@@ -87,26 +90,38 @@ contract EnergyDao {
         return bytes(craftmans[_addr].name).length > 0;
     }
 
-    function checkVotersVoted(uint _id) public view returns (bool) {
+    function checkVotersVoted(uint256 _id) public view returns (bool) {
         return voters[msg.sender][_id];
     }
 
-    function checkCraftmanQuotation(uint _id) public view  returns (bool) {
+    function checkCraftmanQuotation(uint256 _id) public view returns (bool) {
         return craftmansQuotations[msg.sender][_id];
     }
 
-
-    function registerCraftman(string calldata _name, string calldata _addressCompany, string calldata _certification) external {
-        require(checkCraftman(msg.sender) != true, "Already registered as craftman");
+    function registerCraftman(
+        string calldata _name,
+        string calldata _addressCompany,
+        string calldata _certification
+    ) external {
+        require(
+            checkCraftman(msg.sender) != true,
+            "Already registered as craftman"
+        );
         craftmans[msg.sender].name = _name;
         craftmans[msg.sender].certification = _certification;
         craftmans[msg.sender].addressCompany = _addressCompany;
         emit CraftmanRegistered(msg.sender);
-
     }
 
-    function addProject(string calldata _name, string calldata _desc, uint _department, Sector _sector,
-     string[] memory _photos, string calldata _diagnostic, string calldata _plan) external {
+    function addProject(
+        string calldata _name,
+        string calldata _desc,
+        uint256 _department,
+        Sector _sector,
+        string[] memory _photos,
+        string calldata _diagnostic,
+        string calldata _plan
+    ) external {
         require(projectArray.length <= 1000, "Project list is full");
         //require(1=1, "Check that the sender as enough token stake to propose a project");
         Project memory project;
@@ -119,32 +134,57 @@ contract EnergyDao {
         project.diagnostic = _diagnostic;
         project.plan = _plan;
         projectArray.push(project);
-        emit ProjectRegistered(project);
+        emit ProjectRegistered(
+            msg.sender,
+            _name,
+            _sector,
+            ProjectStatus.Registered,
+            projectArray.length-1
+        );
     }
 
-    function proposeQuotationToProject(uint _id, string calldata _desc, uint8 _price, uint8 _nbWorkingDays) external onlyCraftman {
+    function proposeQuotationToProject(
+        uint256 _id,
+        string calldata _desc,
+        uint8 _price,
+        uint8 _nbWorkingDays
+    ) external onlyCraftman {
         //require(1=1, "Check that the sender as enough token stake to propose a quotation");
         require(_id < projectArray.length, "Project doesn't exists");
-        require(projectQuotationsArray[_id].length <= 10, "Quotation list for this project is full");
-        require(projectArray[_id].addressBeneficiary != msg.sender, "You can't propose quotation for your project");
-        require(checkCraftmanQuotation(_id) == false, "You already proposed a quotation for this project");
-        
+        require(
+            projectQuotationsArray[_id].length <= 10,
+            "Quotation list for this project is full"
+        );
+        require(
+            projectArray[_id].addressBeneficiary != msg.sender,
+            "You can't propose quotation for your project"
+        );
+        require(
+            checkCraftmanQuotation(_id) == false,
+            "You already proposed a quotation for this project"
+        );
+
         Quotation memory quotation;
         quotation.description = _desc;
         quotation.price = _price;
         quotation.nbWorkingDays = _nbWorkingDays;
         craftmans[msg.sender].quotationProposed.push(_id);
         projectQuotationsArray[_id].push(quotation);
-        emit QuotationToProjectRegistered(_id, projectQuotationsArray[_id].length-1);
+        emit QuotationToProjectRegistered(
+            _id,
+            projectQuotationsArray[_id].length - 1
+        );
     }
 
-    function setVote(uint _idProject, uint _idQuotation) external {
+    function setVote(uint256 _idProject, uint256 _idQuotation) external {
         //require(1=1, "Check that the sender as enough token stake to vote");
-        require(checkVotersVoted(_idProject) == false, "You already vote for this project");
+        require(
+            checkVotersVoted(_idProject) == false,
+            "You already vote for this project"
+        );
     }
 
-    function getData() public pure returns (uint) {
+    function getData() public pure returns (uint256) {
         return 1;
     }
-
 }
