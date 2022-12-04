@@ -1,10 +1,11 @@
-import { Box, Grid, Link, MenuItem, Select, styled, Typography } from "@mui/material";
+import { Grid, Link } from "@mui/material";
 import { useAccount } from "wagmi";
 import NotConnected from "../Notices/NotConnected";
 
 function Home() {
 
     const { isConnected } = useAccount()
+
     if (isConnected) {
         return (
             <>
@@ -15,7 +16,6 @@ function Home() {
 
             </>
         )
-
     }
     else {
         return (

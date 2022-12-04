@@ -4,18 +4,16 @@ import { CssBaseline } from '@mui/material/';
 import { Grid } from "@mui/material";
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { chain, configureChains, createClient, defaultChains, useAccount, WagmiConfig } from 'wagmi';
-import { InjectedConnector } from 'wagmi/connectors/injected';
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { publicProvider } from 'wagmi/providers/public';
 import './App.css';
-import { CreateCraftsman } from "./components/Craftsman/Create";
+import DisplayCraftsman from "./components/Craftsman/Display/DisplayCraftsman";
 import Home from "./components/Home/Home";
 import Ico from "./components/Ico/Ico";
 import { Navbar } from "./components/Navbar";
-import { CreateProject } from "./components/Projects/Create";
+import { DisplayProjects } from "./components/Projects/Display";
 import { theme } from './components/theme';
 import AppProvider from './contexts/AppContext/AppProvider';
-import { DisplayProjects } from "./components/Projects/Display";
-import DisplayCraftsman from "./components/Craftsman/Display/DisplayCraftsman";
 
 // TODO add alchemy provider
 const { chains, provider } = configureChains([chain.hardhat, ...defaultChains], [
@@ -24,7 +22,7 @@ const { chains, provider } = configureChains([chain.hardhat, ...defaultChains], 
 
 const client = createClient({
   autoConnect: true,
-  connectors: [new InjectedConnector({ chains })],
+  connectors: [new MetaMaskConnector({ chains })],
   provider
 });
 

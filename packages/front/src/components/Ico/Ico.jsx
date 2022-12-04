@@ -1,41 +1,39 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { ethers } from "ethers";
 import { useState } from "react";
-import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
+import { useAccount, useConnect, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite, useProvider } from "wagmi";
+import { InjectedConnector } from 'wagmi/connectors/injected';
 import { getContractDescription, getEthValue } from "../../helpers/eth";
+
 import ButtonUI from "../ui/button";
 import CircularIndeterminate from "../ui/CircularIndeterminate";
 import TextFieldUI from "../ui/text-field";
 
 
 function Ico() {
+    const provider = useProvider()
 
     const { address } = useAccount()
     const { chain } = useNetwork()
     const [amount, setAmount] = useState("")
-
+    console.log(provider);
     const { abi, addr } = getContractDescription('Sale', chain.id)
-    const saleContract = {
+
+    const { data: data1 } = useContractRead({
         address: addr,
         abi: abi,
-    }
-
-    const {data} = useContractReads({
-        contracts: [
-            {
-                ...saleContract,
-                functionName: 'rate',
-            },
-            {
-                ...saleContract,
-                functionName: "remainingTokens",
-            }
-        ],
-        watch: true,
+        functionName: "remainingTokens",
+        watch: true
     })
 
-    const remainingTokens = getEthValue(data[1])
-    const rate = data[0].toNumber()
+    const { data: data2 } = useContractRead({
+        address: addr,
+        abi: abi,
+        functionName: "rate",
+    })
+
+    const remainingTokens = getEthValue(data1)
+    const rate = data2.toNumber()
     const tokensToBuy = amount * rate
 
     const { config } = usePrepareContractWrite({

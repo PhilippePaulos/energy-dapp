@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
 
-contract EngToken is ERC20, ERC20Permit, ERC20Votes {
+contract EEDToken is ERC20, ERC20Permit, ERC20Votes {
  
-    constructor(uint256 _mintAmount) ERC20("EngToken", "ENG") ERC20Permit("EngToken") {
+    constructor(uint256 _mintAmount) ERC20("EEDToken", "ENG") ERC20Permit("EEDToken") {
             _mint(msg.sender, _mintAmount); 
     }
     

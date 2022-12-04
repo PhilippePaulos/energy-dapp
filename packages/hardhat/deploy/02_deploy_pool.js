@@ -30,10 +30,10 @@ module.exports = async (hre) => {
 
     // const tether = await (await hre.ethers.getContractFactory('Tether', owner)).deploy()
     // await tether.connect(owner).mint(signer2.address, hre.ethers.utils.parseEther('100000'))
-    // const engToken = await (await hre.ethers.getContractFactory('EngToken')).deploy()
+    // const eedToken = await (await hre.ethers.getContractFactory('EEDToken')).deploy()
 
     // const tether_address = tether.address
-    // const eng_address = engToken.address
+    // const eng_address = eedToken.address
     // console.log('TETHER_ADDRESS =', tether_address)
     // console.log('ENG_TOKEN_ADDRESS =', eng_address)
 
@@ -48,7 +48,7 @@ module.exports = async (hre) => {
     // console.log("POOL_ADDRESS = ", poolAddress);
 
      // await tether.connect(signer2).approve(POSITION_MANAGER_ADDRESS, hre.ethers.utils.parseEther('1000'))
-    // await engToken.connect(signer2).approve(POSITION_MANAGER_ADDRESS, hre.ethers.utils.parseEther('1000'))
+    // await eedToken.connect(signer2).approve(POSITION_MANAGER_ADDRESS, hre.ethers.utils.parseEther('1000'))
 
     // const poolContract = new Contract(poolAddress, artifacts.UniswapV3Pool.abi, provider)
     // console.log(poolContract);

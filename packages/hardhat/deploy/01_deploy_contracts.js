@@ -20,7 +20,7 @@ async function main() {
 
   await exportAbis(engDeployer.address, "EngDeployer")
   await exportAbis(saleAddress, "Sale")
-  await exportAbis(tokenAddress, "EngToken")
+  await exportAbis(tokenAddress, "EEDToken")
 
 }
 

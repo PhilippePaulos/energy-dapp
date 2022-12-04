@@ -137,7 +137,7 @@
             "name": "token",
             "outputs": [
               {
-                "internalType": "contract EngToken",
+                "internalType": "contract EEDToken",
                 "name": "",
                 "type": "address"
               }
@@ -403,7 +403,7 @@
           }
         ]
       },
-      "EngToken": {
+      "EEDToken": {
         "addr": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
         "abi": [
           {

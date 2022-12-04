@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import "./EngToken.sol";
+import "./EEDToken.sol";
 import "./Sale.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -21,7 +21,7 @@ contract EngDeployer is Ownable{
 
     Sale public sale;
 
-    EngToken public token;
+    EEDToken public token;
 
     /**
      * @dev Constructor
@@ -32,7 +32,7 @@ contract EngDeployer is Ownable{
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
         mintAmount = _mintAmount;
         saleAmount = _saleAmount;
-        token = new EngToken(_mintAmount);
+        token = new EEDToken(_mintAmount);
         sale = new Sale(address(token), _saleRate, _saleClosingTime, address(this));
         token.approve(address(sale), _saleAmount);
     }

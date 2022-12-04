@@ -16,7 +16,7 @@ function Navbar() {
     })
     const { chain } = useNetwork()
 
-    const { abi, addr } = !isConnected ? {} : getContractDescription('EngToken', chain.id)
+    const { abi, addr } = !isConnected ? {} : getContractDescription('EEDToken', chain.id)
 
     const { data } = useContractRead({
         address: addr,

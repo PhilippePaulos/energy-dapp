@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "./EngToken.sol";
+import "./EEDToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * An allowance is given by the contract holding the tokens to the Sale contract so it can sell a given amount of tokens
  */
 contract Sale is Ownable {
-    EngToken engToken;
+    EEDToken eedToken;
     uint public closingTime;
     uint public rate;
     address public tokenWallet;
@@ -48,7 +48,7 @@ contract Sale is Ownable {
         require(_rate > 0);
         require(_tokenWallet != address(0));
         require(_tokenAddress != address(0));
-        engToken = EngToken(_tokenAddress);
+        eedToken = EEDToken(_tokenAddress);
         rate = _rate;
         closingTime = _closingTime;
         tokenWallet = _tokenWallet;
@@ -82,7 +82,7 @@ contract Sale is Ownable {
         uint tokens = msg.value * rate;
         weiRaised = weiRaised += weiAmount;
 
-        engToken.transferFrom(tokenWallet, msg.sender, tokens);
+        eedToken.transferFrom(tokenWallet, msg.sender, tokens);
         emit TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
 
         return tokens;
@@ -93,7 +93,7 @@ contract Sale is Ownable {
      * @return Amount of tokens left in the allowance
      */
     function remainingTokens() public view returns (uint) {
-        return engToken.allowance(tokenWallet, address(this));
+        return eedToken.allowance(tokenWallet, address(this));
     }
 
     /**
