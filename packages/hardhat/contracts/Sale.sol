@@ -85,7 +85,7 @@ contract Sale is Ownable {
         uint256 tokens = msg.value * rate;
         weiRaised = weiRaised += weiAmount;
 
-        eedToken.transferFrom(tokenWallet, msg.sender, tokens);
+        eedToken.transferFrom(tokenWallet, _beneficiary, tokens);
         emit TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
 
         return tokens;
