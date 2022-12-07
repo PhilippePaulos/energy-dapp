@@ -51,9 +51,9 @@ async function main() {
 async function prepareData(energyDao, eedToken, governor, sale) {
   const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners()
 
-  await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('1')})
-  await sale.buyTokens(addr3.address, {value: ONE_ETHER})
-  await sale.buyTokens(addr3.address, {value: ONE_ETHER})
+  await sale.buyTokens(addr1.address, { value: ONE_ETHER })
+  await sale.buyTokens(addr3.address, { value: ONE_ETHER })
+  await sale.buyTokens(addr3.address, { value: ONE_ETHER })
 
   console.log("Register craftsmans...")
   await energyDao.connect(addr1).registerCraftsman("Jean", "7 rue du Maine", IPFS_IMG)
