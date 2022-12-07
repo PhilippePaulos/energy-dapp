@@ -2,7 +2,7 @@ const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers"
 const { expect } = require("chai")
 const { BigNumber } = require("ethers")
 const { ethers } = require("hardhat")
-const { ONE_ETHER, getBalance, BURN_ADDRESS } = require("./helpers")
+const { ONE_ETHER, getBalance, BURN_ADDRESS } = require("../helpers/common")
 
 const provider = ethers.provider
 
@@ -21,7 +21,6 @@ async function deployFixture() {
 
   const EEDToken = await ethers.getContractFactory("EEDToken")
   const token = await EEDToken.deploy(mintAmount)
-
 
   const Sale = await ethers.getContractFactory("Sale")
 

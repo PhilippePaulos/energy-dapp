@@ -1,7 +1,7 @@
 const {time,loadFixture} = require("@nomicfoundation/hardhat-network-helpers");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { getBalance } = require("./helpers");
+const { getBalance } = require("../helpers/common");
 
 const provider = ethers.provider
 

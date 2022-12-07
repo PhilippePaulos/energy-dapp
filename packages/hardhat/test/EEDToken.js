@@ -4,7 +4,7 @@ const {
 } = require("@nomicfoundation/hardhat-network-helpers");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { ONE_ETHER } = require("./helpers");
+const { ONE_ETHER } = require("../helpers/common");
 
 
 async function deployFixture() {
