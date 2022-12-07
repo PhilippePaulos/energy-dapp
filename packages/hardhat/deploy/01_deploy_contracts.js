@@ -9,8 +9,8 @@ const IPFS_IMG = "ipfs://bafybeibrzm2h3z37eaxqvofioxfythtv6fhdq7acdzwgukpoupsdcj
 
 async function main() {
 
-  const mintAmount = ethers.utils.parseEther("400000")
-  const saleAmount = ethers.utils.parseEther("200000")
+  const mintAmount = ethers.utils.parseEther("100000")
+  const saleAmount = ethers.utils.parseEther("100000")
   // 1ETH -> 200 EED
   const rate = 200
   const ONE_DAY_IN_SECS = 24 * 60 * 60
@@ -51,9 +51,9 @@ async function main() {
 async function prepareData(energyDao, eedToken, governor, sale) {
   const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners()
 
-  await sale.buyTokens(addr1.address, { value: ONE_ETHER })
-  await sale.buyTokens(addr3.address, { value: ONE_ETHER })
-  await sale.buyTokens(addr3.address, { value: ONE_ETHER })
+  await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('150') })
+  await sale.buyTokens(addr2.address, { value: ethers.utils.parseEther('150') })
+  await sale.buyTokens(addr3.address, { value: ethers.utils.parseEther('150') })
 
   console.log("Register craftsmans...")
   await energyDao.connect(addr1).registerCraftsman("Jean", "7 rue du Maine", IPFS_IMG)
@@ -63,13 +63,12 @@ async function prepareData(energyDao, eedToken, governor, sale) {
 
   console.log("Validate craftsman via governor instance....")
   // transfer tokens to reach quorum
-  await energyDao.transfer(addr1.address, ethers.utils.parseEther('30000'))
+  // await energyDao.transfer(addr1.address, ethers.utils.parseEther('30000'))
   await eedToken.connect(addr1).delegate(addr1.address)
 
   const { proposalId, descriptionHash, encodedFuncs } = await proposeVote(
     governor, [energyDao, energyDao, energyDao], ["validateCraftsman", "validateCraftsman", "validateCraftsman"],
     [[addr1.address], [addr2.address], [addr3.address]], [0, 0, 0], "validate some craftsmans")
-
 
   await governor.connect(addr1).castVote(proposalId, Votes.For)
 
@@ -87,6 +86,8 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
 
   console.log("Projects created")
+
+  
 }
 
 main()
