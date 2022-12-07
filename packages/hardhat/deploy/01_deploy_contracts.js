@@ -3,17 +3,16 @@ const {
   time,
 } = require("@nomicfoundation/hardhat-network-helpers")
 const { proposeVote, Votes } = require('../helpers/governor')
-const { exportAbis } = require("../helpers/common")
+const { exportAbis, ONE_ETHER } = require("../helpers/common")
 
 const IPFS_IMG = "ipfs://bafybeibrzm2h3z37eaxqvofioxfythtv6fhdq7acdzwgukpoupsdcjecny/"
 
 async function main() {
 
-  const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners()
-
   const mintAmount = ethers.utils.parseEther("100")
   const saleAmount = ethers.utils.parseEther("1")
-  const rate = 1
+  // 1ETH -> 200 EED
+  const rate = 200
   const ONE_DAY_IN_SECS = 24 * 60 * 60
   const closingTime = (await time.latest()) + ONE_DAY_IN_SECS
 
@@ -35,20 +34,26 @@ async function main() {
 
   if (network.config.chainId == 31337) {
     console.log("Prepare data");
-    prepareData(energyDao, eedToken, governor)
+    prepareData(energyDao, eedToken, governor, sale)
   }
 
   console.log("Export ABIs to front folder...");
-  await exportAbis(sale.address, "Sale")
-  await exportAbis(eedToken.address, "EEDToken")
-  await exportAbis(energyDao.address, "EnergyDao")
-  await exportAbis(governor.address, "EnergyDao")
+
+
+  await exportAbis(await sale.address, "Sale")
+  await exportAbis(await eedToken.address, "EEDToken")
+  await exportAbis(await energyDao.address, "EnergyDao")
+  await exportAbis(await governor.address, "EnergyGovernor")
   console.log("ABIs exported");
 
 }
 
-async function prepareData(energyDao, eedToken, governor) {
+async function prepareData(energyDao, eedToken, governor, sale) {
   const [addr1, addr2, addr3, addr4] = await ethers.getSigners()
+
+  await sale.buyTokens(addr2.address, {value: ONE_ETHER})
+  await sale.buyTokens(addr3.address, {value: ONE_ETHER})
+  await sale.buyTokens(addr3.address, {value: ONE_ETHER})
 
   console.log("Register craftsmans...");
   await energyDao.connect(addr1).registerCraftsman("Jean", "7 rue du Maine", IPFS_IMG)
