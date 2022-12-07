@@ -36,21 +36,21 @@ contract EnergyDao is Ownable {
         string plan;
         ProjectStatus status;
         uint8 nbQuotations;
-        address choosedCraftman;
+        address choosedCraftsman;
     }
 
     struct Quotation {
-        address craftmanAddr;
+        address craftsmanAddr;
         string description;
         string documentHash;
-        uint8 price;
+        uint price;
         uint128 nbCee;
         bool isValidated;
         uint256 proposalId;
     }
 
-    struct Craftman {
-        address craftmanAddr;
+    struct Craftsman {
+        address craftsmanAddr;
         string name;
         string addressCompany;
         string certification;
@@ -59,8 +59,9 @@ contract EnergyDao is Ownable {
     }
 
     Project[] public projects;
-    mapping(address => Craftman) public craftmans;
+    mapping(address => Craftsman) public craftsmans;
     mapping(uint256 => mapping(address => Quotation)) quotations;
+        
     EnergyGovernor public governor;
 
     // Amount of tokens to mint
@@ -83,11 +84,11 @@ contract EnergyDao is Ownable {
         ProjectStatus status
     );
 
-    event CraftmanRegistered(address craftmanAddress);
-    event QuotationRegistred(uint256 idProject, address craftmanAddr);
+    event CraftsmanRegistered(address craftsmanAddress);
+    event QuotationRegistred(uint256 idProject, address craftsmanAddr);
 
-    modifier onlyValidatedCraftman() {
-        require(isCraftmanValidated(msg.sender), "You are not a validated craftman");
+    modifier onlyValidatedCraftsman() {
+        require(isCraftsmanValidated(msg.sender), "You are not a validated craftsman");
         _;
     }
 
@@ -101,8 +102,9 @@ contract EnergyDao is Ownable {
         uint _saleAmount,
         uint _saleRate,
         uint _saleClosingTime,
-        uint256 _timeToPropose,
-        uint256 _timeToVote
+        uint _timeToPropose,
+        uint _timeToVote,
+        uint _votingPeriod 
     ) {
         // todo ajouter require sur time
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
@@ -111,32 +113,32 @@ contract EnergyDao is Ownable {
         token.approve(address(sale), _saleAmount);
         timeToPropose = _timeToPropose;
         timeToVote = _timeToVote;
-        governor = new EnergyGovernor(token, 0, _timeToVote);
+        governor = new EnergyGovernor(token, 0, _votingPeriod);
     }
 
-    function registerCraftman(
+    function registerCraftsman(
         string calldata _name,
         string calldata _addressCompany,
         string calldata _certification
     ) external {
         require(
-            craftmans[msg.sender].craftmanAddr == address(0),
-            "Already registered as craftman"
+            craftsmans[msg.sender].craftsmanAddr == address(0),
+            "Already registered as craftsman"
         );
-        craftmans[msg.sender].craftmanAddr = msg.sender;
-        craftmans[msg.sender].name = _name;
-        craftmans[msg.sender].addressCompany = _addressCompany;
-        craftmans[msg.sender].certification = _certification;
+        craftsmans[msg.sender].craftsmanAddr = msg.sender;
+        craftsmans[msg.sender].name = _name;
+        craftsmans[msg.sender].addressCompany = _addressCompany;
+        craftsmans[msg.sender].certification = _certification;
 
-        emit CraftmanRegistered(msg.sender);
+        emit CraftsmanRegistered(msg.sender);
     }
 
-    function isCraftmanValidated(address _address) public view returns(bool) {
-        return craftmans[_address].isValidated;
+    function isCraftsmanValidated(address _address) public view returns(bool) {
+        return craftsmans[_address].isValidated;
     }
 
-    function validateCraftman(address _addr) public onlyGovernor {
-        craftmans[_addr].isValidated = true;
+    function validateCraftsman(address _addr) public onlyGovernor {
+        craftsmans[_addr].isValidated = true;
     }
 
     function addProject(
@@ -173,9 +175,9 @@ contract EnergyDao is Ownable {
         uint256 _id,
         string calldata _description,
         string calldata _docHash,
-        uint8 _price,
+        uint _price,
         uint128 _nbCee
-    ) external onlyValidatedCraftman {
+    ) external onlyValidatedCraftsman {
         //require(1=1, "Check that the sender as enough token stake to propose a quotation");
         // require parameters not empty
         require(_id < projects.length, "Project doesn't exists");
@@ -188,12 +190,12 @@ contract EnergyDao is Ownable {
             "You can't propose quotation for your project"
         );
         require(
-            quotations[_id][msg.sender].craftmanAddr == address(0),
+            quotations[_id][msg.sender].craftsmanAddr == address(0),
             "You already proposed a quotation for this project"
         );
 
         Quotation memory quotation;
-        quotation.craftmanAddr = msg.sender;
+        quotation.craftsmanAddr = msg.sender;
         quotation.documentHash = _docHash;
         quotation.price = _price;
         quotation.nbCee = _nbCee;
@@ -213,7 +215,7 @@ contract EnergyDao is Ownable {
         } else {
             project.status = ProjectStatus.Rejected;
         }
-        craftmans[project.choosedCraftman].nbProjectsValidated += 1;
+        craftsmans[project.choosedCraftsman].nbProjectsValidated += 1;
     }
 
      /**

@@ -11,7 +11,7 @@ contract EnergyGovernor is Governor, GovernorSettings, GovernorCountingSimple, G
     constructor(IVotes _token, uint _votingDelay, uint _votingPeriod)
         Governor("EnergyGovernor")
         GovernorVotes(_token)
-        GovernorVotesQuorumFraction(0)
+        GovernorVotesQuorumFraction(1)
         GovernorSettings(_votingDelay , _votingPeriod, 0)
     {}
 
