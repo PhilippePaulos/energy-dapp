@@ -2,30 +2,40 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/governance/Governor.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 
-contract EnergyGovernor is Governor, GovernorCountingSimple, GovernorVotes, GovernorVotesQuorumFraction {
-    constructor(IVotes _token)
-        Governor("MyGovernor")
+contract EnergyGovernor is Governor, GovernorSettings, GovernorCountingSimple, GovernorVotes, GovernorVotesQuorumFraction {
+    constructor(IVotes _token, uint _votingDelay, uint _votingPeriod)
+        Governor("EnergyGovernor")
         GovernorVotes(_token)
-        GovernorVotesQuorumFraction(10)
+        GovernorVotesQuorumFraction(0)
+        GovernorSettings(_votingDelay , _votingPeriod, 0)
     {}
 
-    function votingDelay() public pure override returns (uint256) {
-        return 0; // 0 seconds
-    }
-
-    function votingPeriod() public pure override returns (uint256) {
-        return 50400; // 1 week
-    }
-
-    function proposalThreshold() public pure override returns (uint256) {
-        return 10e18;
-    }
+    uint[] public ids;
 
     // The following functions are overrides required by Solidity.
+
+    function votingDelay()
+        public
+        view
+        override(IGovernor, GovernorSettings)
+        returns (uint256)
+    {
+        return super.votingDelay();
+    }
+
+    function votingPeriod()
+        public
+        view
+        override(IGovernor, GovernorSettings)
+        returns (uint256)
+    {
+        return super.votingPeriod();
+    }
 
     function quorum(uint256 blockNumber)
         public
@@ -36,7 +46,19 @@ contract EnergyGovernor is Governor, GovernorCountingSimple, GovernorVotes, Gove
         return super.quorum(blockNumber);
     }
 
+    function proposalThreshold()
+        public
+        view
+        override(Governor, GovernorSettings)
+        returns (uint256)
+    {
+        return super.proposalThreshold();
+    }
+
+
 	/*function voteSucceeded(uint256  _proposalId) public view returns (bool) {
 		return super._voteSucceeded(_proposalId);
 	}*/
+
+
 }

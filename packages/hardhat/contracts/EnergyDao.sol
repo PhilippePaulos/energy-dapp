@@ -4,7 +4,9 @@ pragma solidity ^0.8.4;
 
 import "./EEDToken.sol";
 import "./EnergyGovernor.sol";
+import "./Sale.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
 
 
 contract EnergyDao is Ownable {
@@ -26,7 +28,6 @@ contract EnergyDao is Ownable {
         uint256 creationDate;
         string name;
         address beneficiaryAddr;
-        uint256 budget;
         string description;
         uint256 department;
         Sector sector;
@@ -60,9 +61,18 @@ contract EnergyDao is Ownable {
     Project[] public projects;
     mapping(address => Craftman) public craftmans;
     mapping(uint256 => mapping(address => Quotation)) quotations;
-    EnergyGovernor governor;
+    EnergyGovernor public governor;
 
-    EEDToken token;
+    // Amount of tokens to mint
+    uint256 public mintAmount;
+
+    /// Amount of tokens to sale
+    uint256 public saleAmount;
+
+    Sale public sale;
+
+    EEDToken public token;
+
     uint256 timeToPropose;
     uint256 timeToVote;
 
@@ -76,8 +86,8 @@ contract EnergyDao is Ownable {
     event CraftmanRegistered(address craftmanAddress);
     event QuotationRegistred(uint256 idProject, address craftmanAddr);
 
-    modifier onlyCraftman() {
-        require(craftmans[msg.sender].isValidated, "You are not a craftman");
+    modifier onlyValidatedCraftman() {
+        require(isCraftmanValidated(msg.sender), "You are not a validated craftman");
         _;
     }
 
@@ -87,16 +97,21 @@ contract EnergyDao is Ownable {
     }
 
     constructor(
-        EEDToken _token,
+        uint _mintAmount, 
+        uint _saleAmount,
+        uint _saleRate,
+        uint _saleClosingTime,
         uint256 _timeToPropose,
-        uint256 _timeToVote,
-        EnergyGovernor _governor
+        uint256 _timeToVote
     ) {
-        // require sur time
-        token = _token;
+        // todo ajouter require sur time
+        require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
+        token = new EEDToken(_mintAmount);
+        sale = new Sale(address(token), _saleRate, _saleClosingTime, address(this));
+        token.approve(address(sale), _saleAmount);
         timeToPropose = _timeToPropose;
         timeToVote = _timeToVote;
-        governor = _governor;
+        governor = new EnergyGovernor(token, 0, _timeToVote);
     }
 
     function registerCraftman(
@@ -116,13 +131,16 @@ contract EnergyDao is Ownable {
         emit CraftmanRegistered(msg.sender);
     }
 
+    function isCraftmanValidated(address _address) public view returns(bool) {
+        return craftmans[_address].isValidated;
+    }
+
     function validateCraftman(address _addr) public onlyGovernor {
         craftmans[_addr].isValidated = true;
     }
 
     function addProject(
         string calldata _name,
-        uint256 _budget,
         string calldata _desc,
         uint256 _department,
         Sector _sector,
@@ -134,7 +152,6 @@ contract EnergyDao is Ownable {
         //require(1=1, "Check that the sender as enough token stake to propose a project");
         Project memory project;
         project.name = _name;
-        project.budget = _budget;
         project.beneficiaryAddr = msg.sender;
         project.description = _desc;
         project.department = _department;
@@ -154,11 +171,11 @@ contract EnergyDao is Ownable {
 
     function proposeQuotation(
         uint256 _id,
-        string calldata description,
+        string calldata _description,
         string calldata _docHash,
         uint8 _price,
         uint128 _nbCee
-    ) external onlyCraftman {
+    ) external onlyValidatedCraftman {
         //require(1=1, "Check that the sender as enough token stake to propose a quotation");
         // require parameters not empty
         require(_id < projects.length, "Project doesn't exists");
@@ -180,7 +197,7 @@ contract EnergyDao is Ownable {
         quotation.documentHash = _docHash;
         quotation.price = _price;
         quotation.nbCee = _nbCee;
-        quotation.description = description;
+        quotation.description = _description;
 
         quotations[_id][msg.sender] = quotation;
         projects[_id].nbQuotations += 1;
@@ -198,5 +215,29 @@ contract EnergyDao is Ownable {
         }
         craftmans[project.choosedCraftman].nbProjectsValidated += 1;
     }
+
+     /**
+     * @dev Gets funds from `sale` into the contract
+     */
+    function getFunds() public onlyOwner {
+        sale.withdrawFunds();
+    }
+
+    /**
+     * @dev Sends funds to a given `_receiver`
+     * @param _receiver Receiver address
+     */
+    function sendFunds(address _receiver) public onlyOwner {
+        (bool sent, ) = _receiver.call{value: address(this).balance}("");
+        require(sent, "Failed to send funds");
+    }
+
+    function transfer(address _receiver, uint amount) public onlyOwner {
+        token.transfer(_receiver, amount);
+    }
+
+    fallback() external payable {}
+    
+    receive() external payable {}
 
 }
