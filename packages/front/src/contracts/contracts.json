@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0x06B1D212B8da92b83AF328De5eef4E211Da02097",
+        "addr": "0x46682cA783d96a4A65390211934D5714CDb788E4",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0x94099942864EA81cCF197E9D71ac53310b1468D8",
+        "addr": "0x763e69d24a03c0c8B256e470D9fE9e0753504D07",
         "abi": [
           {
             "inputs": [
@@ -839,7 +839,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+        "addr": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
         "abi": [
           {
             "inputs": [
@@ -937,9 +937,9 @@
               },
               {
                 "indexed": false,
-                "internalType": "enum EnergyDao.ProjectStatus",
-                "name": "status",
-                "type": "uint8"
+                "internalType": "address",
+                "name": "beneficiary",
+                "type": "address"
               }
             ],
             "name": "ProjectRegistered",
@@ -949,7 +949,7 @@
             "anonymous": false,
             "inputs": [
               {
-                "indexed": false,
+                "indexed": true,
                 "internalType": "uint256",
                 "name": "idProject",
                 "type": "uint256"
@@ -981,9 +981,9 @@
                 "type": "string"
               },
               {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "_department",
-                "type": "uint256"
+                "type": "uint8"
               },
               {
                 "internalType": "enum EnergyDao.Sector",
@@ -1169,9 +1169,9 @@
                 "type": "string"
               },
               {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "department",
-                "type": "uint256"
+                "type": "uint8"
               },
               {
                 "internalType": "enum EnergyDao.Sector",
@@ -1238,6 +1238,60 @@
             "name": "proposeQuotation",
             "outputs": [],
             "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "name": "quotations",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "craftsmanAddr",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "documentHash",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "price",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint128",
+                "name": "nbCee",
+                "type": "uint128"
+              },
+              {
+                "internalType": "bool",
+                "name": "isValidated",
+                "type": "bool"
+              },
+              {
+                "internalType": "uint256",
+                "name": "proposalId",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
             "type": "function"
           },
           {
@@ -1373,7 +1427,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xED179b78D5781f93eb169730D8ad1bE7313123F4",
+        "addr": "0x0A41804810f008e5EE565aa4B95a6a7c50a09082",
         "abi": [
           {
             "inputs": [

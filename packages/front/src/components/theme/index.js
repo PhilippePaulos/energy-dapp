@@ -3,7 +3,9 @@ import { createTheme } from "@mui/material";
 export const theme = createTheme({
     palette: {
         background: {
-            default: "rgb(17 24 39)"
+            default: "rgb(17 24 39)",
+            grid: "rgb(14, 28, 55)",
+            pop:  "rgb(32, 46, 73)"
         },
         text: {
             primary: "#ffffff",
@@ -16,11 +18,14 @@ export const theme = createTheme({
             main: "#6b7280",
         },
         action: {
-            main: "rgb(59 130 246/1)"
+            main: "#000000"
         },
         error: {
             main: "#ef4444"
-        }
+        },
+        border: {
+            main: "#6f6f6f"
+        },
     },
     typography: {
         fontFamily: "Inter, Arial, sans-serif",

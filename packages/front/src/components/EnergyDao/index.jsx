@@ -7,7 +7,6 @@ import DaoRouter from "../routes/DaoRouter";
 function EnergyDao() {
 
     const { isConnected } = useAccount()
-    console.log(isConnected);
 
     if (isConnected) {
         return (

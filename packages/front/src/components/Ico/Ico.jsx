@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from "@mui/material"
 import { ethers } from "ethers"
 import { useState } from "react"
 import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi"
-import { getContractDescription, getEthValue } from "../../helpers/eth"
+import { getContractDescription, getEthValue } from "../../common/helpers/eth"
 import ButtonUI from "../ui/button"
 import CircularIndeterminate from "../ui/CircularIndeterminate"
 import TextFieldUI from "../ui/text-field"
@@ -56,7 +56,6 @@ function Ico() {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        console.log("go");
         write?.()
     }
 

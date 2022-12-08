@@ -1,7 +1,7 @@
 import { Box, Button, FormControl, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
-import { getContractDescription, uploadIpfsFile } from '../../../helpers/eth';
+import { getContractDescription, uploadIpfsFile } from '../../../common/helpers/eth';
 import ButtonUI from "../../ui/button";
 import CenteredModal from "../../ui/CenteredModal";
 import TextFieldUI from "../../ui/text-field";

@@ -1,6 +1,12 @@
 import { ethers } from "ethers"
 import axios from 'axios';
 
+function initContract(contract, networkId, provider) {
+    const { abi, addr } = getContractDescription(contract, networkId)
+    
+    return new ethers.Contract(addr, abi, provider)
+}
+
 async function isMetaMaskConnected() {
     const { ethereum } = window;
     const accounts = await ethereum.request({ method: 'eth_accounts' });
@@ -8,7 +14,7 @@ async function isMetaMaskConnected() {
 }
 
 function getContractDescription(name, chainId) {
-    const artifact = require("../contracts/contracts.json")
+    const artifact = require("../../contracts/contracts.json")
     return artifact[chainId].contracts[name]
 }
 
@@ -60,4 +66,4 @@ function openIpfsLink(hash) {
     window.open("https://gateway.pinata.cloud/ipfs/QmQ3C2j5ZzHxbdBKPFj6G7s9szwig95iy4MXHMrKcN9cvD")
 }
 
-export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected}
+export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected, initContract}
