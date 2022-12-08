@@ -1,17 +1,19 @@
-import { Box, Grid, Typography } from "@mui/material";
-import { ethers } from "ethers";
-import { useState } from "react";
-import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
-import { getContractDescription, getEthValue } from "../../helpers/eth";
-import ButtonUI from "../ui/button";
-import CircularIndeterminate from "../ui/CircularIndeterminate";
-import TextFieldUI from "../ui/text-field";
+import { Box, Grid, Typography } from "@mui/material"
+import { ethers } from "ethers"
+import { useState } from "react"
+import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi"
+import { getContractDescription, getEthValue } from "../../helpers/eth"
+import ButtonUI from "../ui/button"
+import CircularIndeterminate from "../ui/CircularIndeterminate"
+import TextFieldUI from "../ui/text-field"
 
 
 function Ico() {
     const { address } = useAccount()
+
+    const [tokens, setTokens] = useState(0)
     const { chain } = useNetwork()
-    const [amount, setAmount] = useState("")
+
     const { abi, addr } = getContractDescription('Sale', chain.id)
 
     const { data: data1 } = useContractRead({
@@ -21,15 +23,16 @@ function Ico() {
         watch: true
     })
 
+    const remainingTokens = getEthValue(data1)
+
     const { data: data2 } = useContractRead({
         address: addr,
         abi: abi,
         functionName: "rate",
     })
-
-    const remainingTokens = getEthValue(data1)
     const rate = data2.toNumber()
-    const tokensToBuy = amount * rate
+
+    const amount = parseInt(tokens) / rate
 
     const { config } = usePrepareContractWrite({
         address: addr,
@@ -38,21 +41,22 @@ function Ico() {
         args: [address],
         overrides: {
             from: address,
-            value: !amount ? undefined : ethers.utils.parseEther(amount),
+            value: ethers.utils.parseEther(amount.toString()),
         },
-        enabled: amount > 0 && tokensToBuy <= remainingTokens,
+        enabled: amount > 0,
     })
+    console.log(ethers.utils.parseEther(amount.toString()));
     const { write, isLoading } = useContractWrite(config)
 
     const onInputChange = (event) => {
-        if (/^[1-9]\d*$/.test(event.target.value)) {
-            setAmount((parseFloat(event.target.value) * rate).toString());
+        if (/^[0-9]\d*$/.test(event.target.value)) {
+            setTokens(event.target.value)
         }
-    };
+    }
 
     const handleSubmit = async (event) => {
-        console.log("amount", amount);
-        event.preventDefault();
+        event.preventDefault()
+        console.log("go");
         write?.()
     }
 
@@ -64,7 +68,7 @@ function Ico() {
                 <Box component="form" noValidate autoComplete="off">
                     <TextFieldUI id="amount" label="EED amount" onChange={onInputChange} />
                 </Box>
-                <ButtonUI size="medium" variant="contained" onClick={(e) => handleSubmit(e)}>Buy {amount} EED</ButtonUI>
+                <ButtonUI size="medium" variant="contained" onClick={(e) => handleSubmit(e)}>Buy {tokens} EED for {amount} ETH</ButtonUI>
             </Grid>
             <CircularIndeterminate loading={isLoading} />
         </Grid>

@@ -1,7 +1,7 @@
 import DoneIcon from '@mui/icons-material/Done'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { Box, Popover, styled, Typography } from "@mui/material"
-import { useDisconnect } from "wagmi"
+import { useDisconnect } from 'wagmi'
 
 const PopoverStyled = styled(Popover)({
     ".MuiPaper-root": {
@@ -15,11 +15,10 @@ function PopoverDisconnect(props) {
 
     const { disconnect } = useDisconnect()
 
-    const handleDisconnect = () => {
+    const handleDisconnect = async () => {
         disconnect()
         handleClose()
     }
-
 
     return (
         <PopoverStyled

@@ -16,19 +16,19 @@ function DisplayProjects() {
     const [projects, setProjects] = useState([])
 
 
-    const fetchEvents = useCallback(async (contract) => {
-        console.log("in");
-        let eventFilter = contract.filters.ProjectRegistered()
-        let events = await contract.queryFilter(eventFilter)
-        console.log(await contract.getProject(events[0].args.id))
-        setProjects([{id: "1"}])
+    // const fetchEvents = useCallback(async (contract) => {
+    //     console.log("in");
+    //     let eventFilter = contract.filters.ProjectRegistered()
+    //     let events = await contract.queryFilter(eventFilter)
+    //     console.log(await contract.getProject(events[0].args.id))
+    //     setProjects([{id: "1"}])
 
-    }, [])
+    // }, [])
 
-    useEffect(() => {
-        const contract = new ethers.Contract(addr, abi, provider)
-        fetchEvents(contract)
-    }, [fetchEvents])
+    // useEffect(() => {
+    //     const contract = new ethers.Contract(addr, abi, provider)
+    //     fetchEvents(contract)
+    // }, [fetchEvents])
 
     const handleClick = () => {
         setOpen(true)
@@ -42,12 +42,12 @@ function DisplayProjects() {
             <CreateProjectModal open={open} setOpen={setOpen} />
             <Grid container >
                 <Grid item xs={12}>
-                    {projects.map((project) => {
+                    {/* {projects.map((project) => {
                         console.log("coucou");
                         return (<Typography key={project.id}>
                             TEST
                         </Typography>)
-                    })}
+                    })} */}
                 </Grid>
             </Grid>
         </>
