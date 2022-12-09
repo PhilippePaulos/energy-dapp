@@ -2,10 +2,10 @@ import { Box, Grid, Typography } from "@mui/material"
 import { ethers } from "ethers"
 import { useCallback, useEffect, useState } from "react"
 import { useAccount, useNetwork, useProvider, useSigner } from "wagmi"
-import { getEthValue, initContract } from "../../common/helpers/eth"
-import ButtonUI from "../ui/button"
-import CircularIndeterminate from "../ui/CircularIndeterminate"
-import TextFieldUI from "../ui/text-field"
+import { getEthValue, initContract } from "../../../common/helpers/eth"
+import ButtonUI from "../../ui/button"
+import CircularIndeterminate from "../../ui/CircularIndeterminate"
+import TextFieldUI from "../../ui/text-field"
 
 
 function Ico() {

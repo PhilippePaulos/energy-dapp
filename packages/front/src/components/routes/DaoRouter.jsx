@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
-import DisplayCraftsman from "../Craftsman/Display/DisplayCraftsman"
-import Home from "../Home/Home"
-import Ico from "../Ico/Ico"
-import { DisplayProjects } from "../Projects/Display"
+import DisplayCraftsman from "../EnergyDao/Craftsman/Display/DisplayCraftsman"
+import { Home } from "../EnergyDao/Home"
+import { Ico } from "../EnergyDao/Ico"
+import { DisplayProjects } from "../EnergyDao/Projects/Display"
 
 function DaoRouter({ isConnected }) {
 

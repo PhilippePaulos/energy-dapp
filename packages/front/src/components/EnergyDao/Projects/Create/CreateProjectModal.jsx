@@ -1,11 +1,11 @@
-import { Box, Button, FormControl, MenuItem, Typography } from "@mui/material";
+import { Box, FormControl, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
 import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
-import { getContractDescription, uploadIpfsFile } from '../../../common/helpers/eth';
-import ButtonUI from "../../ui/button";
-import CenteredModal from "../../ui/CenteredModal";
-import TextFieldUI from "../../ui/text-field";
-import CircularIndeterminate from "../../ui/CircularIndeterminate";
+import { getContractDescription, uploadIpfsFile } from '../../../../common/helpers/eth';
+import ButtonUI from "../../../ui/button";
+import CenteredModal from "../../../ui/CenteredModal";
+import CircularIndeterminate from "../../../ui/CircularIndeterminate";
+import TextFieldUI from "../../../ui/text-field";
 
 
 function CreateProjectModal(props) {
@@ -44,7 +44,7 @@ function CreateProjectModal(props) {
     })
 
     const { data, write } = useContractWrite(config)
-    const { isLoading, isSuccess } = useWaitForTransaction({
+    const { isLoading } = useWaitForTransaction({
         hash: data?.hash,
       })
 
@@ -61,7 +61,7 @@ function CreateProjectModal(props) {
     const handleUploadFiles = (event) => {
         const uploaded = values.pictures
         const files = Array.prototype.slice.call(event.target.files)
-        files.some((file) => {
+        files.forEach((file) => {
             if (uploaded.findIndex((f) => f.name === file.name) === -1) {
                 uploaded.push(file)
             }
@@ -71,20 +71,20 @@ function CreateProjectModal(props) {
 
     const onSubmit = async () => {
         console.log("submit");
-        if (values.name != "" && values.sector !== "" && values.department !== "" && values.description != "" &&
+        if (values.name !== "" && values.sector !== "" && values.department !== "" && values.description !== "" &&
             values.diagnostic !== "" && values.plan !== "" && values.pictures.length > 0) {
             // upload files to IPFS
             setPrepare(true)
             setLoadingIpfs(true)
 
             let hash = await uploadIpfsFile(values.diagnostic)
-            setValues({ ...values, ["diagnosticHash"]: hash })
+            setValues({ ...values, diagnosticHash: hash })
 
             hash = await uploadIpfsFile(values.plan)
-            setValues({ ...values, ["planHash"]: hash })
+            setValues({ ...values, planHash: hash })
 
             const promises = values.pictures.map((picture) => uploadIpfsFile(picture))
-            setValues({ ...values, ["picturesHash"]: await Promise.all(promises) })
+            setValues({ ...values, picturesHash: await Promise.all(promises) })
             setLoadingIpfs(false)
             write?.()
         }

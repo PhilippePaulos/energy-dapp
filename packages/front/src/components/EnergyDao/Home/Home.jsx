@@ -1,5 +1,5 @@
 import { Grid, Link } from "@mui/material";
-import { useProfile } from "../../contexts/DaoContext"
+import { useProfile } from "../../../contexts/DaoContext"
 
 function Home() {
 

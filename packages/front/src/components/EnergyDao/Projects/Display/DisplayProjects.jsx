@@ -1,19 +1,15 @@
-import { useCallback, useState } from "react"
-import { chainId, etherscanBlockExplorers, useContractEvent, useContractRead, useNetwork, useProvider } from "wagmi"
-import { getContractDescription, initContract, openIpfsLink } from "../../../common/helpers/eth"
-import ButtonUI from "../../ui/button"
+import AddBusinessIcon from '@mui/icons-material/AddBusiness'
+import { Grid, Paper, Table, TableCell, TableHead, TableRow } from "@mui/material"
+import { useCallback, useEffect, useState } from "react"
+import { useNetwork, useProvider } from "wagmi"
+import { SectorCodes, StatusCodes } from "../../../../common/enums"
+import { initContract } from "../../../../common/helpers/eth"
+import { theme } from "../../../theme"
+import ButtonUI from "../../../ui/button"
+import TableBodyUI from "../../../ui/TableBody"
+import TableContainerUI from "../../../ui/TableContainer"
 import CreateProjectModal from "../Create/CreateProjectModal"
-import { ethers } from "ethers"
-import { useEffect } from "react"
-import { Box, Grid, ListItem, Paper, Table, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
-import { useProfile } from "../../../contexts/DaoContext"
-import { theme } from "../../theme"
-import TableBody from "../../ui/TableBody"
-import TableBodyUI from "../../ui/TableBody"
-import { SectorCodes, StatusCodes } from "../../../common/enums"
 import ProjectDetailsModal from "../Details/ProjectDetails"
-import TableContainerUI from "../../ui/TableContainer"
-import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 
 function DisplayProjects() {
 
@@ -64,7 +60,7 @@ function DisplayProjects() {
 
     useEffect(() => {
         fetchEvents(contract)
-    }, [fetchEvents])
+    }, [fetchEvents, contract])
 
     const handleClickCreate = () => {
         setOpenCreate(true)
@@ -74,7 +70,7 @@ function DisplayProjects() {
         setProject(row)
         fetchQuotationEvents(contract, row.id)
         setOpenDetails(true)
-    }, [])
+    }, [contract, fetchQuotationEvents])
 
     return (
         <>

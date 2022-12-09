@@ -1,5 +1,5 @@
 import { useState } from "react"
-import ButtonUI from "../../ui/button"
+import ButtonUI from "../../../ui/button"
 import CreateCraftsmanModal from "../Create/CreateCraftsmanModal"
 
 function DisplayCraftsman(){

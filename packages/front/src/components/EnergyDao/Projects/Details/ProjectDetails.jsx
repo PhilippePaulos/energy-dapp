@@ -1,23 +1,17 @@
-import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
-import { BigNumber, ethers } from "ethers"
-import { useCallback, useEffect, useState } from "react"
-import { useNetwork, useProvider } from "wagmi"
-import { StatusCodes } from "../../../common/enums"
-import { openIpfsLink } from "../../../common/helpers/eth"
-import { theme } from "../../theme"
-import ButtonUI from "../../ui/button"
-import CenteredModal from "../../ui/CenteredModal"
-import TableBodyUI from "../../ui/TableBody"
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import RoundedGrid from "../../ui/RoundedGrid"
-import PdfPicture from "../../ui/PdfPicture"
-import TableContainerUI from "../../ui/TableContainer"
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
+import { Box, Grid, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import { BigNumber } from "ethers"
+import { StatusCodes } from "../../../../common/enums"
+import { openIpfsLink } from "../../../../common/helpers/eth"
+import CenteredModal from "../../../ui/CenteredModal"
+import PdfPicture from "../../../ui/PdfPicture"
+import RoundedGrid from "../../../ui/RoundedGrid"
+import TableBodyUI from "../../../ui/TableBody"
+import TableContainerUI from "../../../ui/TableContainer"
 
 function ProjectDetailsModal(props) {
 
     const { project, quotations, open, setOpen } = props
-    const { chain } = useNetwork()
-    const provider = useProvider()
 
     return (
         <CenteredModal

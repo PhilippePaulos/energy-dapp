@@ -2,10 +2,10 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, FormControl, Typography } from "@mui/material";
 import { useState } from "react";
-import { isAllDefined, uploadIpfsFile } from "../../../common/helpers/eth";
-import ButtonUI from "../../ui/button";
-import CenteredModal from "../../ui/CenteredModal";
-import TextFieldUI from "../../ui/text-field";
+import { isAllDefined, uploadIpfsFile } from "../../../../common/helpers/eth";
+import ButtonUI from "../../../ui/button";
+import CenteredModal from "../../../ui/CenteredModal";
+import TextFieldUI from "../../../ui/text-field";
 
 function CreateCraftsmanModal(props) {
 
