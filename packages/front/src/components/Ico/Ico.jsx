@@ -1,8 +1,8 @@
 import { Box, Grid, Typography } from "@mui/material"
 import { ethers } from "ethers"
-import { useState } from "react"
-import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi"
-import { getContractDescription, getEthValue } from "../../common/helpers/eth"
+import { useCallback, useEffect, useState } from "react"
+import { useAccount, useNetwork, useProvider, useSigner } from "wagmi"
+import { getEthValue, initContract } from "../../common/helpers/eth"
 import ButtonUI from "../ui/button"
 import CircularIndeterminate from "../ui/CircularIndeterminate"
 import TextFieldUI from "../ui/text-field"
@@ -10,43 +10,39 @@ import TextFieldUI from "../ui/text-field"
 
 function Ico() {
     const { address } = useAccount()
+    const provider = useProvider()
 
     const [tokens, setTokens] = useState(0)
     const { chain } = useNetwork()
+    const [remainingTokens,setRemainingTokens] = useState()
+    const [rate, setRate] = useState()
+    const [isLoading, setIsLoading] = useState(false)
+    const { data: signer } = useSigner() 
 
-    const { abi, addr } = getContractDescription('Sale', chain.id)
+    const contract = initContract("Sale", chain.id, provider)
 
-    const { data: data1 } = useContractRead({
-        address: addr,
-        abi: abi,
-        functionName: "remainingTokens",
-        watch: true
-    })
+    const fetchRemainingTokens = useCallback(async() => {
+        const remaining = await contract.remainingTokens()
+        setRemainingTokens(getEthValue(remaining))
+    }, [])
 
-    const remainingTokens = getEthValue(data1)
+    const fetchRate = useCallback(async() => {
+        setRate((await contract.rate()).toNumber())
+    }, [])
 
-    const { data: data2 } = useContractRead({
-        address: addr,
-        abi: abi,
-        functionName: "rate",
-    })
-    const rate = data2.toNumber()
+    useEffect(() => {
+        fetchRemainingTokens()
+        fetchRate()
+    }, [])
 
-    const amount = parseInt(tokens) / rate
+    const amount = tokens ? parseInt(tokens) / rate : 0
 
-    const { config } = usePrepareContractWrite({
-        address: addr,
-        abi: abi,
-        functionName: 'buyTokens',
-        args: [address],
-        overrides: {
-            from: address,
-            value: ethers.utils.parseEther(amount.toString()),
-        },
-        enabled: amount > 0,
-    })
-    console.log(ethers.utils.parseEther(amount.toString()));
-    const { write, isLoading } = useContractWrite(config)
+    const buyTokens = async() => {
+        setIsLoading(true)
+        await contract.connect(signer).buyTokens(address, {value: ethers.utils.parseEther(amount.toString())})
+        fetchRemainingTokens()
+        setIsLoading(false)
+    }
 
     const onInputChange = (event) => {
         if (/^[0-9]\d*$/.test(event.target.value)) {
@@ -56,7 +52,7 @@ function Ico() {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        write?.()
+        buyTokens()
     }
 
     return (
