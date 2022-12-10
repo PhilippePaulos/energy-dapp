@@ -1,4 +1,4 @@
-const { ethers, artifacts } = require("hardhat");
+const { ethers, artifacts } = require("hardhat")
 const path = require("path")
 
 const fs = require("fs")

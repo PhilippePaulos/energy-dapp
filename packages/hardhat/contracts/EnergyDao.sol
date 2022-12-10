@@ -6,10 +6,13 @@ import "./EEDToken.sol";
 import "./EnergyGovernor.sol";
 import "./Sale.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 
 
 contract EnergyDao is Ownable {
+
+    uint public state;
 
     enum ProjectStatus {
         Created,
@@ -29,7 +32,7 @@ contract EnergyDao is Ownable {
         string name;
         address beneficiaryAddr;
         string description;
-        uint256 department;
+        uint8 department;
         Sector sector;
         string[] photos;
         string diagnostic;
@@ -60,7 +63,7 @@ contract EnergyDao is Ownable {
 
     Project[] public projects;
     mapping(address => Craftsman) public craftsmans;
-    mapping(uint256 => mapping(address => Quotation)) quotations;
+    mapping(uint256 => mapping(address => Quotation)) public quotations;
         
     EnergyGovernor public governor;
 
@@ -81,11 +84,11 @@ contract EnergyDao is Ownable {
         uint256 id,
         string name,
         Sector sector,
-        ProjectStatus status
+        address beneficiary
     );
 
     event CraftsmanRegistered(address craftsmanAddress);
-    event QuotationRegistred(uint256 idProject, address craftsmanAddr);
+    event QuotationRegistred(uint256 indexed idProject, address craftsmanAddr);
 
     modifier onlyValidatedCraftsman() {
         require(isCraftsmanValidated(msg.sender), "You are not a validated craftsman");
@@ -120,18 +123,32 @@ contract EnergyDao is Ownable {
         string calldata _name,
         string calldata _addressCompany,
         string calldata _certification
-    ) external {
+            ) external {
         require(
             craftsmans[msg.sender].craftsmanAddr == address(0),
             "Already registered as craftsman"
         );
+        console.log("coucou");
         craftsmans[msg.sender].craftsmanAddr = msg.sender;
         craftsmans[msg.sender].name = _name;
         craftsmans[msg.sender].addressCompany = _addressCompany;
         craftsmans[msg.sender].certification = _certification;
 
+        // uint proposalId = _proposeCraftsman();
+
         emit CraftsmanRegistered(msg.sender);
     }
+
+    // function _proposeCraftsman() internal returns (uint) {
+    //     address[] memory addr = new address[](1);
+    //     addr[0] = address(this);
+    //     uint[] memory values = new uint[](1);
+    //     string memory description = "validateCraftsman";
+    //     bytes memory transferPayload = abi.encodeWithSignature("validateCraftsman(address)", msg.sender);
+    //     bytes[] memory calldatas = new bytes[](1);
+    //     calldatas[0] = transferPayload;
+    //     return governor.propose(addr, values, calldatas, description);
+    // }
 
     function isCraftsmanValidated(address _address) public view returns(bool) {
         return craftsmans[_address].isValidated;
@@ -144,7 +161,7 @@ contract EnergyDao is Ownable {
     function addProject(
         string calldata _name,
         string calldata _desc,
-        uint256 _department,
+        uint8 _department,
         Sector _sector,
         string[] memory _photos,
         string calldata _diagnostic,
@@ -167,7 +184,7 @@ contract EnergyDao is Ownable {
             projects.length - 1,
             _name,
             _sector,
-            ProjectStatus.Created
+            msg.sender
         );
     }
 
