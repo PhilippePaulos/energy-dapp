@@ -16,7 +16,6 @@ function CreateCraftsmanModal(props) {
 
     const { data: signer } = useSigner()
 
-
     const [values, setValues] = useState({
         name: "",
         certification: "",
@@ -40,15 +39,16 @@ function CreateCraftsmanModal(props) {
         console.log(values);
         if (isAllDefined(values)) {
             try {
+                setIsLoading(true)
                 const hash = await uploadIpfsFile(values.certification)
+                await EnergyDao.connect(signer).registerCraftsman(values.name, values.address, hash)
+                fetchCraftsman()
+                setIsLoading(false)
+                setOpen(false)
             }
             catch (error) {
-                console.log("Error sending File to IPFS: ", error)
+                console.log(error)
             }
-            setIsLoading(true)
-            await EnergyDao.connect(signer).registerCraftsman(values.name, values.address, values.certification)
-            setIsLoading(false)
-            setOpen(false)
         }
         else {
             console.log("not");

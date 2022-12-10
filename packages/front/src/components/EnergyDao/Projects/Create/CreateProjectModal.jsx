@@ -42,6 +42,7 @@ function CreateProjectModal(props) {
         },
         enabled: prepare,
     })
+    console.log(values);
 
     const { data, write } = useContractWrite(config)
     const { isLoading } = useWaitForTransaction({

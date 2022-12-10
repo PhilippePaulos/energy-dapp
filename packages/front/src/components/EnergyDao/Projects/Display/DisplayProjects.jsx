@@ -1,11 +1,12 @@
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
-import { Grid, Paper, Table, TableCell, TableHead, TableRow } from "@mui/material"
+import { Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import { useCallback, useEffect, useState } from "react"
 import { useNetwork, useProvider } from "wagmi"
 import { SectorCodes, StatusCodes } from "../../../../common/enums"
 import { initContract } from "../../../../common/helpers/eth"
 import { theme } from "../../../theme"
 import ButtonUI from "../../../ui/button"
+import IconHover from '../../../ui/IconHover'
 import TableBodyHover from "../../../ui/TableBodyHover"
 import TableContainerUI from "../../../ui/TableContainer"
 import CreateProjectModal from "../Create/CreateProjectModal"
@@ -75,17 +76,17 @@ function DisplayProjects() {
 
     return (
         <>
-            <Grid container >
-                <Grid item xs={12} m={1}>
-                    <ButtonUI variant="contained" color="action" onClick={handleClickCreate} >
-                        <AddBusinessIcon />
-                    </ButtonUI>
-                </Grid>
-            </Grid>
-
             <CreateProjectModal open={openCreate} setOpen={setOpenCreate} />
             {Object.keys(project).length !== 0 && <ProjectDetailsModal open={openDetails} setOpen={setOpenDetails} project={project} quotations={quotations} />}
-            <Grid container >
+            <Grid container pb={2}>
+                <Grid item xs={12} m={1} display="flex" justifyContent={"space-between"}>
+                    <Typography variant='h4'>Liste des projets de rénovation énergétiques</Typography>
+                    <Typography variant="contained" color="action" onClick={handleClickCreate} alignSelf="center" >
+                        <IconHover sx={{width: "50px"}}><AddBusinessIcon /></IconHover>
+                    </Typography>
+                </Grid>
+            </Grid>
+            <Grid container mb={10}>
                 <Grid item xs={12}>
                     <TableContainerUI component={Paper} sx={{ width: '100%', backgroundColor: theme.palette.background.grid, marginBottom: '10px', boxShadow: 'none' }}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">

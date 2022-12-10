@@ -1,6 +1,6 @@
 import GroupsIcon from '@mui/icons-material/Groups'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import { Box, Grid, Typography } from "@mui/material"
+import { Box, Grid, ImageList, ImageListItem, Typography } from "@mui/material"
 import Identicon from "@polkadot/react-identicon"
 import { ethers } from "ethers"
 import { useState } from "react"
@@ -74,7 +74,7 @@ function CraftsmanDetailsModal(props) {
                 className="bg-gray-900"
                 p={2}
                 borderRadius={2}>
-                <Grid container mb={5} >
+                <Grid container >
                     <RoundedGrid sx={{ width: "inherit" }} className="bg-gray-900">
                         <Box className="boxHeader" display="flex" alignItems="center" gap="4px">
                             <Box display="flex" gap={1}>
@@ -100,6 +100,12 @@ function CraftsmanDetailsModal(props) {
                     craftsman.votes && <DisplayVotes craftsman={craftsman} />
                 }
                 <CircularIndeterminate loading={isLoading} />
+                {/* <img src=''></img> */}
+                <div>
+                {/* <img
+                    src="https://gateway.pinata.cloud/ipfs/QmPuV2zVQKir4TyexrS8AxoL5igtPRT22w9NXaAnoiVfVD"
+                /> */}
+                </div>
             </Box>
         </CenteredModal>
     )

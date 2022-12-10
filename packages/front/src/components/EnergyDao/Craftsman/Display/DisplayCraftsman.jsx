@@ -1,26 +1,19 @@
-import AddBusinessIcon from '@mui/icons-material/AddBusiness'
+import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import Identicon from '@polkadot/react-identicon'
+import { BigNumber } from 'ethers'
 import { useCallback, useEffect, useState } from "react"
-import { useNetwork, useProvider } from "wagmi"
-import {leftJoin} from "../../../../common/helpers/utils.js"
-import { ProposalState, ProposalStateCodes, SectorCodes, StatusCodes } from "../../../../common/enums"
-import { formatAddress, initContract, openIpfsLink } from "../../../../common/helpers/eth"
+import { formatAddress, openIpfsLink } from "../../../../common/helpers/eth"
+import { leftJoin } from "../../../../common/helpers/utils.js"
+import { useProfile } from "../../../../contexts/DaoContext"
 import { theme } from "../../../theme"
-import ButtonUI from "../../../ui/button"
+import IconHover from "../../../ui/IconHover"
 import TableBodyHover from "../../../ui/TableBodyHover"
 import TableContainerUI from "../../../ui/TableContainer"
 import { CreateCraftsmanModal } from "../../Craftsman/Create"
-import { useProfile } from "../../../../contexts/DaoContext"
 import CraftsmanDetailsModal from '../Details/CraftsmanDetailsModal'
-import { BigNumber, ethers } from 'ethers'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import HourglassFullIcon from '@mui/icons-material/HourglassFull';
-import Identicon from '@polkadot/react-identicon'
 import VoteIcon from '../VoteIcon/VoteIcon.jsx'
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import IconHover from "../../../ui/IconHover"
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 function DisplayCraftsman() {
 
@@ -97,9 +90,10 @@ function DisplayCraftsman() {
 
     return (
         <>
-            <Grid container >
-                <Grid item xs={12} textAlign="left" mb={1}>
-                    <Typography variant="contained" color="action" onClick={handleClickCreate} >
+            <Grid container pb={2}>
+                <Grid item xs={12} m={1} display="flex" justifyContent={"space-between"}>
+                    <Typography variant='h4'>Liste des artisans</Typography>
+                    <Typography variant="contained" color="action" onClick={handleClickCreate} alignSelf="center" >
                         <IconHover sx={{width: "50px"}}><PersonAddIcon /></IconHover>
                     </Typography>
                 </Grid>

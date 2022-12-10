@@ -1,5 +1,8 @@
-import { Grid, Link } from "@mui/material";
+import { Grid, Link } from "@mui/material"
 import { useProfile } from "../../../contexts/DaoContext"
+import DisplayCraftsman from "../Craftsman/Display/DisplayCraftsman"
+import DisplayProjects from "../Projects/Display/DisplayProjects"
+import { Divider } from '@mui/material';
 
 function Home() {
 
@@ -7,13 +10,11 @@ function Home() {
 
     return (
         <>
-            <Grid container spacing={2}>
-                <Grid item xs={12}><Link href="/projects-display" color="inherit" underline="none">Projets</Link></Grid>
-                <Grid item xs={12}><Link href="/craftsman-display" color="inherit" underline="none">Artisans</Link></Grid>
-            </Grid>
+            <DisplayProjects/>
+            <DisplayCraftsman />
         </>
     )
 
 }
 
-export default Home;
+export default Home

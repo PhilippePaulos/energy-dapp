@@ -58,7 +58,7 @@ function DisplayVotes({ craftsman }) {
     }
 
     return (
-        <Grid container >
+        <Grid container mt={5}>
             <Grid item xs={12} >
                 <Typography variant="h6" pl={1} pb={1}>Vote results</Typography>
                 

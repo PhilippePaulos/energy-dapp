@@ -8,7 +8,6 @@ import { formatAddress, getContractDescription, getEthValue } from "../../common
 import ButtonUI from "../ui/button"
 import PopoverDisconnect from "./PopoverDisconnect"
 
-
 function Navbar() {
     const { address, isConnected } = useAccount()
     const { connect } = useConnect({
