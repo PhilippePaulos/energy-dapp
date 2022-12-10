@@ -10,6 +10,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EnergyDao is Ownable {
 
+    uint public state;
+
     enum ProjectStatus {
         Created,
         Tallied,
@@ -65,8 +67,9 @@ contract EnergyDao is Ownable {
     mapping(address => Craftsman) public craftsmans;
     mapping(uint256 => mapping(address => Quotation)) public quotations;
     mapping(address => mapping(uint => address)) voters;
+    
     EnergyGovernor public governor;
-    mapping (address => uint256) public stakers;
+    mapping (address => uint256) public locks;
 
     // Amount of tokens to mint
     uint256 public mintAmount;
@@ -80,9 +83,9 @@ contract EnergyDao is Ownable {
 
     uint256 timeToPropose;
     uint256 timeToVote;
-    uint256 nbTokenToStake;
+    uint256 nbTokenToLock;
     uint256 fees;
-    uint amountToStake;
+    uint amountToLock;
 
     event ProjectRegistered(
         address beneficiary,
@@ -120,32 +123,34 @@ contract EnergyDao is Ownable {
         uint _timeToPropose,
         uint _timeToVote,
         uint _votingPeriod,
-        uint _nbTokenToStake 
+        uint _nbTokenToLock 
     ) {
         // todo ajouter require sur time
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
-        nbTokenToStake = _nbTokenToStake;
-        token = new EEDToken(_mintAmount, nbTokenToStake);
+        nbTokenToLock = _nbTokenToLock;
+        token = new EEDToken(_mintAmount, nbTokenToLock);
         sale = new Sale(address(token), _saleRate, _saleClosingTime, address(this));
         token.approve(address(sale), _saleAmount);
         timeToPropose = _timeToPropose;
         timeToVote = _timeToVote;
         governor = new EnergyGovernor(token, 0, _votingPeriod);
-        fees = _calculateFees(nbTokenToStake);
-        amountToStake = nbTokenToStake - fees;
+        fees = _calculateFees(nbTokenToLock);
+        amountToLock = nbTokenToLock - fees;
     }
 
     function registerCraftsman(
         string calldata _name,
         string calldata _addressCompany,
         string calldata _certification
-    ) external {
+            ) external {
         require(
             craftsmans[msg.sender].craftsmanAddr == address(0),
             "Already registered as craftsman"
         );
+
         require(isNotEmptyString(_name)  && isNotEmptyString(_addressCompany) 
         && isNotEmptyString(_certification),"You must fill all fields");
+
         craftsmans[msg.sender].craftsmanAddr = msg.sender;
         craftsmans[msg.sender].name = _name;
         craftsmans[msg.sender].addressCompany = _addressCompany;
@@ -153,6 +158,17 @@ contract EnergyDao is Ownable {
 
         emit CraftsmanRegistered(msg.sender);
     }
+
+    // function _proposeCraftsman() internal returns (uint) {
+    //     address[] memory addr = new address[](1);
+    //     addr[0] = address(this);
+    //     uint[] memory values = new uint[](1);
+    //     string memory description = "validateCraftsman";
+    //     bytes memory transferPayload = abi.encodeWithSignature("validateCraftsman(address)", msg.sender);
+    //     bytes[] memory calldatas = new bytes[](1);
+    //     calldatas[0] = transferPayload;
+    //     return governor.propose(addr, values, calldatas, description);
+    // }
 
     function isCraftsmanValidated(address _address) public view returns(bool) {
         return craftsmans[_address].isValidated;
@@ -191,7 +207,7 @@ contract EnergyDao is Ownable {
         project.creationDate = block.timestamp;
         projects.push(project);
 
-        stake();
+        lock();
 
         emit ProjectRegistered(
             msg.sender,
@@ -238,7 +254,7 @@ contract EnergyDao is Ownable {
         projects[_id].craftsmans.push(msg.sender);
         projects[_id].nbQuotations += 1;
 
-        stake();
+        lock();
 
         emit QuotationRegistred(_id, msg.sender);
     }
@@ -279,7 +295,7 @@ contract EnergyDao is Ownable {
         for(uint i=0; i < projects[_projectId].craftsmans.length ; i++){
             address craftsmanAddr;
             craftsmanAddr = projects[_projectId].craftsmans[i];
-            unstake(craftsmanAddr);
+            unlock(craftsmanAddr);
             if(quotations[_projectId][craftsmanAddr].weightVote > voteCount){
                 voteCount = quotations[_projectId][craftsmanAddr].weightVote;
                 _winningCraftsman = craftsmanAddr;
@@ -303,15 +319,15 @@ contract EnergyDao is Ownable {
         emit ProjectDecision(_projectId);
     }
 
-    function stake() internal {
-        require(token.balanceOf(msg.sender) >= amountToStake + stakers[msg.sender], "You don't have enough token in your account");
+    function lock() internal {
+        require(token.balanceOf(msg.sender) >= amountToLock + locks[msg.sender], "You don't have enough token in your account");
         token.transferFrom(msg.sender, address(this), fees);
-        stakers[msg.sender] += amountToStake;  
+        locks[msg.sender] += amountToLock;  
     }
 
-    function unstake(address _addr) internal {
-        require(token.balanceOf(_addr) >= amountToStake, "You can't unstake that much");
-        stakers[_addr] -= amountToStake;    
+    function unlock(address _addr) internal {
+        require(token.balanceOf(_addr) >= amountToLock, "You can't unlock that much");
+        locks[_addr] -= amountToLock;    
     }
 
     function _calculateFees(uint _amount) internal pure returns(uint) {

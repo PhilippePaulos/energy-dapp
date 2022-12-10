@@ -4,7 +4,7 @@ import Identicon from '@polkadot/react-identicon'
 import { useState } from "react"
 import { useAccount, useConnect, useContractRead, useNetwork } from "wagmi"
 import { InjectedConnector } from 'wagmi/connectors/injected'
-import { formatAddress, getContractDescription, getEthValue } from "../../helpers/eth"
+import { formatAddress, getContractDescription, getEthValue } from "../../common/helpers/eth"
 import ButtonUI from "../ui/button"
 import PopoverDisconnect from "./PopoverDisconnect"
 
@@ -35,7 +35,6 @@ function Navbar() {
     const handleClose = () => {
         setAnchorEl(null)
     }
-
 
     const open = Boolean(anchorEl)
     const id = open ? 'disconnect-popover' : undefined

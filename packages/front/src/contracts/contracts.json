@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968",
+        "addr": "0xBf5A316F4303e13aE92c56D2D8C9F7629bEF5c6e",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+        "addr": "0xB955b6c65Ff69bfe07A557aa385055282b8a5eA3",
         "abi": [
           {
             "inputs": [
@@ -896,7 +896,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "addr": "0x851356ae760d987E095750cCeb3bC6014560891C",
         "abi": [
           {
             "inputs": [
@@ -937,7 +937,7 @@
               },
               {
                 "internalType": "uint256",
-                "name": "_nbTokenToStake",
+                "name": "_nbTokenToLock",
                 "type": "uint256"
               }
             ],
@@ -1100,9 +1100,9 @@
                 "type": "string"
               },
               {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "_department",
-                "type": "uint256"
+                "type": "uint8"
               },
               {
                 "internalType": "enum EnergyDao.Sector",
@@ -1214,6 +1214,25 @@
             "type": "function"
           },
           {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "name": "locks",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
             "inputs": [],
             "name": "mintAmount",
             "outputs": [
@@ -1288,9 +1307,9 @@
                 "type": "string"
               },
               {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "department",
-                "type": "uint256"
+                "type": "uint8"
               },
               {
                 "internalType": "enum EnergyDao.Sector",
@@ -1447,6 +1466,19 @@
             "type": "function"
           },
           {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              }
+            ],
+            "name": "removeQuotation",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
             "inputs": [],
             "name": "renounceOwnership",
             "outputs": [],
@@ -1511,14 +1543,8 @@
             "type": "function"
           },
           {
-            "inputs": [
-              {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-              }
-            ],
-            "name": "stakers",
+            "inputs": [],
+            "name": "state",
             "outputs": [
               {
                 "internalType": "uint256",
@@ -1606,7 +1632,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xeEBe00Ac0756308ac4AaBfD76c05c4F3088B8883",
+        "addr": "0xbA94C268049DD87Ded35F41F6D4C7542b4BdB767",
         "abi": [
           {
             "inputs": [

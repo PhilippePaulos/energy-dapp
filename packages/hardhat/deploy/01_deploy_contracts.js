@@ -9,8 +9,8 @@ const IPFS_IMG = "ipfs://bafybeibrzm2h3z37eaxqvofioxfythtv6fhdq7acdzwgukpoupsdcj
 
 async function main() {
 
-  const mintAmount = ethers.utils.parseEther("100000")
-  const saleAmount = ethers.utils.parseEther("100000")
+  const mintAmount = ethers.utils.parseEther("300000")
+  const saleAmount = ethers.utils.parseEther("300000")
   // 1ETH -> 200 EED
   const rate = 200
   const ONE_DAY_IN_SECS = 24 * 60 * 60
@@ -18,7 +18,7 @@ async function main() {
 
   console.log("Deploy DAO...")
   const EnergyDao = await ethers.getContractFactory("EnergyDao")
-  //const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, 10, 2, 2, ethers.utils.parseEther("75"))
+
   const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, 10, 2, 3, ethers.utils.parseEther("75"))
 
   await energyDao.deployed()
@@ -53,6 +53,7 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   const [owner, addr1, addr2, addr3, addr4, addr5] = await ethers.getSigners()
 
   await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('150') })
+  console.log("addr1", addr1.address);
   await sale.buyTokens(addr2.address, { value: ethers.utils.parseEther('150') })
   await sale.buyTokens(addr3.address, { value: ethers.utils.parseEther('150') })
   await sale.buyTokens(addr4.address, { value: ethers.utils.parseEther('150') })
@@ -71,19 +72,19 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   // transfer tokens to reach quorum
   // await energyDao.transfer(addr1.address, ethers.utils.parseEther('30000'))
   await eedToken.connect(addr1).delegate(addr1.address)
+  await eedToken.connect(addr2).delegate(addr2.address)
+  await eedToken.connect(addr3).delegate(addr3.address)
+  await eedToken.connect(addr4).delegate(addr4.address)
+  await eedToken.connect(addr5).delegate(addr5.address)
 
-  const { proposalId, descriptionHash, encodedFuncs } = await proposeVote(
-    governor, [energyDao, energyDao, energyDao], ["validateCraftsman", "validateCraftsman", "validateCraftsman"],
-    [[addr1.address], [addr2.address], [addr3.address]], [0, 0, 0], "validate some craftsmans")
+  await addCraftsman(governor, energyDao,addr1, addr1)
+  await addCraftsman(governor, energyDao, addr1, addr2)
+  await addCraftsman(governor, energyDao, addr1, addr3)
 
-  await governor.connect(addr1).castVote(proposalId, Votes.For)
-
-  await hre.network.provider.send("hardhat_mine")
-
-  await governor.execute([energyDao.address, energyDao.address, energyDao.address], [0, 0, 0], encodedFuncs, descriptionHash)
   console.log("Craftsmans validated")
 
   console.log("Create projects...")
+
   await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("0.75"));
   await energyDao.connect(addr1).addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
   await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("0.75"));
@@ -101,26 +102,34 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   console.log(res2);
   const res4 = await eedToken.balanceOf(addr1.address);
   console.log(res4);
-  const stake1 = await energyDao.connect(addr2).stakers(addr2.address)
+  const stake1 = await energyDao.connect(addr2).locks(addr2.address)
   console.log(stake1)
   console.log("Quotations Created...")
   
   console.log("Vote session started")
   await time.increase(3)
-  await energyDao.connect(addr1).setVote(1, addr1.address)
-  //await energyDao.connect(addr2).setVote(0, addr1.address)
-  const quot = await energyDao.connect(addr1).quotations(1, addr1.address)
-  console.log(quot)
+  await energyDao.connect(addr1).setVote(1, addr2.address)
+
+  await energyDao.connect(addr1).quotations(1, addr2.address)
 
   console.log("Vote session terminated")
   await time.increase(10)
   await energyDao.connect(addr1).tallyVotes(1)
-  const project = await energyDao.connect(addr1).projects(1)
-  console.log(project)
-  const stake = await energyDao.connect(addr3).stakers(addr3.address)
-  console.log(stake)
+  await energyDao.connect(addr1).projects(1)
+  await energyDao.connect(addr3).locks(addr3.address)
 
-  
+}
+
+async function addCraftsman(governor, energyDao, signer, addr) {
+
+  const { proposalId, descriptionHash, encodedFuncs } = await proposeVote(governor, [energyDao], ["validateCraftsman"], [[addr.address]], [0], `validate ${addr.address}`)
+  await governor.connect(signer).castVote(proposalId, Votes.For)
+
+  await hre.network.provider.send("hardhat_mine")
+
+  await hre.network.provider.send("hardhat_mine")
+
+  await governor.execute([energyDao.address], [0], encodedFuncs, descriptionHash)
 }
 
 main()
