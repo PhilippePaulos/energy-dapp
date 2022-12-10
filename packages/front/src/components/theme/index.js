@@ -18,7 +18,8 @@ export const theme = createTheme({
             main: "#6b7280",
         },
         action: {
-            main: "#000000"
+            main: "#ffffff",
+            secondary: "rgb(17 24 39)"
         },
         error: {
             main: "#ef4444"
@@ -26,6 +27,9 @@ export const theme = createTheme({
         border: {
             main: "#6f6f6f"
         },
+        hover: {
+            main: "#6b7280"
+        }
     },
     typography: {
         fontFamily: "Inter, Arial, sans-serif",

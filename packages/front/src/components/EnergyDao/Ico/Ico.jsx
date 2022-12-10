@@ -56,7 +56,7 @@ function Ico() {
     }
 
     return (
-        <Grid container>
+        <Grid container mar>
             <Grid item margin={"auto"} sx={{ display: "flex", gap: "5px", flexDirection: "column", textAlign: "left" }}>
                 <Typography variant="h6">Sale Price:  1 ETH = {rate} EED</Typography>
                 <Typography variant="h6">Remaining tokens: {remainingTokens}</Typography>

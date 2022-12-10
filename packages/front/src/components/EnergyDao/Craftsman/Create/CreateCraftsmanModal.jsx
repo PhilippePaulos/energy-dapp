@@ -2,20 +2,30 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, FormControl, Typography } from "@mui/material";
 import { useState } from "react";
+import { useConnect, useSigner } from 'wagmi';
 import { isAllDefined, uploadIpfsFile } from "../../../../common/helpers/eth";
+import { useProfile } from '../../../../contexts/DaoContext';
 import ButtonUI from "../../../ui/button";
 import CenteredModal from "../../../ui/CenteredModal";
 import TextFieldUI from "../../../ui/text-field";
+import CircularIndeterminate from "../../../ui/CircularIndeterminate"
 
 function CreateCraftsmanModal(props) {
 
-    const { open, setOpen } = props
+    const { open, setOpen, fetchCraftsman } = props
+
+    const { data: signer } = useSigner()
+
 
     const [values, setValues] = useState({
         name: "",
         certification: "",
         address: ""
     })
+
+    const { profile: { contracts: { EnergyDao } } } = useProfile()
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleChange = (e) => {
         setValues({ ...values, [e.target.name]: e.target.value })
@@ -29,14 +39,16 @@ function CreateCraftsmanModal(props) {
     const onSubmit = async () => {
         console.log(values);
         if (isAllDefined(values)) {
-            console.log("go");
             try {
                 const hash = await uploadIpfsFile(values.certification)
-                console.log(hash);
             }
             catch (error) {
                 console.log("Error sending File to IPFS: ", error)
             }
+            setIsLoading(true)
+            await EnergyDao.connect(signer).registerCraftsman(values.name, values.address, values.certification)
+            setIsLoading(false)
+            setOpen(false)
         }
         else {
             console.log("not");
@@ -66,7 +78,10 @@ function CreateCraftsmanModal(props) {
                         Candidater
                     </ButtonUI>
                 </FormControl>
+                <CircularIndeterminate loading={isLoading} />
+
             </Box>
+
         </CenteredModal>
     )
 }

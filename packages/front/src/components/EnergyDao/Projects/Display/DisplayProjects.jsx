@@ -6,7 +6,7 @@ import { SectorCodes, StatusCodes } from "../../../../common/enums"
 import { initContract } from "../../../../common/helpers/eth"
 import { theme } from "../../../theme"
 import ButtonUI from "../../../ui/button"
-import TableBodyUI from "../../../ui/TableBody"
+import TableBodyHover from "../../../ui/TableBodyHover"
 import TableContainerUI from "../../../ui/TableContainer"
 import CreateProjectModal from "../Create/CreateProjectModal"
 import ProjectDetailsModal from "../Details/ProjectDetails"
@@ -20,8 +20,6 @@ function DisplayProjects() {
     const [projects, setProjects] = useState([])
     const [project, setProject] = useState({})
     const [quotations, setQuotations] = useState([])
-
-    const contract = initContract("EnergyDao", chain.id, provider)
 
     const fetchEvents = useCallback(async (contract) => {
         let eventFilter = contract.filters.ProjectRegistered()
@@ -37,6 +35,7 @@ function DisplayProjects() {
         const promises = ids.map((id) => retrieveProject(id))
         const projects = await Promise.all(promises)
         setProjects(projects)
+
     }, [])
 
     const fetchQuotationEvents = useCallback(async (contract, projectId) => {
@@ -59,23 +58,25 @@ function DisplayProjects() {
     }, [])
 
     useEffect(() => {
+        const contract = initContract("EnergyDao", chain.id, provider)
         fetchEvents(contract)
-    }, [fetchEvents, contract])
+    }, [fetchEvents])
 
     const handleClickCreate = () => {
         setOpenCreate(true)
     }
 
     const handleClickDetails = useCallback((row) => {
+        const contract = initContract("EnergyDao", chain.id, provider)
         setProject(row)
         fetchQuotationEvents(contract, row.id)
         setOpenDetails(true)
-    }, [contract, fetchQuotationEvents])
+    }, [fetchQuotationEvents])
 
     return (
         <>
             <Grid container >
-                <Grid item xs={12} textAlign="right" mb={1}>
+                <Grid item xs={12} m={1}>
                     <ButtonUI variant="contained" color="action" onClick={handleClickCreate} >
                         <AddBusinessIcon />
                     </ButtonUI>
@@ -96,7 +97,7 @@ function DisplayProjects() {
                                     <TableCell align="right">Beneficiaire</TableCell>
                                 </TableRow>
                             </TableHead>
-                            <TableBodyUI>
+                            <TableBodyHover>
                                 {projects.map((row) =>
                                 (
 
@@ -110,7 +111,7 @@ function DisplayProjects() {
                                         <TableCell align="right">{row.beneficiaryAddr}</TableCell>
                                     </TableRow>
                                 ))}
-                            </TableBodyUI>
+                            </TableBodyHover>
                         </Table>
                     </TableContainerUI>
                 </Grid>

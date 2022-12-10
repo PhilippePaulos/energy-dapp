@@ -36,7 +36,6 @@ function Navbar() {
         setAnchorEl(null)
     }
 
-
     const open = Boolean(anchorEl)
     const id = open ? 'disconnect-popover' : undefined
 

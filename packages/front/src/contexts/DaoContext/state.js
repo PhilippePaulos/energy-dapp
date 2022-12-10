@@ -3,7 +3,6 @@ const actions = {
 }
 
 const initialState = {
-  balance: null,
   contracts: null
 }
 

@@ -66,4 +66,16 @@ function openIpfsLink(hash) {
     window.open("https://gateway.pinata.cloud/ipfs/QmQ3C2j5ZzHxbdBKPFj6G7s9szwig95iy4MXHMrKcN9cvD")
 }
 
-export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected, initContract}
+async function proposeVote(governor, instances, funcs, args, values, description) {
+    let encodedFuncs = [];
+
+    for (let i = 0; i < instances.length; i++) {
+        encodedFuncs.push(instances[i].interface.encodeFunctionData(funcs[i], args[i]))
+    }
+    
+    const addresses = instances.map((instance) => instance.address)
+    await governor.propose(addresses, values, encodedFuncs, description)
+}
+
+
+export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected, initContract, proposeVote}

@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968",
+        "addr": "0x2e1E753d4a984F592D9De32C7e8009CE53298720",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+        "addr": "0xd43F5E24C6b2edc1dFDE8548cDdaBeFFA6eCc822",
         "abi": [
           {
             "inputs": [
@@ -839,7 +839,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "addr": "0x18E317A7D70d8fBf8e6E893616b52390EbBdb629",
         "abi": [
           {
             "inputs": [
@@ -1365,6 +1365,19 @@
           },
           {
             "inputs": [],
+            "name": "state",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
             "name": "token",
             "outputs": [
               {
@@ -1427,7 +1440,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xeEBe00Ac0756308ac4AaBfD76c05c4F3088B8883",
+        "addr": "0x49559916a93A279E9da576339d76e24e73044Fc3",
         "abi": [
           {
             "inputs": [

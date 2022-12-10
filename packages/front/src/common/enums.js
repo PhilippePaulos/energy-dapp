@@ -24,4 +24,33 @@ const StatusCodes = {
     "3": Status.Rejected,
 }
 
-export { Status, StatusCodes, Sector, SectorCodes};
+const ProposalState = {
+    Pending: "Pending",
+    Active: "Active",
+    Canceled: "Canceled",
+    Defeated: "Defeated",
+    Succeeded: "Succeeded",
+    Queued: "Queued",
+    Expired: "Expired",
+    Executed: "Executed"
+}
+
+const ProposalStateCodes = {
+    "0": ProposalState.Pending,
+    "1": ProposalState.Active,
+    "2": ProposalState.Canceled,
+    "3": ProposalState.Defeated,
+    "4": ProposalState.Succeeded,
+    "5": ProposalState.Queued,
+    "6": ProposalState.Expired,
+    "7": ProposalState.Executed,
+}
+
+const Votes = {
+    Against: 0,
+    For: 1,
+    Abstain: 2
+}
+
+
+export { Status, StatusCodes, Sector, SectorCodes, ProposalState, ProposalStateCodes, Votes};

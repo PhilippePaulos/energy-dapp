@@ -4,10 +4,12 @@ import { BigNumber } from "ethers"
 import { StatusCodes } from "../../../../common/enums"
 import { openIpfsLink } from "../../../../common/helpers/eth"
 import CenteredModal from "../../../ui/CenteredModal"
+import IconHover from '../../../ui/IconHover'
 import PdfPicture from "../../../ui/PdfPicture"
 import RoundedGrid from "../../../ui/RoundedGrid"
-import TableBodyUI from "../../../ui/TableBody"
+import TableBodyHover from "../../../ui/TableBodyHover"
 import TableContainerUI from "../../../ui/TableContainer"
+
 
 function ProjectDetailsModal(props) {
 
@@ -76,7 +78,7 @@ function ProjectDetailsModal(props) {
                                         <TableCell align="right">CEE émis</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                <TableBodyUI>
+                                <TableBodyHover>
                                     {quotations.map((row) =>
                                     (
 
@@ -85,12 +87,12 @@ function ProjectDetailsModal(props) {
                                         >
                                             <TableCell component="th" scope="row">{row.craftsmanAddr}</TableCell>
                                             <TableCell align="right">{row.description}</TableCell>
-                                            <TableCell align="right"><PictureAsPdfIcon onClick={() => openIpfsLink(row.documentHash)} /></TableCell>
+                                            <TableCell align="right"><IconHover><PictureAsPdfIcon onClick={() => openIpfsLink(row.documentHash)} /></IconHover></TableCell>
                                             <TableCell align="right">{BigNumber.from(project.department).toNumber()}</TableCell>
                                             <TableCell align="right">{BigNumber.from(row.nbCee).toNumber()}</TableCell>
                                         </TableRow>
                                     ))}
-                                </TableBodyUI>
+                                </TableBodyHover>
                             </Table>
                         </TableContainerUI>
                     </Grid>
