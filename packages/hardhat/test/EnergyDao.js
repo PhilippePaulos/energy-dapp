@@ -2,6 +2,7 @@ const {time,loadFixture} = require("@nomicfoundation/hardhat-network-helpers");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { getBalance } = require("../helpers/common");
+//const { BN , expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
 
 const provider = ethers.provider
 
@@ -14,20 +15,6 @@ async function prepare() {
   return { mintAmount, saleAmount, rate, closingTime }
 }
 
-describe("MainContract", function () {
-  async function deployFixture() {
-
-    const { mintAmount, saleAmount, rate, closingTime } = await prepare()
-
-    const [owner, otherAccount] = await ethers.getSigners();
-
-    const Deployer = await ethers.getContractFactory("MainContract");
-    const deployer = await Deployer.deploy(mintAmount, saleAmount, rate, closingTime);
-    const Sale = await ethers.getContractFactory("Sale");
-    const sale = Sale.attach(await deployer.sale());
-
-    return { deployer, sale, mintAmount, saleAmount, rate, closingTime, owner, otherAccount };
-  }
 
   describe("Deployment", function () {
     it("Should set the right status", async function () {
@@ -107,5 +94,3 @@ describe("MainContract", function () {
       await expect(deployer.getFunds()).to.be.revertedWith("Sale still ongoing");
     })
   });
-
-});

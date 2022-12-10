@@ -32,7 +32,7 @@ contract MainContract is Ownable {
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
         mintAmount = _mintAmount;
         saleAmount = _saleAmount;
-        token = new EEDToken(_mintAmount);
+        token = new EEDToken(_mintAmount, 5);
         sale = new Sale(address(token), _saleRate, _saleClosingTime, address(this));
         token.approve(address(sale), _saleAmount);
     }

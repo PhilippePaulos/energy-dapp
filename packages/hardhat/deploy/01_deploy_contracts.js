@@ -18,7 +18,8 @@ async function main() {
 
   console.log("Deploy DAO...")
   const EnergyDao = await ethers.getContractFactory("EnergyDao")
-  const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, 0, 2, 2)
+  //const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, 10, 2, 2, ethers.utils.parseEther("75"))
+  const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, 10, 2, 3, ethers.utils.parseEther("75"))
 
   await energyDao.deployed()
   console.log("Deployed DAO to", energyDao.address)
@@ -49,12 +50,17 @@ async function main() {
 }
 
 async function prepareData(energyDao, eedToken, governor, sale) {
-  const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners()
+  const [owner, addr1, addr2, addr3, addr4, addr5] = await ethers.getSigners()
 
   await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('150') })
   await sale.buyTokens(addr2.address, { value: ethers.utils.parseEther('150') })
   await sale.buyTokens(addr3.address, { value: ethers.utils.parseEther('150') })
+  await sale.buyTokens(addr4.address, { value: ethers.utils.parseEther('150') })
+  await sale.buyTokens(addr5.address, { value: ethers.utils.parseEther('150') })
 
+  //const res = await eedToken.balanceOf(energyDao.address);
+  const res = await eedToken.balanceOf(addr1.address);
+  console.log(res);
   console.log("Register craftsmans...")
   await energyDao.connect(addr1).registerCraftsman("Jean", "7 rue du Maine", IPFS_IMG)
   await energyDao.connect(addr2).registerCraftsman("Paul", "8 impasse des coquelicots", IPFS_IMG)
@@ -78,14 +84,41 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   console.log("Craftsmans validated")
 
   console.log("Create projects...")
-  await energyDao.addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
-  await energyDao.addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
-
-  await energyDao.connect(addr1).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
-  await energyDao.connect(addr2).proposeQuotation(1, "devis Paul SARL", IPFS_IMG, 6500, 250000)
-  await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
-
+  await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("0.75"));
+  await energyDao.connect(addr1).addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+  await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("0.75"));
+  await energyDao.connect(addr1).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
   console.log("Projects created")
+
+  console.log("Create Quotations...")
+  await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("0.75"));
+  await energyDao.connect(addr2).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
+  await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("0.75"));
+  await energyDao.connect(addr2).proposeQuotation(1, "devis Paul SARL", IPFS_IMG, 6500, 250000)
+  await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("0.75"));
+  await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
+  const res2 = await eedToken.balanceOf(energyDao.address);
+  console.log(res2);
+  const res4 = await eedToken.balanceOf(addr1.address);
+  console.log(res4);
+  const stake1 = await energyDao.connect(addr2).stakers(addr2.address)
+  console.log(stake1)
+  console.log("Quotations Created...")
+  
+  console.log("Vote session started")
+  await time.increase(3)
+  await energyDao.connect(addr1).setVote(1, addr1.address)
+  //await energyDao.connect(addr2).setVote(0, addr1.address)
+  const quot = await energyDao.connect(addr1).quotations(1, addr1.address)
+  console.log(quot)
+
+  console.log("Vote session terminated")
+  await time.increase(10)
+  await energyDao.connect(addr1).tallyVotes(1)
+  const project = await energyDao.connect(addr1).projects(1)
+  console.log(project)
+  const stake = await energyDao.connect(addr3).stakers(addr3.address)
+  console.log(stake)
 
   
 }
