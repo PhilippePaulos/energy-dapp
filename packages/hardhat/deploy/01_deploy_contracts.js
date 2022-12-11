@@ -9,14 +9,14 @@ const IPFS_IMG = "ipfs://bafybeibrzm2h3z37eaxqvofioxfythtv6fhdq7acdzwgukpoupsdcj
 
 async function main() {
 
-  const mintAmount = ethers.utils.parseEther("300000")
-  const saleAmount = ethers.utils.parseEther("300000")
+  const mintAmount = ethers.utils.parseEther("3000000")
+  const saleAmount = ethers.utils.parseEther("3000000")
   const craftsmanPeriod = 2
   const quotationPeriod = 3
   const votingPeriod = 2
   const voteExpire = 2
   // 1ETH -> 200 EED
-  const rate = 200
+  const rate = 2000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
   const closingTime = (await time.latest()) + ONE_DAY_IN_SECS
 
@@ -74,7 +74,6 @@ async function prepareData(energyDao, eedToken, governor, sale) {
 
   console.log("Validate craftsman via governor instance....")
   // transfer tokens to reach quorum
-  // await energyDao.transfer(addr1.address, ethers.utils.parseEther('30000'))
   await eedToken.connect(addr1).delegate(addr1.address)
   await eedToken.connect(addr2).delegate(addr2.address)
   await eedToken.connect(addr3).delegate(addr3.address)

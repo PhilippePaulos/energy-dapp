@@ -19,7 +19,7 @@ contract EnergyDao is Ownable {
         Active,
         Ended,
         Rejected,
-        Executed,
+        Accepted,
         Expired
     }
 
@@ -33,7 +33,7 @@ contract EnergyDao is Ownable {
         uint64 voteStart;
         uint64 voteEnd;
         uint64 voteExpire;
-        bool executed;
+        bool accepted;
         bool rejected;
     }
 
@@ -302,8 +302,8 @@ contract EnergyDao is Ownable {
     function _state(uint _projectId, uint _block) internal view returns(ProposalState) {
         Project memory project = projects[_projectId];
 
-        if(project.voteInfo.executed){
-            return ProposalState.Executed;
+        if(project.voteInfo.accepted){
+            return ProposalState.Accepted;
         }
 
         if(project.voteInfo.rejected){
@@ -357,7 +357,7 @@ contract EnergyDao is Ownable {
         }
         else {
             projects[_projectId].choosedCraftsman = winner;
-            projects[_projectId].voteInfo.executed = true;
+            projects[_projectId].voteInfo.accepted = true;
             craftsmans[winner].nbProjectsValidated += 1;
         }
 
