@@ -94,39 +94,37 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("1.5"));
   await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("1.5"));
 
+
+  console.log("PROJET 1");
   await energyDao.connect(addr1).addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+  await energyDao.connect(addr2).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
+  await energyDao.connect(addr3).proposeQuotation(0, "devis super", IPFS_IMG, 720, 200000)
 
   await hre.network.provider.send("hardhat_mine")
   await hre.network.provider.send("hardhat_mine")
-  await hre.network.provider.send("hardhat_mine")
+  
 
-  console.log("state", await energyDao.getState(0));
-  await energyDao.getS()
-  console.log("Vote session started")
-  console.log("SCRIPT - STATE");
-  console.log("state", await energyDao.getState(0));
-
-  console.log("SCRIPT - CAST VOTE");
   await energyDao.connect(addr1).castVote(0, addr1.address, addr2.address)
+  await hre.network.provider.send("hardhat_mine")
 
-  // await energyDao.connect(addr1).castVote(1, addr1.address, addr2.address)
+  await energyDao.connect(addr1).execute(0)
 
-  // // await energyDao.connect(addr1).execute(0)
-  // await energyDao.connect(addr1).reject(0)
-  // console.log("state", await energyDao.getState(0));
-  // const winner = (await energyDao.projects(0)).choosedCraftsman;
+  console.log("PROJET 2");
+  await energyDao.connect(addr1).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+  await energyDao.connect(addr2).proposeQuotation(1, "devis Paul SARL", IPFS_IMG, 6500, 250000)
+  await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
+  await hre.network.provider.send("hardhat_mine")
+  await hre.network.provider.send("hardhat_mine")
+
+  await energyDao.connect(addr1).castVote(1, addr1.address, addr2.address)
+  await energyDao.connect(addr1).execute(1)
+  
+  // const winner = (await energyDao.projects(1)).choosedCraftsman;
   // console.log((await energyDao.craftsmans(winner)).nbProjectsValidated);
 
   // console.log(await energyDao.getVoteProject(0, winner));
 
-  // await energyDao.connect(addr1).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
-  // console.log("Projects created")
 
-  // console.log("Create Quotations...")
-  
-  // await energyDao.connect(addr2).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
-  // await energyDao.connect(addr2).proposeQuotation(1, "devis Paul SARL", IPFS_IMG, 6500, 250000)
-  // await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
 
 }
 

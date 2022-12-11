@@ -272,8 +272,7 @@ contract EnergyDao is Ownable {
 
 
     function castVote(uint _projectId, address _account, address _craftsman) external {
-        console.log("STATE CAST", block.number);
-        require(getState(_projectId) == ProposalState.Active, "Vote session is not active");
+        require(_state(_projectId, block.number) == ProposalState.Active, "Vote session is not active");
         require(!hasVoted(_projectId, _account), "Vote already cast");
         voters[_account][_projectId] = _craftsman;
 
@@ -296,9 +295,12 @@ contract EnergyDao is Ownable {
         return voters[_account][_projectId] != address(0);
     }
 
-    function getState(uint projectId) public view returns(ProposalState) {
-        console.log("GET STATE BLOCK", block.number);
-        Project memory project = projects[projectId];
+    function getState(uint _projectId) external view returns(ProposalState) {
+        return _state(_projectId, block.number + 1);
+    }
+
+    function _state(uint _projectId, uint _block) internal view returns(ProposalState) {
+        Project memory project = projects[_projectId];
 
         if(project.voteInfo.executed){
             return ProposalState.Executed;
@@ -308,19 +310,19 @@ contract EnergyDao is Ownable {
             return ProposalState.Rejected;
         }
 
-        uint voteStart = projects[projectId].voteInfo.voteStart;
+        uint voteStart = projects[_projectId].voteInfo.voteStart;
 
-        if(voteStart >= block.number) {
+        if(voteStart >= _block) {
             return ProposalState.Pending;
         }
 
-        uint voteEnd = projects[projectId].voteInfo.voteEnd;
-        if (voteEnd >= block.number){
+        uint voteEnd = projects[_projectId].voteInfo.voteEnd;
+        if (voteEnd >= _block){
             return ProposalState.Active;
         }
 
-        uint _voteExpire = projects[projectId].voteInfo.voteExpire;
-        if (_voteExpire >= block.number) {
+        uint _voteExpire = projects[_projectId].voteInfo.voteExpire;
+        if (_voteExpire >= _block) {
             return ProposalState.Ended;
         }
 
@@ -328,9 +330,13 @@ contract EnergyDao is Ownable {
     }
 
      function _computeProjectWinner(uint _projectId) internal view returns (address) {
+        if (projects[_projectId].nbQuotations == 0){
+            return address(0);
+        }
         uint weight;
-        address winner = projects[_projectId].craftsmans[0];
-        for(uint i=1; i < projects[_projectId].craftsmans.length ; i++){ 
+        address winner;
+
+        for(uint i=0; i < projects[_projectId].craftsmans.length ; i++){ 
             address craftsman = projects[_projectId].craftsmans[i];
             uint vote = getVoteProject(_projectId, craftsman);
             if (vote > weight) {
@@ -342,19 +348,24 @@ contract EnergyDao is Ownable {
     }
 
     function execute(uint _projectId) external onlyBeneficiary(_projectId){
-        ProposalState status = getState(_projectId);
-        require(status == ProposalState.Ended, "");
+        ProposalState status = _state(_projectId, block.number);
+        require(status == ProposalState.Ended, "Vote session is not ended");
         
         address winner = _computeProjectWinner(_projectId);
-        projects[_projectId].choosedCraftsman = winner;
-        projects[_projectId].voteInfo.executed = true;
-        craftsmans[winner].nbProjectsValidated += 1;
+        if (winner == address(0)) {
+            projects[_projectId].voteInfo.rejected = true;
+        }
+        else {
+            projects[_projectId].choosedCraftsman = winner;
+            projects[_projectId].voteInfo.executed = true;
+            craftsmans[winner].nbProjectsValidated += 1;
+        }
 
         emit QuotationAccepted(_projectId, winner);
     }
 
     function reject(uint _projectId) external onlyBeneficiary(_projectId) {
-        ProposalState status = getState(_projectId);
+        ProposalState status = _state(_projectId, block.number);
         require(status == ProposalState.Ended);
         
         projects[_projectId].voteInfo.rejected = true;
