@@ -347,7 +347,7 @@ contract EnergyDao is Ownable {
         return winner;
     }
 
-    function execute(uint _projectId) external onlyBeneficiary(_projectId){
+    function accept(uint _projectId) external onlyBeneficiary(_projectId){
         ProposalState status = _state(_projectId, block.number);
         require(status == ProposalState.Ended, "Vote session is not ended");
         
