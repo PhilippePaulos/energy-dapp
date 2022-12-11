@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xbD89b434dD59562756ED9B14B0bec5E71f3c6876",
+        "addr": "0xd79Df1927718b3212FA6E126Ec4Ad2b3Ee1263D9",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0xc95ff0608561b6bA084c78D14f09e9826190f968",
+        "addr": "0x465Df401621060aE6330C13cA7A0baa2B0a9d66D",
         "abi": [
           {
             "inputs": [
@@ -896,7 +896,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00",
+        "addr": "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f",
         "abi": [
           {
             "inputs": [
@@ -1312,7 +1312,7 @@
             "inputs": [
               {
                 "internalType": "address",
-                "name": "_address",
+                "name": "_addr",
                 "type": "address"
               }
             ],
@@ -1599,6 +1599,19 @@
           {
             "inputs": [
               {
+                "internalType": "address",
+                "name": "_addr",
+                "type": "address"
+              }
+            ],
+            "name": "removeCrafsman",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
                 "internalType": "uint256",
                 "name": "_projectId",
                 "type": "uint256"
@@ -1719,7 +1732,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xB01718DCF2124e3a9217aC0dEc176a72733d2589",
+        "addr": "0x437aa5691C456a3bB39e1051505F10382D6A3b63",
         "abi": [
           {
             "inputs": [

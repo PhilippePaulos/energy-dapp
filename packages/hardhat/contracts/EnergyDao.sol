@@ -172,16 +172,16 @@ contract EnergyDao is Ownable {
         emit CraftsmanRegistered(msg.sender);
     }
 
-    function isCraftsmanValidated(address _address) public view returns(bool) {
-        return craftsmans[_address].isValidated;
+    function isCraftsmanValidated(address _addr) public view returns(bool) {
+        return craftsmans[_addr].isValidated;
     }
 
     function validateCraftsman(address _addr) public onlyGovernor {
         craftsmans[_addr].isValidated = true;
     }
 
-    function removeCrafsman(address _address) public onlyGovernor {
-        craftsman[_addr].isValidated = false;
+    function removeCrafsman(address _addr) public onlyGovernor {
+        craftsmans[_addr].isValidated = false;
     }
 
     function isNotEmptyString(string calldata _str) internal pure returns(bool) {
