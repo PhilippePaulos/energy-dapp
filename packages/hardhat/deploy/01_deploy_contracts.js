@@ -9,14 +9,14 @@ const IPFS_IMG = "ipfs://bafybeibrzm2h3z37eaxqvofioxfythtv6fhdq7acdzwgukpoupsdcj
 
 async function main() {
 
-  const mintAmount = ethers.utils.parseEther("3000000")
-  const saleAmount = ethers.utils.parseEther("3000000")
+  const mintAmount = ethers.utils.parseEther("1000000")
+  const saleAmount = ethers.utils.parseEther("1000000")
   const craftsmanPeriod = 2
-  const quotationPeriod = 3
+  const quotationPeriod = 4
   const votingPeriod = 2
   const voteExpire = 2
   // 1ETH -> 2000 EED
-  const rate = 2000
+  const rate = 10000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
   const closingTime = (await time.latest()) + ONE_DAY_IN_SECS
 
@@ -54,13 +54,15 @@ async function main() {
 }
 
 async function prepareData(energyDao, eedToken, governor, sale) {
-  const [owner, addr1, addr2, addr3, addr4, addr5] = await ethers.getSigners()
+  const [owner, addr1, addr2, addr3, addr4, addr5, addr6, addr7] = await ethers.getSigners()
 
-  await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('150') })
-  await sale.buyTokens(addr2.address, { value: ethers.utils.parseEther('150') })
-  await sale.buyTokens(addr3.address, { value: ethers.utils.parseEther('150') })
-  await sale.buyTokens(addr4.address, { value: ethers.utils.parseEther('150') })
-  await sale.buyTokens(addr5.address, { value: ethers.utils.parseEther('150') })
+  await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('1') })
+  await sale.buyTokens(addr2.address, { value: ethers.utils.parseEther('1') })
+  await sale.buyTokens(addr3.address, { value: ethers.utils.parseEther('1') })
+  await sale.buyTokens(addr4.address, { value: ethers.utils.parseEther('1') })
+  await sale.buyTokens(addr5.address, { value: ethers.utils.parseEther('1') })
+  await sale.buyTokens(addr6.address, { value: ethers.utils.parseEther('1') })
+  await sale.buyTokens(addr7.address, { value: ethers.utils.parseEther('1') })
 
   //const res = await eedToken.balanceOf(energyDao.address);
   const res = await eedToken.balanceOf(addr1.address);
@@ -69,6 +71,7 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr2).registerCraftsman("Paul", "8 impasse des coquelicots", IPFS_IMG)
   await energyDao.connect(addr3).registerCraftsman("Jacques", "1 rue des Rameaux", IPFS_IMG)
   await energyDao.connect(addr4).registerCraftsman("Philippe", "12 avenue des Lilas", IPFS_IMG)
+  await energyDao.connect(addr5).registerCraftsman("Baptiste", "3 impasse Emile Zola", IPFS_IMG)
 
   console.log("Validate craftsman via governor instance....")
   // transfer tokens to reach quorum
@@ -81,47 +84,42 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await addCraftsman(governor, energyDao,addr1, addr1)
   await addCraftsman(governor, energyDao, addr1, addr2)
   await addCraftsman(governor, energyDao, addr1, addr3)
+  await addCraftsman(governor, energyDao, addr1, addr4)
 
-  console.log("Craftsmans validated")
+  // console.log("Craftsmans validated")
 
-  console.log("Create projects...")
+  // console.log("Create projects...")
 
   console.log("Approve tokens");
   await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("1.5"));
   await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("1.5"));
   await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("1.5"));
+  await eedToken.connect(addr4).approve(energyDao.address, ethers.utils.parseEther("1.5"));
+  await eedToken.connect(addr5).approve(energyDao.address, ethers.utils.parseEther("1.5"));
+  await eedToken.connect(addr6).approve(energyDao.address, ethers.utils.parseEther("1.5"));
+  await eedToken.connect(addr7).approve(energyDao.address, ethers.utils.parseEther("1.5"));
 
 
   console.log("PROJET 1");
-  await energyDao.connect(addr1).addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+  await energyDao.connect(addr6).addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
   await energyDao.connect(addr2).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
   await energyDao.connect(addr3).proposeQuotation(0, "devis super", IPFS_IMG, 720, 200000)
+  await energyDao.connect(addr4).proposeQuotation(0, "Etanchéité renouvelable", IPFS_IMG, 720, 200000)
 
   await hre.network.provider.send("hardhat_mine")
   await hre.network.provider.send("hardhat_mine")
   
-
   await energyDao.connect(addr1).castVote(0, addr1.address, addr2.address)
   await hre.network.provider.send("hardhat_mine")
 
-  await energyDao.connect(addr1).accept(0)
+  await energyDao.connect(addr6).accept(0)
 
   console.log("PROJET 2");
-  await energyDao.connect(addr1).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+  await energyDao.connect(addr7).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
   await energyDao.connect(addr2).proposeQuotation(1, "devis Paul SARL", IPFS_IMG, 6500, 250000)
   await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
+  await energyDao.connect(addr4).proposeQuotation(1, "Devis installation panneaux solaires ", IPFS_IMG, 900, 300000)
   await hre.network.provider.send("hardhat_mine")
-  await hre.network.provider.send("hardhat_mine")
-
-  await energyDao.connect(addr1).castVote(1, addr1.address, addr2.address)
-  await energyDao.connect(addr1).accept(1)
-  
-  // const winner = (await energyDao.projects(1)).choosedCraftsman;
-  // console.log((await energyDao.craftsmans(winner)).nbProjectsValidated);
-
-  // console.log(await energyDao.getVoteProject(0, winner));
-
-
 
 }
 

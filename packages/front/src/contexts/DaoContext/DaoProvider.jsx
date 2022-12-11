@@ -1,9 +1,9 @@
-import { BigNumber, ethers } from "ethers";
-import React, { useEffect, useState } from "react";
-import { useCallback } from "react";
-import { useAccount, useNetwork, useProvider } from "wagmi";
-import { initContract } from "../../common/helpers/eth";
-import DaoContext from "./DaoContext";
+import { BigNumber, ethers } from "ethers"
+import React, { useEffect, useState } from "react"
+import { useCallback } from "react"
+import { useAccount, useNetwork, useProvider } from "wagmi"
+import { initContract } from "../../common/helpers/eth"
+import DaoContext from "./DaoContext"
 
 function DaoProvider({ children }) {
 
@@ -17,6 +17,19 @@ function DaoProvider({ children }) {
     EnergyGovernor: initContract("EnergyGovernor", chain.id, provider)
   }
 
+  useEffect(() => {
+    const events = ["chainChanged", "accountsChanged"]
+    
+    const handleChange = () => {
+      window.location.reload()
+    }
+
+    events.forEach(e => window.ethereum.on(e, handleChange))
+    return () => {
+      events.forEach(e => window.ethereum.removeListener(e, handleChange))
+    }
+  }, [])
+
   const profile = {
     contracts
   }
@@ -27,8 +40,8 @@ function DaoProvider({ children }) {
     }}>
       {children}
     </DaoContext.Provider>
-  );
+  )
 }
 
 
-export default DaoProvider;
+export default DaoProvider

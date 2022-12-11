@@ -1,7 +1,9 @@
 import { Box, FormControl, MenuItem, Typography } from "@mui/material";
+import { Contract } from "ethers";
 import { useState } from "react";
-import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { useAccount, useContractWrite, useNetwork, usePrepareContractWrite, useSigner, useWaitForTransaction } from 'wagmi';
 import { getContractDescription, uploadIpfsFile } from '../../../../common/helpers/eth';
+import { useProfile } from "../../../../contexts/DaoContext";
 import ButtonUI from "../../../ui/button";
 import CenteredModal from "../../../ui/CenteredModal";
 import CircularIndeterminate from "../../../ui/CircularIndeterminate";
@@ -12,7 +14,9 @@ function CreateProjectModal(props) {
     const { open, setOpen } = props
     const { address } = useAccount()
     const [prepare, setPrepare] = useState(false)
-    const [loadingIpfs, setLoadingIpfs] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const { profile: { contracts: { EnergyDao } } } = useProfile()
+    const { data: signer } = useSigner() 
 
     const [values, setValues] = useState({
         name: "",
@@ -30,27 +34,8 @@ function CreateProjectModal(props) {
     const { chain } = useNetwork()
     const { abi, addr } = getContractDescription('EnergyDao', chain.id)
 
-    const { config } = usePrepareContractWrite({
-        address: addr,
-        abi: abi,
-        functionName: 'addProject',
-        args: [values.name, values.description, values.department, values.sector,
-        values.picturesHash, values.diagnosticHash, values.planHash],
-        overrides: {
-            from: address,
-            // value: ethers.utils.parseEther('5'),
-        },
-        enabled: prepare,
-    })
-
-    const { data, write } = useContractWrite(config)
-    const { isLoading } = useWaitForTransaction({
-        hash: data?.hash,
-      })
-
     const handleChange = (event) => {
         setValues({ ...values, [event.target.name]: event.target.value });
-        console.log(values);
     };
 
     const handleUploadFile = (event) => {
@@ -70,23 +55,22 @@ function CreateProjectModal(props) {
     }
 
     const onSubmit = async () => {
-        console.log("submit");
         if (values.name !== "" && values.sector !== "" && values.department !== "" && values.description !== "" &&
             values.diagnostic !== "" && values.plan !== "" && values.pictures.length > 0) {
+
+            setIsLoading(true)
             // upload files to IPFS
-            setPrepare(true)
-            setLoadingIpfs(true)
+            const hashDiagnostic = await uploadIpfsFile(values.diagnostic)
 
-            let hash = await uploadIpfsFile(values.diagnostic)
-            setValues({ ...values, diagnosticHash: hash })
-
-            hash = await uploadIpfsFile(values.plan)
-            setValues({ ...values, planHash: hash })
+            const hashPlan = await uploadIpfsFile(values.plan)
 
             const promises = values.pictures.map((picture) => uploadIpfsFile(picture))
-            setValues({ ...values, picturesHash: await Promise.all(promises) })
-            setLoadingIpfs(false)
-            write?.()
+            const hashPictures = await Promise.all(promises)
+            
+            setPrepare(true)
+
+            await EnergyDao.connect(signer).addProject(values.name, values.description, values.department, values.sector, hashPictures, hashDiagnostic, hashPlan)
+            setIsLoading(false)
         }
     }
 
@@ -141,11 +125,11 @@ function CreateProjectModal(props) {
                         {values.plan && <><Typography>{values.plan.name}</Typography></>}
                         <input hidden name="plan" accept="*" type="file" id="plan-upload" onChange={(e) => handleUploadFile(e)} />
                     </Box>
-                    <ButtonUI variant="contained" component="label" onClick={onSubmit}>
+                    <ButtonUI variant="contained" component="label" onClick={() => onSubmit()}>
                         Create project
                     </ButtonUI>
                 </FormControl>
-                <CircularIndeterminate loading={loadingIpfs || isLoading} />
+                <CircularIndeterminate loading={isLoading} />
             </Box>
         </CenteredModal>
 

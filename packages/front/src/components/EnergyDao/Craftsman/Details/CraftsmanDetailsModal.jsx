@@ -38,33 +38,25 @@ function State({ craftsman, handleClick }) {
 
 function CraftsmanDetailsModal(props) {
     const { craftsman, open, setOpen, fetchCraftsman } = props
-    const { address } = useAccount()
     const { data: signer } = useSigner()
     const { profile: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
     const [isLoading, setIsLoading] = useState(false)
 
     const handleProposal = async () => {
+        setIsLoading(true)
+        const encodedFunc = EnergyDao.interface.encodeFunctionData("validateCraftsman", [craftsman.craftsmanAddr])
         if (craftsman.state === undefined) {
-            setIsLoading(true)
-            const encodedFunc = EnergyDao.interface.encodeFunctionData("validateCraftsman", [craftsman.craftsmanAddr])
             await EnergyGovernor.connect(signer).propose([EnergyDao.address], [0], [encodedFunc], `validate ${craftsman.craftsmanAddr}`)
-            fetchCraftsman()
-            setOpen(false)
-            setIsLoading(false)
         }
-        else if (ProposalStateCodes[craftsman.state] === ProposalState.Succeeded) {            
-            setIsLoading(true)
-            const encodedFunc = EnergyDao.interface.encodeFunctionData("validateCraftsman", [craftsman.craftsmanAddr])
-            console.log(encodedFunc);
-            console.log(craftsman.description);
-
-
+        else if (ProposalStateCodes[craftsman.state] === ProposalState.Succeeded) {
             await EnergyGovernor.connect(signer).execute([EnergyDao.address], [0], [encodedFunc], ethers.utils.id(craftsman.description))
-            fetchCraftsman()
-            setOpen(false)
-            setIsLoading(false)
         }
+        fetchCraftsman()
+        setOpen(false)
+        setIsLoading(false)
     }
+
+
 
     return (
         <CenteredModal
@@ -100,12 +92,6 @@ function CraftsmanDetailsModal(props) {
                     craftsman.votes && <DisplayVotes craftsman={craftsman} />
                 }
                 <CircularIndeterminate loading={isLoading} />
-                {/* <img src=''></img> */}
-                <div>
-                {/* <img
-                    src="https://gateway.pinata.cloud/ipfs/QmPuV2zVQKir4TyexrS8AxoL5igtPRT22w9NXaAnoiVfVD"
-                /> */}
-                </div>
             </Box>
         </CenteredModal>
     )

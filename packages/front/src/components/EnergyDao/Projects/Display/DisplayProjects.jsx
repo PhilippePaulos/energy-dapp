@@ -1,6 +1,7 @@
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
 import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import Identicon from '@polkadot/react-identicon'
+import { ethers } from 'ethers'
 import { useCallback, useEffect, useState } from "react"
 import { useNetwork, useProvider } from "wagmi"
 import { ProposalProjectStateCodes, ProposalProjectStates, SectorCodes, StatusCodes } from "../../../../common/enums"
@@ -36,7 +37,7 @@ function DisplayProjects() {
         }
         const retrieveState = (project) => {
             return contract.getState(project.id).then((state) => {
-                return Object.assign({}, { state: state }, project)
+                return Object.assign({}, { state: ProposalProjectStateCodes[state] }, project)
             })
         }
         let promises = ids.map((id) => retrieveProject(id))
@@ -62,21 +63,8 @@ function DisplayProjects() {
             })
         }
 
-        const retrieveVotes = (quotation) => {
-            console.log(projectId);
-            return contract.getVoteProject(projectId, quotation.craftsmanAddr).then((vote) => {
-                return Object.assign({}, vote, quotation)
-            })
-            
-        }
-        // console.log(await contract.getVoteProject(projectId, "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"));
-
         let promises = quotationsEvents.map((addr) => retrieveQuotations(addr))
         let quotations = await Promise.all(promises)
-        console.log(quotations);
-
-        promises = quotations.map((quotation) => retrieveVotes(quotation))
-        quotations = await Promise.all(promises)
 
         setQuotations(quotations)
     }, [])
@@ -116,9 +104,9 @@ function DisplayProjects() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell >Beneficiaire</TableCell>
-                                    <TableCell align="right">Projet</TableCell>
                                     <TableCell align="right">Secteur</TableCell>
                                     <TableCell align="right">Status</TableCell>
+                                    <TableCell align="right">Votes</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBodyHover>
@@ -137,7 +125,8 @@ function DisplayProjects() {
                                         </TableCell>
                                         <TableCell component="th" scope="row">{row.name}</TableCell>
                                         <TableCell align="right">{SectorCodes[row.sector]}</TableCell>
-                                        <TableCell align="right">{ProposalProjectStateCodes[row.state]}</TableCell>
+                                        <TableCell align="right">{row.state}</TableCell>
+                                        {/* <TableCell align="right">{ethers.utils.formatEther(row.weightVote)}</TableCell> */}
                                     </TableRow>
                                 ))}
                             </TableBodyHover>

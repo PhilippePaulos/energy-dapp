@@ -47,12 +47,12 @@ const ProposalStateCodes = {
 }
 
 const ProposalProjectStates = {
-    Pending: "Pending",
-    Active: "Active",
-    Ended: "Ended",
-    Rejected: "Rejected",
-    Accepted: "Accepted",
-    Expire: "Expired"
+    Pending: "Proposition de devis",
+    Active: "Votes ouverts",
+    Ended: "Votes terminés, en attente de la décision du bénéficiaire",
+    Rejected: "Rejeté",
+    Accepted: "Accepté",
+    Expire: "Expiré"
 }
 
 const ProposalProjectStateCodes = {
