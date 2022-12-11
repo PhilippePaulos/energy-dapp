@@ -180,6 +180,10 @@ contract EnergyDao is Ownable {
         craftsmans[_addr].isValidated = true;
     }
 
+    function removeCrafsman(address _address) public onlyGovernor {
+        craftsman[_addr].isValidated = false;
+    }
+
     function isNotEmptyString(string calldata _str) internal pure returns(bool) {
         return keccak256(abi.encode(_str)) != keccak256(abi.encode(""));
     }
