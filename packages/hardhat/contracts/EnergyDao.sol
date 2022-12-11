@@ -5,18 +5,22 @@ import "./EEDToken.sol";
 import "./EnergyGovernor.sol";
 import "./Sale.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Timers.sol";
+import "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import "hardhat/console.sol";
 
 
 
 contract EnergyDao is Ownable {
+    using SafeCast for uint256;
 
-    uint public state;
-
-    enum ProjectStatus {
-        Created,
-        Tallied,
-        Validated,
-        Rejected
+    enum ProposalState {
+        Pending,
+        Active,
+        Ended,
+        Rejected,
+        Executed,
+        Expired
     }
 
     enum Sector {
@@ -25,17 +29,24 @@ contract EnergyDao is Ownable {
         Tertiaire
     }
 
+    struct VoteInfo {
+        uint64 voteStart;
+        uint64 voteEnd;
+        uint64 voteExpire;
+        bool executed;
+        bool rejected;
+    }
+
     struct Project {
-        uint256 creationDate;
         string name;
         address beneficiaryAddr;
         string description;
-        uint8 department;
+        uint32 department;
         Sector sector;
         string[] photos;
         string diagnostic;
         string plan;
-        ProjectStatus status;
+        VoteInfo voteInfo;
         uint8 nbQuotations;
         address[] craftsmans;
         address choosedCraftsman;
@@ -62,10 +73,10 @@ contract EnergyDao is Ownable {
         bool isValidated;
     }
 
-
     Project[] public projects;
     mapping(address => Craftsman) public craftsmans;
     mapping(uint256 => mapping(address => Quotation)) public quotations;
+    mapping (uint => mapping(address => uint)) craftsmanVotes;
     mapping(address => mapping(uint => address)) voters;
     
     EnergyGovernor public governor;
@@ -81,8 +92,9 @@ contract EnergyDao is Ownable {
 
     EEDToken public token;
 
-    uint256 timeToPropose;
-    uint256 timeToVote;
+    uint quotationPeriod;
+    uint votingPeriod;
+    uint voteExpire;
     uint256 nbTokenToLock;
     uint256 fees;
     uint amountToLock;
@@ -95,10 +107,10 @@ contract EnergyDao is Ownable {
     );
 
     event CraftsmanRegistered(address craftsmanAddress);
-    event QuotationRegistred(uint256 indexed idProject, address craftsmanAddr);
-    event Voted(address addrSender, uint _idProject, address craftsmanAddr);
-    event VoteTallied(uint256 idProject, address craftsmanAddr);
-    event ProjectDecision(uint256 idProject);
+    event QuotationRegistred(uint256 indexed projectId, address craftsmanAddr);
+    event Voted(address account, uint indexed projectId, address craftsmanAddr, uint weight);
+    event QuotationAccepted(uint256 projectId, address craftsmanAddr);
+    event QuotationRejected(uint256 projectId);
 
     modifier onlyValidatedCraftsman() {
         require(isCraftsmanValidated(msg.sender), "You are not a validated craftsman");
@@ -120,20 +132,22 @@ contract EnergyDao is Ownable {
         uint _saleAmount,
         uint _saleRate,
         uint _saleClosingTime,
-        uint _timeToPropose,
-        uint _timeToVote,
+        uint _craftsmanVotingPeriod,
+        uint _quotationPeriod,
         uint _votingPeriod,
+        uint _voteExpire,
         uint _nbTokenToLock 
     ) {
-        // todo ajouter require sur time
+        // todo ajouter REQUIRE
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
         nbTokenToLock = _nbTokenToLock;
         token = new EEDToken(_mintAmount, nbTokenToLock);
         sale = new Sale(address(token), _saleRate, _saleClosingTime, address(this));
         token.approve(address(sale), _saleAmount);
-        timeToPropose = _timeToPropose;
-        timeToVote = _timeToVote;
-        governor = new EnergyGovernor(token, 0, _votingPeriod);
+        quotationPeriod = _quotationPeriod;
+        voteExpire = _voteExpire;
+        votingPeriod = _votingPeriod;
+        governor = new EnergyGovernor(token, 0, _craftsmanVotingPeriod);
         fees = _calculateFees(nbTokenToLock);
         amountToLock = nbTokenToLock - fees;
     }
@@ -159,17 +173,6 @@ contract EnergyDao is Ownable {
         emit CraftsmanRegistered(msg.sender);
     }
 
-    // function _proposeCraftsman() internal returns (uint) {
-    //     address[] memory addr = new address[](1);
-    //     addr[0] = address(this);
-    //     uint[] memory values = new uint[](1);
-    //     string memory description = "validateCraftsman";
-    //     bytes memory transferPayload = abi.encodeWithSignature("validateCraftsman(address)", msg.sender);
-    //     bytes[] memory calldatas = new bytes[](1);
-    //     calldatas[0] = transferPayload;
-    //     return governor.propose(addr, values, calldatas, description);
-    // }
-
     function isCraftsmanValidated(address _address) public view returns(bool) {
         return craftsmans[_address].isValidated;
     }
@@ -191,11 +194,13 @@ contract EnergyDao is Ownable {
         string calldata _diagnostic,
         string calldata _plan
     ) external {
-        require(projects.length < 1000, "Project list is full");
+        require(projects.length < 100000, "Project list is full");
+
         require(isNotEmptyString(_name)  && isNotEmptyString(_desc) && isNotEmptyString(_diagnostic)
         && isNotEmptyString(_plan) && _department != 0 && _photos.length > 0, "You must fill all fields");
         require( _photos.length < 5, "You can't upload more than 5 documents");
-        Project memory project;
+
+        Project memory  project;
         project.name = _name;
         project.beneficiaryAddr = msg.sender;
         project.description = _desc;
@@ -204,18 +209,21 @@ contract EnergyDao is Ownable {
         project.photos = _photos;
         project.diagnostic = _diagnostic;
         project.plan = _plan;
-        project.creationDate = block.timestamp;
+
+        project.voteInfo.voteStart = block.number.toUint64() + quotationPeriod.toUint64();
+        project.voteInfo.voteEnd = project.voteInfo.voteStart + votingPeriod.toUint64();
+        project.voteInfo.voteExpire = project.voteInfo.voteEnd + voteExpire.toUint64();
+        
         projects.push(project);
 
         lock();
 
-        emit ProjectRegistered(
-            msg.sender,
-            projects.length - 1,
-            _name,
-            _sector
-        );
+        emit ProjectRegistered(msg.sender, projects.length - 1, _name, _sector);
     }
+
+    // function cleanProjects() public onlyGovernor {
+
+    // }
 
     function proposeQuotation(
         uint256 _id,
@@ -240,17 +248,16 @@ contract EnergyDao is Ownable {
             "You already proposed a quotation for this project"
         );
         require(
-            block.timestamp - projects[_id].creationDate < timeToPropose, "Proposal session is close for this project"
+            block.number <= projects[_id].voteInfo.voteStart, "Proposal session is close for this project"
         );
 
-        Quotation memory quotation;
+        Quotation storage quotation = quotations[_id][msg.sender];
         quotation.craftsmanAddr = msg.sender;
         quotation.documentHash = _docHash;
         quotation.price = _price;
         quotation.nbCee = _nbCee;
         quotation.description = _description;
 
-        quotations[_id][msg.sender] = quotation;
         projects[_id].craftsmans.push(msg.sender);
         projects[_id].nbQuotations += 1;
 
@@ -263,60 +270,96 @@ contract EnergyDao is Ownable {
         quotations[_projectId][msg.sender].isDeleted = true;
     }
 
-    function setVote(uint _projectId, address _craftsmanAddr) external {
-        require(_projectId < projects.length, "Project doesn't exists");
-        require(quotations[_projectId][_craftsmanAddr].craftsmanAddr != address(0), "No quotation available for this craftman / project");
-        require(
-            (block.timestamp >= (projects[_projectId].creationDate + timeToPropose)), "Vote session is not open yet for this project"
-        );
-        require(
-            (block.timestamp - (projects[_projectId].creationDate + timeToPropose)) < timeToVote, "Vote session is close for this project"
-        );
-        require(voters[msg.sender][_projectId] == address(0), "You already vote for this project");
-        if (token.delegates(msg.sender) == address(0)){
-            token.delegate(msg.sender);
+
+    function castVote(uint _projectId, address _account, address _craftsman) external {
+        console.log("STATE CAST", block.number);
+        require(getState(_projectId) == ProposalState.Active, "Vote session is not active");
+        require(!hasVoted(_projectId, _account), "Vote already cast");
+        voters[_account][_projectId] = _craftsman;
+
+        if (token.delegates(_account) == address(0)){
+            token.delegate(_account);
         }
+
+        uint weight = token.getVotes(_account);
+
+        craftsmanVotes[_projectId][_craftsman] += weight;
+
+        emit Voted(_account, _projectId, _craftsman, weight);
+    }
+
+    function getVoteProject(uint _projectId, address _craftsmanAddr) public view returns (uint) {
+        return craftsmanVotes[_projectId][_craftsmanAddr];
+    }
+
+    function hasVoted(uint256 _projectId, address _account) public view returns (bool) {
+        return voters[_account][_projectId] != address(0);
+    }
+
+    function getState(uint projectId) public view returns(ProposalState) {
+        console.log("GET STATE BLOCK", block.number);
+        Project memory project = projects[projectId];
+
+        if(project.voteInfo.executed){
+            return ProposalState.Executed;
+        }
+
+        if(project.voteInfo.rejected){
+            return ProposalState.Rejected;
+        }
+
+        uint voteStart = projects[projectId].voteInfo.voteStart;
+
+        if(voteStart >= block.number) {
+            return ProposalState.Pending;
+        }
+
+        uint voteEnd = projects[projectId].voteInfo.voteEnd;
+        if (voteEnd >= block.number){
+            return ProposalState.Active;
+        }
+
+        uint _voteExpire = projects[projectId].voteInfo.voteExpire;
+        if (_voteExpire >= block.number) {
+            return ProposalState.Ended;
+        }
+
+        return ProposalState.Expired;
+    }
+
+     function _computeProjectWinner(uint _projectId) internal view returns (address) {
         uint weight;
-        weight = token.getVotes(msg.sender);
-        quotations[_projectId][_craftsmanAddr].weightVote += weight;
-        voters[msg.sender][_projectId] = _craftsmanAddr;
-        emit Voted(msg.sender, _projectId, _craftsmanAddr);
-    }
-
-    function tallyVotes(uint _projectId) external onlyBeneficiary(_projectId) {
-        require(_projectId < projects.length, "Project doesn't exists");
-        require(
-            (block.timestamp >= (projects[_projectId].creationDate + timeToPropose + timeToVote)), "Vote session is not finished yet for this project"
-        );
-        require(projects[_projectId].status == ProjectStatus.Created, "This project is already tallied");
-        address _winningCraftsman;
-        uint voteCount;
-        voteCount = 0;
-        for(uint i=0; i < projects[_projectId].craftsmans.length ; i++){
-            address craftsmanAddr;
-            craftsmanAddr = projects[_projectId].craftsmans[i];
-            unlock(craftsmanAddr);
-            if(quotations[_projectId][craftsmanAddr].weightVote > voteCount){
-                voteCount = quotations[_projectId][craftsmanAddr].weightVote;
-                _winningCraftsman = craftsmanAddr;
+        address winner = projects[_projectId].craftsmans[0];
+        for(uint i=1; i < projects[_projectId].craftsmans.length ; i++){ 
+            address craftsman = projects[_projectId].craftsmans[i];
+            uint vote = getVoteProject(_projectId, craftsman);
+            if (vote > weight) {
+                weight = vote;
+                winner = craftsman;
             }
-        projects[_projectId].choosedCraftsman = _winningCraftsman;
-        projects[_projectId].status = ProjectStatus.Tallied;
-        emit VoteTallied(_projectId, _winningCraftsman);
         }
-
+        return winner;
     }
 
-    function projectDecision(uint _projectId, bool _decision) public onlyBeneficiary(_projectId) {
-        require(projects[_projectId].status == ProjectStatus.Tallied, "Project vote is not tallied yet");
-        Project storage project = projects[_projectId];
-        if (_decision) {
-            project.status = ProjectStatus.Validated;
-        } else {
-            project.status = ProjectStatus.Rejected;
-        }
-        craftsmans[project.choosedCraftsman].nbProjectsValidated += 1;
-        emit ProjectDecision(_projectId);
+    function execute(uint _projectId) external onlyBeneficiary(_projectId){
+        ProposalState status = getState(_projectId);
+        require(status == ProposalState.Ended, "");
+        
+        address winner = _computeProjectWinner(_projectId);
+        projects[_projectId].choosedCraftsman = winner;
+        projects[_projectId].voteInfo.executed = true;
+        craftsmans[winner].nbProjectsValidated += 1;
+
+        emit QuotationAccepted(_projectId, winner);
+    }
+
+    function reject(uint _projectId) external onlyBeneficiary(_projectId) {
+        ProposalState status = getState(_projectId);
+        require(status == ProposalState.Ended);
+        
+        projects[_projectId].voteInfo.rejected = true;
+
+        emit QuotationRejected(_projectId);
     }
 
     function lock() internal {

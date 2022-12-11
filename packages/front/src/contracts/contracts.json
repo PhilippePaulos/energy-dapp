@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xC9bE209D054a3d64D8c630E24D755667B608efD6",
+        "addr": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0xB581a165B12a98c728Ce16D9ebA085F4222C89f7",
+        "addr": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
         "abi": [
           {
             "inputs": [
@@ -896,7 +896,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x01c1DeF3b91672704716159C9041Aeca392DdFfb",
+        "addr": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
         "abi": [
           {
             "inputs": [
@@ -922,17 +922,22 @@
               },
               {
                 "internalType": "uint256",
-                "name": "_timeToPropose",
+                "name": "_craftsmanVotingPeriod",
                 "type": "uint256"
               },
               {
                 "internalType": "uint256",
-                "name": "_timeToVote",
+                "name": "_quotationPeriod",
                 "type": "uint256"
               },
               {
                 "internalType": "uint256",
                 "name": "_votingPeriod",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "_voteExpire",
                 "type": "uint256"
               },
               {
@@ -981,19 +986,6 @@
             "inputs": [
               {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "idProject",
-                "type": "uint256"
-              }
-            ],
-            "name": "ProjectDecision",
-            "type": "event"
-          },
-          {
-            "anonymous": false,
-            "inputs": [
-              {
-                "indexed": false,
                 "internalType": "address",
                 "name": "beneficiary",
                 "type": "address"
@@ -1024,9 +1016,28 @@
             "anonymous": false,
             "inputs": [
               {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "projectId",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "internalType": "address",
+                "name": "craftsmanAddr",
+                "type": "address"
+              }
+            ],
+            "name": "QuotationAccepted",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
                 "indexed": true,
                 "internalType": "uint256",
-                "name": "idProject",
+                "name": "projectId",
                 "type": "uint256"
               },
               {
@@ -1045,17 +1056,11 @@
               {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "idProject",
+                "name": "projectId",
                 "type": "uint256"
-              },
-              {
-                "indexed": false,
-                "internalType": "address",
-                "name": "craftsmanAddr",
-                "type": "address"
               }
             ],
-            "name": "VoteTallied",
+            "name": "QuotationRejected",
             "type": "event"
           },
           {
@@ -1064,13 +1069,13 @@
               {
                 "indexed": false,
                 "internalType": "address",
-                "name": "addrSender",
+                "name": "account",
                 "type": "address"
               },
               {
-                "indexed": false,
+                "indexed": true,
                 "internalType": "uint256",
-                "name": "_idProject",
+                "name": "projectId",
                 "type": "uint256"
               },
               {
@@ -1078,6 +1083,12 @@
                 "internalType": "address",
                 "name": "craftsmanAddr",
                 "type": "address"
+              },
+              {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "weight",
+                "type": "uint256"
               }
             ],
             "name": "Voted",
@@ -1133,6 +1144,29 @@
           {
             "inputs": [
               {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "_craftsman",
+                "type": "address"
+              }
+            ],
+            "name": "castVote",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
                 "internalType": "address",
                 "name": "",
                 "type": "address"
@@ -1175,10 +1209,79 @@
             "type": "function"
           },
           {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              }
+            ],
+            "name": "execute",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
             "inputs": [],
             "name": "getFunds",
             "outputs": [],
             "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "getS",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "projectId",
+                "type": "uint256"
+              }
+            ],
+            "name": "getState",
+            "outputs": [
+              {
+                "internalType": "enum EnergyDao.ProposalState",
+                "name": "",
+                "type": "uint8"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "_craftsmanAddr",
+                "type": "address"
+              }
+            ],
+            "name": "getVoteProject",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
             "type": "function"
           },
           {
@@ -1189,6 +1292,30 @@
                 "internalType": "contract EnergyGovernor",
                 "name": "",
                 "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+              }
+            ],
+            "name": "hasVoted",
+            "outputs": [
+              {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
               }
             ],
             "stateMutability": "view",
@@ -1262,35 +1389,12 @@
             "inputs": [
               {
                 "internalType": "uint256",
-                "name": "_projectId",
-                "type": "uint256"
-              },
-              {
-                "internalType": "bool",
-                "name": "_decision",
-                "type": "bool"
-              }
-            ],
-            "name": "projectDecision",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-          },
-          {
-            "inputs": [
-              {
-                "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
               }
             ],
             "name": "projects",
             "outputs": [
-              {
-                "internalType": "uint256",
-                "name": "creationDate",
-                "type": "uint256"
-              },
               {
                 "internalType": "string",
                 "name": "name",
@@ -1327,9 +1431,36 @@
                 "type": "string"
               },
               {
-                "internalType": "enum EnergyDao.ProjectStatus",
-                "name": "status",
-                "type": "uint8"
+                "components": [
+                  {
+                    "internalType": "uint64",
+                    "name": "voteStart",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "voteEnd",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "uint64",
+                    "name": "voteExpire",
+                    "type": "uint64"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "executed",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "rejected",
+                    "type": "bool"
+                  }
+                ],
+                "internalType": "struct EnergyDao.VoteInfo",
+                "name": "voteInfo",
+                "type": "tuple"
               },
               {
                 "internalType": "uint8",
@@ -1473,6 +1604,19 @@
                 "type": "uint256"
               }
             ],
+            "name": "reject",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              }
+            ],
             "name": "removeQuotation",
             "outputs": [],
             "stateMutability": "nonpayable",
@@ -1520,50 +1664,6 @@
               }
             ],
             "name": "sendFunds",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-          },
-          {
-            "inputs": [
-              {
-                "internalType": "uint256",
-                "name": "_projectId",
-                "type": "uint256"
-              },
-              {
-                "internalType": "address",
-                "name": "_craftsmanAddr",
-                "type": "address"
-              }
-            ],
-            "name": "setVote",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-          },
-          {
-            "inputs": [],
-            "name": "state",
-            "outputs": [
-              {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-              }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-          },
-          {
-            "inputs": [
-              {
-                "internalType": "uint256",
-                "name": "_projectId",
-                "type": "uint256"
-              }
-            ],
-            "name": "tallyVotes",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -1632,7 +1732,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0x62aA1de72Db01cAd8430BE3De877Fd4Cd7674Ba7",
+        "addr": "0xeEBe00Ac0756308ac4AaBfD76c05c4F3088B8883",
         "abi": [
           {
             "inputs": [
