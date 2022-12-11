@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat")
-const {
+/* const {
   time,
-} = require("@nomicfoundation/hardhat-network-helpers")
+} = require("@nomicfoundation/hardhat-network-helpers") */
 const { proposeVote, Votes } = require('../helpers/governor')
 const { exportAbis, ONE_ETHER } = require("../helpers/common")
 
@@ -20,7 +20,7 @@ async function main() {
   // 1ETH -> 2000 EED
   const rate = 10000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
-  const closingTime = (await time.latest()) + ONE_DAY_IN_SECS
+  const closingTime = Date.now() + ONE_DAY_IN_SECS
 
   console.log("Deploy DAO...")
   const EnergyDao = await ethers.getContractFactory("EnergyDao")

@@ -7,7 +7,6 @@ import "./Sale.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Timers.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "hardhat/console.sol";
 
 /**
  * @title Contract for EnergyDAO
@@ -144,8 +143,18 @@ contract EnergyDao is Ownable {
         uint _numberProject,
         uint _numberQuotation
     ) {
-        // todo ajouter REQUIRE
+        require(_mintAmount > 0, "Mint amount should not be 0");
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
+        require(_saleRate > 0, "_saleRate should not be 0");
+        require(_saleClosingTime > 0, "_saleClosingTime  should not be 0");
+        require(_craftsmanVotingPeriod > 0, "_craftsmanVotingPeriod  should not be 0");
+        require(_quotationPeriod > 0, "_quotationPeriod should  not be 0");
+        require(_votingPeriod > 0, "_votingPeriod should  not be 0");
+        require(_voteExpire > 0, "_voteExpire should  not be 0");
+        require(_nbTokenToLock > 0, "_nbTokenToLock should  not be 0");
+        require(_saleAmount > _nbTokenToLock, "sale amount should be greater dans _nbTokenToLock");
+        require(_numberProject > 0, "_numberProject should  not be 0");
+        require(_numberQuotation > 0, "_numberQuotation should  not be 0");
         nbTokenToLock = _nbTokenToLock;
         token = new EEDToken(_mintAmount, nbTokenToLock);
         sale = new Sale(address(token), _saleRate, _saleClosingTime, address(this));
