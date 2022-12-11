@@ -22,10 +22,10 @@ function CreateProjectModal(props) {
         sector: "",
         plan: "",
         diagnostic: "",
-        pictures: [],
+        pictures: "",
         planHash: "",
         diagnosticHash: "",
-        picturesHash: [],
+        picturesHash: ""
     })
 
     const handleChange = (event) => {
@@ -37,20 +37,10 @@ function CreateProjectModal(props) {
 
     }
 
-    const handleUploadFiles = (event) => {
-        const uploaded = values.pictures
-        const files = Array.prototype.slice.call(event.target.files)
-        files.forEach((file) => {
-            if (uploaded.findIndex((f) => f.name === file.name) === -1) {
-                uploaded.push(file)
-            }
-        })
-        setValues({ ...values, [event.target.name]: uploaded })
-    }
 
     const onSubmit = async () => {
         if (values.name !== "" && values.sector !== "" && values.department !== "" && values.description !== "" &&
-            values.diagnostic !== "" && values.plan !== "" && values.pictures.length > 0) {
+            values.diagnostic !== "" && values.plan !== "" && values.pictures != "") {
 
             setIsLoading(true)
             // upload files to IPFS
@@ -58,8 +48,7 @@ function CreateProjectModal(props) {
 
             const hashPlan = await uploadIpfsFile(values.plan)
 
-            const promises = values.pictures.map((picture) => uploadIpfsFile(picture))
-            const hashPictures = await Promise.all(promises)
+            const hashPictures = await uploadIpfsFile(values.pictures)
             
             await EnergyDao.connect(signer).addProject(values.name, values.description, values.department, values.sector, hashPictures, hashDiagnostic, hashPlan)
             setIsLoading(false)
@@ -95,12 +84,8 @@ function CreateProjectModal(props) {
                             <ButtonUI variant="contained" component="label" htmlFor="file-upload">
                                 Photos
                             </ButtonUI>
-                            {values.pictures.map(file => (
-                                <Typography key={file.name}>
-                                    {file.name}
-                                </Typography>
-                            ))}
-                            <input hidden name="pictures" onChange={(e) => handleUploadFiles(e)} accept="*" multiple type="file" id="file-upload" />
+                            {values.pictures && <Typography >{values.pictures.name}</Typography>}
+                            <input hidden name="pictures" onChange={(e) => handleUploadFile(e)} accept="*" multiple type="file" id="file-upload" />
                         </Box>
 
                         <Box sx={{ display: "flex", gap: "5px", alignItems: "center" }}>

@@ -1,11 +1,11 @@
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt'
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt'
-import { Grid, Table, TableCell, TableHead, TableRow, Typography, Box } from "@mui/material"
+import { Box, Grid, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import { ethers } from "ethers"
 import { useCallback, useEffect, useState } from 'react'
 import { useAccount, useSigner } from "wagmi"
-import { ProposalState, ProposalStateCodes, Votes } from "../../../../common/enums"
+import { ProposalState, Votes } from "../../../../common/enums"
 import { useProfile } from "../../../../contexts/DaoContext"
 import CircularIndeterminate from "../../../ui/CircularIndeterminate"
 import IconHover from "../../../ui/IconHover"
@@ -21,7 +21,6 @@ function DisplayVotes({ craftsman, quorum }) {
     const [isLoading, setIsLoading] = useState(false)
     const [hasVoted, setHasVoted] = useState(false)
     const [votePower, setVotePower] = useState(0)
-    console.log(quorum);
 
     const fetchHasVoted = useCallback(async () => {
         const hasVoted = await EnergyGovernor.hasVoted(craftsman.proposalId, address)
@@ -40,7 +39,7 @@ function DisplayVotes({ craftsman, quorum }) {
 
 
 
-    const handleClick = async (type) => {
+    const handleClick = useCallback(async (type) => {
         setIsLoading(true)
         let vote
         switch (type) {
@@ -55,8 +54,9 @@ function DisplayVotes({ craftsman, quorum }) {
                 break
         }
         await EnergyGovernor.connect(signer).castVote(craftsman.proposalId, vote)
+
         setIsLoading(false)
-    }
+    }, [])
 
     return (
         <Grid container mt={5}>

@@ -1,7 +1,7 @@
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Typography } from "@mui/material"
 import Identicon from "@polkadot/react-identicon"
-import { ethers } from "ethers"
+import { BigNumber, ethers } from "ethers"
 import { useState } from "react"
 import { useContractEvent, useNetwork, useSigner } from "wagmi"
 import { ProposalState } from "../../../../common/enums"
@@ -97,6 +97,10 @@ function CraftsmanDetailsModal(props) {
                                 <Typography><IconHover><PictureAsPdfIcon onClick={() => openIpfsLink(craftsman.certification)} /></IconHover></Typography>
                             </Box>
                             <State state={craftsman.state} />
+                            <Box className="line">
+                                <Typography variant="b">Nombre de projets validés</Typography>
+                                <Typography>{BigNumber.from(craftsman.nbProjectsValidated).toNumber()}</Typography>
+                            </Box>
                         </Box>
                     </RoundedGrid>
                 </Grid>

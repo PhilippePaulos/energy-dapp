@@ -6,6 +6,7 @@ import { getEthValue, initContract } from "../../../common/helpers/eth"
 import ButtonUI from "../../ui/button"
 import CircularIndeterminate from "../../ui/CircularIndeterminate"
 import TextFieldUI from "../../ui/text-field"
+import RoundedGrid from "../../ui/RoundedGrid"
 
 
 function Ico() {
@@ -56,17 +57,19 @@ function Ico() {
     }
 
     return (
-        <Grid container mar>
-            <Grid item margin={"auto"} sx={{ display: "flex", gap: "5px", flexDirection: "column", textAlign: "left" }}>
-                <Typography variant="h6">Sale Price:  1 ETH = {rate} EED</Typography>
-                <Typography variant="h6">Remaining tokens: {remainingTokens}</Typography>
-                <Box component="form" noValidate autoComplete="off">
+        <>
+            <RoundedGrid sx={{ display: "flex", gap: "5px", flexDirection: "column", textAlign: "left", padding: "40px", position: "absolute", top: "50%", left:"50%",
+             transform: "translate(-50%,-50%)"}}>
+                <Typography mb={2} variant="h6">Sale Price:  1 ETH = {rate} EED</Typography>
+                
+                <Box mb={2} component="form" noValidate autoComplete="off">
                     <TextFieldUI id="amount" label="EED amount" onChange={onInputChange} />
                 </Box>
                 <ButtonUI size="medium" variant="contained" onClick={(e) => handleSubmit(e)}>Buy {tokens} EED for {amount} ETH</ButtonUI>
-            </Grid>
+                <Typography mt={2} variant="h6">Remaining tokens: {remainingTokens}</Typography>
+            </RoundedGrid>
             <CircularIndeterminate loading={isLoading} />
-        </Grid>
+        </>
     )
 }
 

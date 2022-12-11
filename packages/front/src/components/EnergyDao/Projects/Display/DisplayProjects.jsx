@@ -64,7 +64,6 @@ function DisplayProjects() {
         }
         let promises = ids.map((id) => retrieveProject(id))
         let projects = await Promise.all(promises)
-        console.log(await contract.projects(0));
 
         promises = projects.map((id) => retrieveState(id))
         projects = await Promise.all(promises)
@@ -120,10 +119,10 @@ function DisplayProjects() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell >Beneficiaire</TableCell>
+                                    <TableCell>Beneficiaire</TableCell>
+                                    <TableCell align="right">Description</TableCell>
                                     <TableCell align="right">Secteur</TableCell>
                                     <TableCell align="right">Status</TableCell>
-                                    <TableCell align="right">Votes</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBodyHover>
@@ -134,16 +133,15 @@ function DisplayProjects() {
                                         key={row.id}
                                         onClick={() => handleClickDetails(row)}
                                     >
-                                        <TableCell >
+                                        <TableCell component="th" scope="row">
                                             <Box display="flex" gap="4px">
                                                 <Identicon className="identicon" value={row.beneficiaryAddr} size={20} theme="ethereum" />
                                                 <Typography>{formatAddress(row.beneficiaryAddr)}</Typography>
                                             </Box>
                                         </TableCell>
-                                        <TableCell component="th" scope="row">{row.name}</TableCell>
+                                        <TableCell align="right">{row.name}</TableCell>
                                         <TableCell align="right">{SectorCodes[row.sector]}</TableCell>
                                         <TableCell align="right">{row.state}</TableCell>
-                                        {/* <TableCell align="right">{ethers.utils.formatEther(row.weightVote)}</TableCell> */}
                                     </TableRow>
                                 ))}
                             </TableBodyHover>

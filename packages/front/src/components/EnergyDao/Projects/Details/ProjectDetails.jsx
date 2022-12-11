@@ -89,7 +89,6 @@ function ProjectDetailsModal(props) {
     useBlockNumber({
         onSuccess(data) {
             fetchData(data)
-            console.log(project);
         },
       })
 
@@ -227,7 +226,7 @@ function ProjectDetailsModal(props) {
                                             </TableCell>
                                             <TableCell align="right">{row.description}</TableCell>
                                             <TableCell align="right"><IconHover><PictureAsPdfIcon onClick={() => openIpfsLink(row.documentHash)} /></IconHover></TableCell>
-                                            <TableCell align="right">{BigNumber.from(project.department).toNumber()}</TableCell>
+                                            <TableCell align="right">{BigNumber.from(row.price).toNumber()}</TableCell>
                                             <TableCell align="right">{BigNumber.from(row.nbCee).toNumber()}</TableCell>
                                             {
                                                 castVote ?

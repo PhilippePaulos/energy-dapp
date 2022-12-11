@@ -133,8 +133,7 @@ function DisplayCraftsman({ isCraftsman }) {
 
         setCraftsmans(result)
 
-
-    }, [EnergyGovernor, fetchVotes])
+    }, [fetchVotes])
 
     const fetchQuorum = useCallback(async (currentBlock) => {
         const quorum = await EnergyGovernor.quorum(currentBlock - 1)
@@ -165,7 +164,7 @@ function DisplayCraftsman({ isCraftsman }) {
                                 <TableRow>
                                     <TableCell>Artisan</TableCell>
                                     <TableCell align="right">Nom</TableCell>
-                                    <TableCell align="right">Addresse </TableCell>
+                                    <TableCell align="right">Addresse</TableCell>
                                     <TableCell align="right">Certification </TableCell>
                                     <TableCell align="right">Projets validés </TableCell>
                                     <TableCell align="right">Validé par la DAO ? </TableCell>
