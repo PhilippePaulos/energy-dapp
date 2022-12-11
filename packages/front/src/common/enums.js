@@ -46,6 +46,24 @@ const ProposalStateCodes = {
     "7": ProposalState.Executed,
 }
 
+const ProposalProjectStates = {
+    Pending: "Pending",
+    Active: "Active",
+    Ended: "Ended",
+    Rejected: "Rejected",
+    Accepted: "Accepted",
+    Expire: "Expired"
+}
+
+const ProposalProjectStateCodes = {
+    "0": ProposalProjectStates.Pending,
+    "1": ProposalProjectStates.Active,
+    "2": ProposalProjectStates.Ended,
+    "3": ProposalProjectStates.Rejected,
+    "4": ProposalProjectStates.Accepted,
+    "5": ProposalProjectStates.Expire
+}
+
 const Votes = {
     Against: 0,
     For: 1,
@@ -53,4 +71,4 @@ const Votes = {
 }
 
 
-export { Status, StatusCodes, Sector, SectorCodes, ProposalState, ProposalStateCodes, Votes};
+export { Status, StatusCodes, Sector, SectorCodes, ProposalState, ProposalStateCodes, Votes, ProposalProjectStates, ProposalProjectStateCodes};

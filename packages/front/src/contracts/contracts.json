@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968",
+        "addr": "0xbD89b434dD59562756ED9B14B0bec5E71f3c6876",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+        "addr": "0xc95ff0608561b6bA084c78D14f09e9826190f968",
         "abi": [
           {
             "inputs": [
@@ -896,7 +896,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "addr": "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00",
         "abi": [
           {
             "inputs": [
@@ -1101,6 +1101,19 @@
           {
             "inputs": [
               {
+                "internalType": "uint256",
+                "name": "_projectId",
+                "type": "uint256"
+              }
+            ],
+            "name": "accept",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
                 "internalType": "string",
                 "name": "_name",
                 "type": "string"
@@ -1206,19 +1219,6 @@
               }
             ],
             "stateMutability": "view",
-            "type": "function"
-          },
-          {
-            "inputs": [
-              {
-                "internalType": "uint256",
-                "name": "_projectId",
-                "type": "uint256"
-              }
-            ],
-            "name": "execute",
-            "outputs": [],
-            "stateMutability": "nonpayable",
             "type": "function"
           },
           {
@@ -1436,7 +1436,7 @@
                   },
                   {
                     "internalType": "bool",
-                    "name": "executed",
+                    "name": "accepted",
                     "type": "bool"
                   },
                   {
@@ -1719,7 +1719,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xeEBe00Ac0756308ac4AaBfD76c05c4F3088B8883",
+        "addr": "0xB01718DCF2124e3a9217aC0dEc176a72733d2589",
         "abi": [
           {
             "inputs": [

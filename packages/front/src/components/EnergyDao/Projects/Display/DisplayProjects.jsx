@@ -1,9 +1,10 @@
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
-import { Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import Identicon from '@polkadot/react-identicon'
 import { useCallback, useEffect, useState } from "react"
 import { useNetwork, useProvider } from "wagmi"
-import { SectorCodes, StatusCodes } from "../../../../common/enums"
-import { initContract } from "../../../../common/helpers/eth"
+import { ProposalProjectStateCodes, ProposalProjectStates, SectorCodes, StatusCodes } from "../../../../common/enums"
+import { formatAddress, initContract } from "../../../../common/helpers/eth"
 import { theme } from "../../../theme"
 import ButtonUI from "../../../ui/button"
 import IconHover from '../../../ui/IconHover'
@@ -33,8 +34,17 @@ function DisplayProjects() {
                 return Object.assign({}, project, { id: projectId })
             })
         }
-        const promises = ids.map((id) => retrieveProject(id))
-        const projects = await Promise.all(promises)
+        const retrieveState = (project) => {
+            return contract.getState(project.id).then((state) => {
+                return Object.assign({}, { state: state }, project)
+            })
+        }
+        let promises = ids.map((id) => retrieveProject(id))
+        let projects = await Promise.all(promises)
+
+        promises = projects.map((id) => retrieveState(id))
+        projects = await Promise.all(promises)
+
         setProjects(projects)
 
     }, [])
@@ -52,8 +62,21 @@ function DisplayProjects() {
             })
         }
 
-        const promises = quotationsEvents.map((addr) => retrieveQuotations(addr))
-        const quotations = await Promise.all(promises)
+        const retrieveVotes = (quotation) => {
+            console.log(projectId);
+            return contract.getVoteProject(projectId, quotation.craftsmanAddr).then((vote) => {
+                return Object.assign({}, vote, quotation)
+            })
+            
+        }
+        // console.log(await contract.getVoteProject(projectId, "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"));
+
+        let promises = quotationsEvents.map((addr) => retrieveQuotations(addr))
+        let quotations = await Promise.all(promises)
+        console.log(quotations);
+
+        promises = quotations.map((quotation) => retrieveVotes(quotation))
+        quotations = await Promise.all(promises)
 
         setQuotations(quotations)
     }, [])
@@ -82,7 +105,7 @@ function DisplayProjects() {
                 <Grid item xs={12} m={1} display="flex" justifyContent={"space-between"}>
                     <Typography variant='h4'>Liste des projets de rénovation énergétiques</Typography>
                     <Typography variant="contained" color="action" onClick={handleClickCreate} alignSelf="center" >
-                        <IconHover sx={{width: "50px"}}><AddBusinessIcon /></IconHover>
+                        <IconHover sx={{ width: "50px" }}><AddBusinessIcon /></IconHover>
                     </Typography>
                 </Grid>
             </Grid>
@@ -92,10 +115,10 @@ function DisplayProjects() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Projet</TableCell>
+                                    <TableCell >Beneficiaire</TableCell>
+                                    <TableCell align="right">Projet</TableCell>
                                     <TableCell align="right">Secteur</TableCell>
                                     <TableCell align="right">Status</TableCell>
-                                    <TableCell align="right">Beneficiaire</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBodyHover>
@@ -106,10 +129,15 @@ function DisplayProjects() {
                                         key={row.id}
                                         onClick={() => handleClickDetails(row)}
                                     >
+                                        <TableCell >
+                                            <Box display="flex" gap="4px">
+                                                <Identicon className="identicon" value={row.beneficiaryAddr} size={20} theme="ethereum" />
+                                                <Typography>{formatAddress(row.beneficiaryAddr)}</Typography>
+                                            </Box>
+                                        </TableCell>
                                         <TableCell component="th" scope="row">{row.name}</TableCell>
                                         <TableCell align="right">{SectorCodes[row.sector]}</TableCell>
-                                        <TableCell align="right">{StatusCodes[row.status]}</TableCell>
-                                        <TableCell align="right">{row.beneficiaryAddr}</TableCell>
+                                        <TableCell align="right">{ProposalProjectStateCodes[row.state]}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBodyHover>

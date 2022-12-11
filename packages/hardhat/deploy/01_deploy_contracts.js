@@ -15,7 +15,7 @@ async function main() {
   const quotationPeriod = 3
   const votingPeriod = 2
   const voteExpire = 2
-  // 1ETH -> 200 EED
+  // 1ETH -> 2000 EED
   const rate = 2000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
   const closingTime = (await time.latest()) + ONE_DAY_IN_SECS

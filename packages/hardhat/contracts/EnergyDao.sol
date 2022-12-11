@@ -76,7 +76,6 @@ contract EnergyDao is Ownable {
     Project[] public projects;
     mapping(address => Craftsman) public craftsmans;
     mapping(uint256 => mapping(address => Quotation)) public quotations;
-    mapping (uint => mapping(address => uint)) craftsmanVotes;
     mapping(address => mapping(uint => address)) voters;
     
     EnergyGovernor public governor;
@@ -282,13 +281,13 @@ contract EnergyDao is Ownable {
 
         uint weight = token.getVotes(_account);
 
-        craftsmanVotes[_projectId][_craftsman] += weight;
+        quotations[_projectId][_craftsman].weightVote += weight;
 
         emit Voted(_account, _projectId, _craftsman, weight);
     }
 
     function getVoteProject(uint _projectId, address _craftsmanAddr) public view returns (uint) {
-        return craftsmanVotes[_projectId][_craftsmanAddr];
+        return quotations[_projectId][_craftsmanAddr].weightVote;
     }
 
     function hasVoted(uint256 _projectId, address _account) public view returns (bool) {

@@ -35,7 +35,6 @@ function DisplayCraftsman() {
     const fetchVotes = useCallback(async () => {
         let eventFilter = EnergyGovernor.filters.ProposalCreated()
         let events = await EnergyGovernor.queryFilter(eventFilter)
-        console.log(events);
 
         let proposals = events.flatMap((event) => {
             const description = event.args.description.toLowerCase()
@@ -107,7 +106,7 @@ function DisplayCraftsman() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="right">Artisan</TableCell>
+                                    <TableCell>Artisan</TableCell>
                                     <TableCell align="right">Nom</TableCell>
                                     <TableCell align="right">Addresse </TableCell>
                                     <TableCell align="right">Certification </TableCell>

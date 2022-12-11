@@ -1,8 +1,10 @@
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import { BigNumber } from "ethers"
-import { StatusCodes } from "../../../../common/enums"
+import { useEffect } from 'react'
+import { ProposalProjectStateCodes, StatusCodes } from "../../../../common/enums"
 import { openIpfsLink } from "../../../../common/helpers/eth"
+import { useProfile } from '../../../../contexts/DaoContext'
 import CenteredModal from "../../../ui/CenteredModal"
 import IconHover from '../../../ui/IconHover'
 import PdfPicture from "../../../ui/PdfPicture"
@@ -14,6 +16,12 @@ import TableContainerUI from "../../../ui/TableContainer"
 function ProjectDetailsModal(props) {
 
     const { project, quotations, open, setOpen } = props
+    const { profile: { contracts: { EnergyDao } } } = useProfile()
+
+
+    useEffect(() => {
+        
+    }, [])
 
     return (
         <CenteredModal
@@ -59,7 +67,7 @@ function ProjectDetailsModal(props) {
                             </Box>
                             <Box className="line">
                                 <Typography variant="b">Status</Typography>
-                                <Typography>{StatusCodes[project.status]}</Typography>
+                                <Typography>{ProposalProjectStateCodes[project.state]}</Typography>
                             </Box>
 
                         </Box>
