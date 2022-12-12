@@ -19,7 +19,7 @@ TBD
 ## Voting contract
 
 ### Docs
-[Voting.md](https://github.com/PhilippePaulos/energy-dapp/blob/main/Energy.md)
+[Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/main/Energy.md)
 
 ### Contract address
 The contract is deployed in the Goerli testnet at TBD
