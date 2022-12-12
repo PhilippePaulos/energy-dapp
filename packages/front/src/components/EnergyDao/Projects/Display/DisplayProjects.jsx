@@ -64,6 +64,7 @@ function DisplayProjects() {
         }
         let promises = ids.map((id) => retrieveProject(id))
         let projects = await Promise.all(promises)
+        console.log(await contract.projects(0));
 
         promises = projects.map((id) => retrieveState(id))
         projects = await Promise.all(promises)

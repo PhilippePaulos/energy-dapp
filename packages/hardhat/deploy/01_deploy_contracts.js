@@ -5,7 +5,7 @@ const {
 const { proposeVote, Votes } = require('../helpers/governor')
 const { exportAbis, ONE_ETHER } = require("../helpers/common")
 
-const IPFS_IMG = "ipfs://bafybeibrzm2h3z37eaxqvofioxfythtv6fhdq7acdzwgukpoupsdcjecny/"
+const IPFS_FOLDER = "ipfs/QmY1okHh4rc6NriBJYVqTComuprvaxpHqCbPk9jLF3eUE1"
 
 async function main() {
 
@@ -69,13 +69,14 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   //const res = await eedToken.balanceOf(energyDao.address);
   const res = await eedToken.balanceOf(addr1.address);
   console.log("Register craftsmans...")
-  await energyDao.connect(addr1).registerCraftsman("Jean", "7 rue du Maine", IPFS_IMG)
-  await energyDao.connect(addr2).registerCraftsman("Paul", "8 impasse des coquelicots", IPFS_IMG)
-  await energyDao.connect(addr3).registerCraftsman("Jacques", "1 rue des Rameaux", IPFS_IMG)
-  await energyDao.connect(addr4).registerCraftsman("Philippe", "12 avenue des Lilas", IPFS_IMG)
-  await energyDao.connect(addr5).registerCraftsman("Baptiste", "3 impasse Emile Zola", IPFS_IMG)
+  const certif = `${IPFS_FOLDER}/CertificationRGE-01.jpg`
+  await energyDao.connect(addr1).registerCraftsman("Jean Massé", "7 rue du Maine - 75013 Paris", certif)
+  await energyDao.connect(addr2).registerCraftsman("Paul Dumant", "8 impasse des Coquelicots - 21231 Dijon", certif)
+  await energyDao.connect(addr3).registerCraftsman("Jacques Artan", "1 rue des Rameaux - 35000 Rennes", certif)
+  await energyDao.connect(addr4).registerCraftsman("Charlotte Dieuzé", "12 avenue des Lilas - 29510 Edern", certif)
+  await energyDao.connect(addr5).registerCraftsman("Carla Santori", "3 impasse Emile Zola - 75012 Paris", certif)
 
-  console.log("Validate craftsman via governor instance....")
+  console.log("Delegates...");
   await eedToken.connect(addr1).delegate(addr1.address)
   await eedToken.connect(addr2).delegate(addr2.address)
   await eedToken.connect(addr3).delegate(addr3.address)
@@ -84,14 +85,12 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await eedToken.connect(addr6).delegate(addr6.address)
   await eedToken.connect(addr7).delegate(addr7.address)
 
-  await addCraftsman(governor, energyDao,addr1, addr1)
+  console.log("Execute craftsman proposals");
+  await addCraftsman(governor, energyDao, addr1, addr1)
   await addCraftsman(governor, energyDao, addr1, addr2)
   await addCraftsman(governor, energyDao, addr1, addr3)
   await addCraftsman(governor, energyDao, addr1, addr4)
 
-  // console.log("Craftsmans validated")
-
-  // console.log("Create projects...")
 
   console.log("Approve tokens");
   await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("10"));
@@ -102,28 +101,31 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await eedToken.connect(addr6).approve(energyDao.address, ethers.utils.parseEther("10"));
   await eedToken.connect(addr7).approve(energyDao.address, ethers.utils.parseEther("10"));
 
-
   console.log("PROJET 1");
-  await energyDao.connect(addr6).addProject("Citya Pau", "Renovation immeuble année 1980 10 étages", 64, 1, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
-  await energyDao.connect(addr2).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
-  await energyDao.connect(addr3).proposeQuotation(0, "devis super", IPFS_IMG, 720, 200000)
-  await energyDao.connect(addr4).proposeQuotation(0, "Etanchéité renouvelable", IPFS_IMG, 720, 200000)
+  const PHOTOS_IPFS = `${IPFS_FOLDER}/photos.jpg`
+  const DPE_IPFS = `${IPFS_FOLDER}/dpe.gif`
+
+  await energyDao.connect(addr6).addProject("Citya Pau", "Rénovation immeuble année 1980 - 10 étages", 64, 1, [PHOTOS_IPFS], DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
+  console.log(await energyDao.projects(0));
+  await energyDao.connect(addr2).proposeQuotation(0, "Devis - Construction 2000", `${IPFS_FOLDER}/Certification Devis-01.jpg`, 720, 200000)
+  await energyDao.connect(addr3).proposeQuotation(0, "Devis - Renov", `${IPFS_FOLDER}/Devis-03.jpeg`, 720, 200000)
+  await energyDao.connect(addr4).proposeQuotation(0, "Devis - Vie Renovation ", `${IPFS_FOLDER}/Devis-03.jpeg`, 720, 200000)
 
   await hre.network.provider.send("hardhat_mine")
   await hre.network.provider.send("hardhat_mine")
-  
+
   await energyDao.connect(addr1).castVote(0, addr1.address, addr2.address)
   await hre.network.provider.send("hardhat_mine")
 
   await energyDao.connect(addr6).accept(0)
 
   console.log("PROJET 2");
-  await energyDao.connect(addr7).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
-  await energyDao.connect(addr2).proposeQuotation(1, "devis Paul SARL", IPFS_IMG, 6500, 250000)
-  await energyDao.connect(addr3).proposeQuotation(1, "devis Construct2001", IPFS_IMG, 900, 300000)
-  await energyDao.connect(addr4).proposeQuotation(1, "Devis installation panneaux solaires ", IPFS_IMG, 900, 300000)
+  console.log(PHOTOS_IPFS);
+  await energyDao.connect(addr7).addProject("Immo City", "Devis - Rénovation entreprise paprem Marseille", 13, 0, [PHOTOS_IPFS], DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
+  await energyDao.connect(addr2).proposeQuotation(1, "Devis - Paul SARL", `${IPFS_FOLDER}/Certification Devis-01.jpg`, 6500, 250000)
+  await energyDao.connect(addr3).proposeQuotation(1, "Devis - Construct2001", `${IPFS_FOLDER}/Devis-03.jpeg`, 900, 300000)
+  await energyDao.connect(addr4).proposeQuotation(1, "Devis - Aqui Renov ", `${IPFS_FOLDER}/Devis-03.jpeg`, 900, 300000)
   await hre.network.provider.send("hardhat_mine")
-
 }
 
 async function addCraftsman(governor, energyDao, signer, addr) {

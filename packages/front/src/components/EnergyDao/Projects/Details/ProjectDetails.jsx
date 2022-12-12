@@ -89,6 +89,7 @@ function ProjectDetailsModal(props) {
     useBlockNumber({
         onSuccess(data) {
             fetchData(data)
+            console.log(project);
         },
       })
 
@@ -109,7 +110,6 @@ function ProjectDetailsModal(props) {
     const fetchCraftsman = useCallback(async (currentBlock) => {
         const isValidated = await EnergyDao.isCraftsmanValidated(address)
         const quotation = await EnergyDao.quotations(project.id, address)
-        console.log(project.beneficiaryAddr !== address);
         if (project.beneficiaryAddr !== address && address !== quotation.craftsmanAddr && isValidated && project.voteInfo.voteStart > currentBlock) {
             setDisplayCreation(true)
         }

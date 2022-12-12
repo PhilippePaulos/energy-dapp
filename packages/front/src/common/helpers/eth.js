@@ -63,7 +63,8 @@ async function uploadIpfsFile(file) {
 }
 
 function openIpfsLink(hash) {
-    window.open("https://gateway.pinata.cloud/ipfs/QmQ3C2j5ZzHxbdBKPFj6G7s9szwig95iy4MXHMrKcN9cvD")
+    console.log(hash);
+    window.open(`https://gateway.pinata.cloud/${hash}`)
 }
 
 async function proposeVote(governor, instances, funcs, args, values, description) {
