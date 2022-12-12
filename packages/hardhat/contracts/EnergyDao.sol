@@ -169,7 +169,7 @@ contract EnergyDao is Ownable {
         numberQuotation = _numberQuotation;
     }
 
-       /**
+    /**
      * @notice register a craftman 
      * @dev Can be called by anyone
      * @param _name  name craftman
