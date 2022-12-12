@@ -40,7 +40,7 @@ You can deploy the contract in your local environment using the following comand
 cd hardhat && npx hardhat run deploy/01_deploy_contracts.js --network localhost
 ```
 
-Make sure that you have a local blockchain running in your machine and feel free to update the truffle-config.js file in order to match your local configuration:
+Make sure that you have a local blockchain running in your machine and feel free to update the hardhat.config.js file in order to match your local configuration:
 ```js
 networks: {
     localhost: {
