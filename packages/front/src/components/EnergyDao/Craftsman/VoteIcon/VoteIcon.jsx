@@ -8,21 +8,20 @@ import GroupsIcon from '@mui/icons-material/Groups'
 
 
 function VoteIcon({state}){
-    const st = ProposalStateCodes[state]
 
-    if (st === ProposalState.Executed){
+    if (state === ProposalState.Executed){
         return <CheckCircleIcon />
     }
-    else if(st === ProposalState.Defeated) {
+    else if(state === ProposalState.Defeated) {
         return <CancelIcon  />
     } 
-    else if(st === ProposalState.Pending) {
+    else if(state === ProposalState.Pending) {
         return <HourglassFullIcon />
     }
-    else if(st === ProposalState.Active) {
+    else if(state === ProposalState.Active) {
         return <HowToVoteIcon />
     }
-    else if(st === ProposalState.Succeeded){
+    else if(state === ProposalState.Succeeded){
         return <StartIcon sx={{'&:hover': {cursor:"pointer"}}} />
     }
     else {

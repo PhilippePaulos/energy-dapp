@@ -1,13 +1,12 @@
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'
 import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import Identicon from '@polkadot/react-identicon'
-import { ethers } from 'ethers'
 import { useCallback, useEffect, useState } from "react"
-import { useNetwork, useProvider } from "wagmi"
-import { ProposalProjectStateCodes, ProposalProjectStates, SectorCodes, StatusCodes } from "../../../../common/enums"
-import { formatAddress, initContract } from "../../../../common/helpers/eth"
+import { useContractEvent, useNetwork } from "wagmi"
+import { ProposalProjectStateCodes, SectorCodes } from "../../../../common/enums"
+import { formatAddress, getContractDescription } from "../../../../common/helpers/eth"
+import { useProfile } from '../../../../contexts/DaoContext'
 import { theme } from "../../../theme"
-import ButtonUI from "../../../ui/button"
 import IconHover from '../../../ui/IconHover'
 import TableBodyHover from "../../../ui/TableBodyHover"
 import TableContainerUI from "../../../ui/TableContainer"
@@ -16,13 +15,36 @@ import ProjectDetailsModal from "../Details/ProjectDetails"
 
 function DisplayProjects() {
 
-    const provider = useProvider()
+    const { profile: { contracts: { EnergyDao } } } = useProfile()
     const [openCreate, setOpenCreate] = useState(false)
     const [openDetails, setOpenDetails] = useState(false)
     const { chain } = useNetwork()
     const [projects, setProjects] = useState([])
     const [project, setProject] = useState({})
     const [quotations, setQuotations] = useState([])
+
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyDao', chain.id).abi,
+        eventName: 'QuotationRegistred',
+        listener() {
+            fetchEvents(EnergyDao)
+        },
+    })
+
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyDao', chain.id).abi,
+        eventName: 'ProjectRegistered',
+        listener() {
+            fetchEvents(EnergyDao)
+            setOpenCreate(false)
+        },
+    })
+
+    useEffect(() => {
+        fetchEvents(EnergyDao)
+    }, [])
 
     const fetchEvents = useCallback(async (contract) => {
         let eventFilter = contract.filters.ProjectRegistered()
@@ -69,19 +91,13 @@ function DisplayProjects() {
         setQuotations(quotations)
     }, [])
 
-    useEffect(() => {
-        const contract = initContract("EnergyDao", chain.id, provider)
-        fetchEvents(contract)
-    }, [fetchEvents])
-
     const handleClickCreate = () => {
         setOpenCreate(true)
     }
 
     const handleClickDetails = useCallback((row) => {
-        const contract = initContract("EnergyDao", chain.id, provider)
         setProject(row)
-        fetchQuotationEvents(contract, row.id)
+        fetchQuotationEvents(EnergyDao, row.id)
         setOpenDetails(true)
     }, [fetchQuotationEvents])
 

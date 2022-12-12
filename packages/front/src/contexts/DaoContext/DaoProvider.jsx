@@ -16,6 +16,7 @@ function DaoProvider({ children }) {
     Sale: initContract("Sale", chain.id, provider),
     EnergyGovernor: initContract("EnergyGovernor", chain.id, provider)
   }
+  
 
   useEffect(() => {
     const events = ["chainChanged", "accountsChanged"]

@@ -1,46 +1,60 @@
-import GroupsIcon from '@mui/icons-material/Groups'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import { Box, Grid, ImageList, ImageListItem, Typography } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 import Identicon from "@polkadot/react-identicon"
 import { ethers } from "ethers"
 import { useState } from "react"
-import { useAccount, useSigner } from "wagmi"
-import { ProposalState, ProposalStateCodes } from "../../../../common/enums"
-import { openIpfsLink } from "../../../../common/helpers/eth"
+import { useContractEvent, useNetwork, useSigner } from "wagmi"
+import { ProposalState } from "../../../../common/enums"
+import { getContractDescription, openIpfsLink } from "../../../../common/helpers/eth"
 import { useProfile } from "../../../../contexts/DaoContext"
+import ButtonUI from "../../../ui/button"
 import CenteredModal from "../../../ui/CenteredModal"
 import CircularIndeterminate from "../../../ui/CircularIndeterminate"
 import IconHover from "../../../ui/IconHover"
 import RoundedGrid from "../../../ui/RoundedGrid"
-import VoteIcon from '../VoteIcon/VoteIcon'
 import DisplayVotes from './DisplayVotes'
 
-
-function State({ craftsman, handleClick }) {
-
-    if (craftsman.state === undefined || ProposalStateCodes[craftsman.state] === ProposalState.Succeeded) {
-        const icon = craftsman.state === undefined ? <GroupsIcon state={craftsman.state} /> : <VoteIcon state={craftsman.state} />
+function State({ state }) {
+    if (state !== undefined) {
         return (
-            <Box className="line" onClick={() => handleClick()}>
+            <Box className="line">
                 <Typography variant="b">Proposal status</Typography>
-                <Typography sx={{ "& .MuiSvgIcon-root": { marginLeft: "5px" }, "& .MuiSvgIcon-root:hover": { cursor: "pointer", color: "black" } }}>{icon}</Typography>
-            </Box>)
+                <Typography> {state}</Typography>
+            </Box>
+        )
     }
-    else {
+}
+
+function VoteProposal({ state, handleDecision }) {
+    
+    const title = state === undefined ? "Initier vote" : "Accepter vote"
+
+    if (state === undefined || state === ProposalState.Succeeded) {
         return (
-            <Box className="line" onClick={() => handleClick(craftsman.state)}>
-                <Typography variant="b">Proposal status</Typography>
-                <Typography> {ProposalStateCodes[craftsman.state]}</Typography>
+            <Box display="flex" gap="5px" mt={2}>
+                <ButtonUI variant="contained" component="label" htmlFor="file-upload" onClick={() => handleDecision(true)}>
+                    {title}
+                </ButtonUI>
             </Box>
         )
     }
 }
 
 function CraftsmanDetailsModal(props) {
-    const { craftsman, open, setOpen, fetchCraftsman } = props
+    const { craftsman, open, setOpen, fetchCraftsman, quorum } = props
     const { data: signer } = useSigner()
     const { profile: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
     const [isLoading, setIsLoading] = useState(false)
+    const {chain} = useNetwork()
+
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyGovernor', chain.id).abi,
+        eventName: 'VoteCastWithParams',
+        listener() {
+            console.log("EVEEEEEEEEEEEEEEEEEEEENT");
+        },
+    })
 
     const handleProposal = async () => {
         setIsLoading(true)
@@ -48,15 +62,13 @@ function CraftsmanDetailsModal(props) {
         if (craftsman.state === undefined) {
             await EnergyGovernor.connect(signer).propose([EnergyDao.address], [0], [encodedFunc], `validate ${craftsman.craftsmanAddr}`)
         }
-        else if (ProposalStateCodes[craftsman.state] === ProposalState.Succeeded) {
+        else if (craftsman.state === ProposalState.Succeeded) {
             await EnergyGovernor.connect(signer).execute([EnergyDao.address], [0], [encodedFunc], ethers.utils.id(craftsman.description))
         }
         fetchCraftsman()
         setOpen(false)
         setIsLoading(false)
     }
-
-
 
     return (
         <CenteredModal
@@ -84,16 +96,19 @@ function CraftsmanDetailsModal(props) {
                                 <Typography variant="b">Certification</Typography>
                                 <Typography><IconHover><PictureAsPdfIcon onClick={() => openIpfsLink(craftsman.certification)} /></IconHover></Typography>
                             </Box>
-                            <State craftsman={craftsman} handleClick={handleProposal} />
+                            <State state={craftsman.state} />
                         </Box>
                     </RoundedGrid>
                 </Grid>
+                <VoteProposal state={craftsman.state} handleDecision={handleProposal}/>
                 {
-                    craftsman.votes && <DisplayVotes craftsman={craftsman} />
+                    craftsman.votes && <DisplayVotes craftsman={craftsman} quorum={quorum} />
                 }
                 <CircularIndeterminate loading={isLoading} />
             </Box>
         </CenteredModal>
+
+
     )
 }
 export default CraftsmanDetailsModal

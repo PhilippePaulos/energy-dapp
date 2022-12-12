@@ -74,12 +74,13 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr5).registerCraftsman("Baptiste", "3 impasse Emile Zola", IPFS_IMG)
 
   console.log("Validate craftsman via governor instance....")
-  // transfer tokens to reach quorum
   await eedToken.connect(addr1).delegate(addr1.address)
   await eedToken.connect(addr2).delegate(addr2.address)
   await eedToken.connect(addr3).delegate(addr3.address)
   await eedToken.connect(addr4).delegate(addr4.address)
   await eedToken.connect(addr5).delegate(addr5.address)
+  await eedToken.connect(addr6).delegate(addr6.address)
+  await eedToken.connect(addr7).delegate(addr7.address)
 
   await addCraftsman(governor, energyDao,addr1, addr1)
   await addCraftsman(governor, energyDao, addr1, addr2)
@@ -91,13 +92,13 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   // console.log("Create projects...")
 
   console.log("Approve tokens");
-  await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("1.5"));
-  await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("1.5"));
-  await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("1.5"));
-  await eedToken.connect(addr4).approve(energyDao.address, ethers.utils.parseEther("1.5"));
-  await eedToken.connect(addr5).approve(energyDao.address, ethers.utils.parseEther("1.5"));
-  await eedToken.connect(addr6).approve(energyDao.address, ethers.utils.parseEther("1.5"));
-  await eedToken.connect(addr7).approve(energyDao.address, ethers.utils.parseEther("1.5"));
+  await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("10"));
+  await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("10"));
+  await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("10"));
+  await eedToken.connect(addr4).approve(energyDao.address, ethers.utils.parseEther("10"));
+  await eedToken.connect(addr5).approve(energyDao.address, ethers.utils.parseEther("10"));
+  await eedToken.connect(addr6).approve(energyDao.address, ethers.utils.parseEther("10"));
+  await eedToken.connect(addr7).approve(energyDao.address, ethers.utils.parseEther("10"));
 
 
   console.log("PROJET 1");
@@ -127,6 +128,7 @@ async function addCraftsman(governor, energyDao, signer, addr) {
 
   const { proposalId, descriptionHash, encodedFuncs } = await proposeVote(governor, [energyDao], ["validateCraftsman"], [[addr.address]], [0], `validate ${addr.address}`)
   await governor.connect(signer).castVote(proposalId, Votes.For)
+
 
   await hre.network.provider.send("hardhat_mine")
   await hre.network.provider.send("hardhat_mine")

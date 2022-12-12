@@ -1,7 +1,7 @@
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt'
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt'
-import { Grid, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import { Grid, Table, TableCell, TableHead, TableRow, Typography, Box } from "@mui/material"
 import { ethers } from "ethers"
 import { useCallback, useEffect, useState } from 'react'
 import { useAccount, useSigner } from "wagmi"
@@ -13,7 +13,7 @@ import TableBodyNormal from "../../../ui/TableBodyNormal"
 import TableContainerUI from "../../../ui/TableContainer"
 
 
-function DisplayVotes({ craftsman }) {
+function DisplayVotes({ craftsman, quorum }) {
 
     const { profile: { contracts: { EnergyGovernor, EEDToken } } } = useProfile()
     const { data: signer } = useSigner()
@@ -21,6 +21,7 @@ function DisplayVotes({ craftsman }) {
     const [isLoading, setIsLoading] = useState(false)
     const [hasVoted, setHasVoted] = useState(false)
     const [votePower, setVotePower] = useState(0)
+    console.log(quorum);
 
     const fetchHasVoted = useCallback(async () => {
         const hasVoted = await EnergyGovernor.hasVoted(craftsman.proposalId, address)
@@ -60,12 +61,12 @@ function DisplayVotes({ craftsman }) {
     return (
         <Grid container mt={5}>
             <Grid item xs={12} >
-                <Typography variant="h6" pl={1} pb={1}>Vote results</Typography>
-                
+                <Typography variant="h6" pl={1}>Votes</Typography>
+                <Box><Typography variant="p" pl={1} pb={1}>Le quorum à atteindre est de {quorum} EED</Typography></Box>
                 <TableContainerUI sx={{ width: '100%', marginBottom: '10px' }} className="bg-gray-900">
                     <Table sx={{ minWidth: 650 }} aria-label="simple table" className="bg-gray-900">
                         {
-                            !hasVoted && ProposalStateCodes[craftsman.state] === ProposalState.Active ?
+                            !hasVoted && craftsman.state === ProposalState.Active ?
                                 <TableHead>
                                     <TableRow>
                                         <TableCell onClick={() => handleClick("up")}><IconHover><ThumbUpAltIcon /></IconHover></TableCell>
@@ -93,7 +94,7 @@ function DisplayVotes({ craftsman }) {
                     </Table>
                 </TableContainerUI>
                 
-                { !hasVoted && ProposalStateCodes[craftsman.state] === ProposalState.Active && <Typography variant="p" pl={1} pb={1}>Votre poids de vote actuel est de {votePower} EED. Selectionnez votre option préférée.</Typography>}
+                { !hasVoted && craftsman.state === ProposalState.Active && <Typography variant="p" pl={1} pb={1}>Votre poids de vote actuel est de {votePower} EED. Selectionnez votre option préférée.</Typography>}
                 <CircularIndeterminate loading={isLoading} />
             </Grid>
         </Grid>

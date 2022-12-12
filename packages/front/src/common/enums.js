@@ -25,14 +25,15 @@ const StatusCodes = {
 }
 
 const ProposalState = {
-    Pending: "Pending",
-    Active: "Active",
-    Canceled: "Canceled",
-    Defeated: "Defeated",
-    Succeeded: "Succeeded",
+    Pending: "En attente",
+    Active: "En cours",
+    Canceled: "Annulé",
+    Defeated: "Défaite",
+    Succeeded: "Succès",
     Queued: "Queued",
-    Expired: "Expired",
-    Executed: "Executed"
+    Expired: "Expiré",
+    Executed: "Exécuté",
+    Finished: "Terminé, en attente du prochain block"
 }
 
 const ProposalStateCodes = {

@@ -1,17 +1,29 @@
-import { Grid, Link } from "@mui/material"
-import { useProfile } from "../../../contexts/DaoContext"
-import DisplayCraftsman from "../Craftsman/Display/DisplayCraftsman"
-import DisplayProjects from "../Projects/Display/DisplayProjects"
-import { Divider } from '@mui/material';
+import { useCallback, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import { useProfile } from "../../../contexts/DaoContext";
+import DisplayCraftsman from "../Craftsman/Display/DisplayCraftsman";
+import DisplayProjects from "../Projects/Display/DisplayProjects";
 
 function Home() {
 
-    const { state: balance } = useProfile()
+    const { profile: { contracts: { EnergyDao } } } = useProfile()
+    const {address} = useAccount()
+
+    const [isCraftsman, setIsCraftsman] = useState(false)
+
+    const fetchCraftsman = useCallback(async() => {
+        const addr = await EnergyDao.craftsmans(address)
+        setIsCraftsman(addr.craftsmanAddr === address)
+    }, [EnergyDao])
+
+    useEffect(() => {
+        fetchCraftsman()
+    }, [fetchCraftsman])
 
     return (
         <>
             <DisplayProjects/>
-            <DisplayCraftsman />
+            <DisplayCraftsman isCraftsman={isCraftsman}/>
         </>
     )
 

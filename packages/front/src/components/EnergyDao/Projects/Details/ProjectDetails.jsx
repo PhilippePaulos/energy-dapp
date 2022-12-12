@@ -5,9 +5,9 @@ import Identicon from '@polkadot/react-identicon'
 import { BigNumber, ethers } from "ethers"
 import { formatEther } from 'ethers/lib/utils.js'
 import { useCallback, useEffect, useState } from 'react'
-import { useAccount, useBlockNumber, useSigner } from 'wagmi'
+import { useAccount, useBlockNumber, useSigner, useContractEvent, useNetwork} from 'wagmi'
 import { ProposalProjectStates } from "../../../../common/enums"
-import { formatAddress, openIpfsLink } from "../../../../common/helpers/eth"
+import { formatAddress, getContractDescription, openIpfsLink } from "../../../../common/helpers/eth"
 import { useProfile } from '../../../../contexts/DaoContext'
 import ButtonUI from '../../../ui/button'
 import CenteredModal from "../../../ui/CenteredModal"
@@ -16,6 +16,7 @@ import IconHover from '../../../ui/IconHover'
 import PdfPicture from "../../../ui/PdfPicture"
 import RoundedGrid from "../../../ui/RoundedGrid"
 import TableContainerUI from "../../../ui/TableContainer"
+import CreateQuotationModal from '../Create/CreateQuotationModal'
 
 
 function DisplayVoteBlock({ project }) {
@@ -61,23 +62,39 @@ function DisplayVoteBlock({ project }) {
 
         )
     }
-
 }
 
 function ProjectDetailsModal(props) {
 
-    const { project, quotations, open, setOpen } = props
+    const { project, quotations, open, setOpen} = props
+    const [openQuotation, setOpenQuotation] = useState(false)
     const { data: signer } = useSigner()
     const { address } = useAccount()
     const { profile: { contracts: { EnergyDao, EEDToken } } } = useProfile()
     const [votePower, setVotePower] = useState(0)
     const [hasVoted, setHasVoted] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
+    const [displayCreation, setDisplayCreation] = useState()
+    const {chain} = useNetwork()
+
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyDao', chain.id).abi,
+        eventName: 'QuotationRegistred',
+        listener() {
+            fetchData()
+        },
+      })
+    
+    useBlockNumber({
+        onSuccess(data) {
+            fetchData(data)
+        },
+      })
 
     const castVote = !hasVoted && project.state === ProposalProjectStates.Active
 
     const isBeneficiary = project.beneficiaryAddr === address
-    console.log(isBeneficiary);
 
     const fetchHasVoted = useCallback(async () => {
         const hasVoted = await EnergyDao.hasVoted(project.id, address)
@@ -89,7 +106,15 @@ function ProjectDetailsModal(props) {
         setVotePower(ethers.utils.formatEther(votes))
     }, [])
 
+    const fetchCraftsman = useCallback(async (currentBlock) => {
+        const isValidated = await EnergyDao.isCraftsmanValidated(address)
+        const quotation = await EnergyDao.quotations(project.id, address)
+        console.log(project.beneficiaryAddr !== address);
+        if (project.beneficiaryAddr !== address && address !== quotation.craftsmanAddr && isValidated && project.voteInfo.voteStart > currentBlock) {
+            setDisplayCreation(true)
+        }
 
+    }, [project, EnergyDao])
 
     const handleClick = useCallback(async (addr) => {
         setIsLoading(true)
@@ -100,22 +125,27 @@ function ProjectDetailsModal(props) {
     const handleDecision = useCallback(async (accept) => {
         setIsLoading(true)
         if (accept) {
-            console.log("es");
             await EnergyDao.connect(signer).accept(project.id)
         }
         else {
-            console.log("no");
             await EnergyDao.connect(signer).reject(project.id)
         }
         setIsLoading(false)
     })
 
-    useEffect(() => {
+    const handleCreate = () => {
+        setOpenQuotation(true)
+    }
+
+    const fetchData = useCallback((currentBlock) => {
         fetchVotePower()
         fetchHasVoted()
-    }, [fetchVotePower, fetchHasVoted])
+        fetchCraftsman(currentBlock)
+    }, [fetchVotePower, fetchHasVoted, fetchCraftsman])   
 
     return (
+        <>
+        <CreateQuotationModal open={openQuotation} setOpen={setOpenQuotation} project={project}/>
         <CenteredModal
             open={open}
             onClose={() => setOpen(false)}>
@@ -216,7 +246,7 @@ function ProjectDetailsModal(props) {
                                 </TableBody>
                             </Table>
                         </TableContainerUI>
-                        {castVote && <Typography variant="p" pl={1} pb={1}>Votre poids de vote actuel est de {votePower} EED. Veuillez selectionner votre option préférée.</Typography>}
+                        {castVote && <Typography variant="p" pl={1} pb={1}>Votre poids de vote actuel est de {votePower} EED. Faites votre choix.</Typography>}
 
                         <CircularIndeterminate loading={isLoading} />
                     </Grid>
@@ -233,10 +263,21 @@ function ProjectDetailsModal(props) {
 
                         </>
                     }
+                    {displayCreation && 
+                        <>
+                            <Box display="flex" gap="5px">
+                                <ButtonUI variant="contained" component="label" htmlFor="file-upload" onClick={() => handleCreate()}>
+                                    Propose un devis
+                                </ButtonUI>
+                            </Box>
+
+                        </>
+                    }
 
                 </Grid>
             </Box>
         </CenteredModal>
+        </>
     )
 }
 
