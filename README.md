@@ -14,7 +14,7 @@ Finally the best quotation is revealed and the benficiary has the choice to acce
 https://app.videas.fr/v/6abff012-85aa-46cc-af60-4c9c3f76c926/
 
 ## Website
-https://vercel.com/philippepaulos/voting-dapp
+https://energy-dapp.vercel.app/
 
 ## Voting contract
 
