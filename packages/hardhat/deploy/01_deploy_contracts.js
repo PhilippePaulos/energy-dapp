@@ -15,6 +15,8 @@ async function main() {
   const quotationPeriod = 4
   const votingPeriod = 2
   const voteExpire = 2
+  const nbMaxProject = 100
+  const nbMaxQuotations = 10
   // 1ETH -> 2000 EED
   const rate = 10000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
@@ -23,7 +25,7 @@ async function main() {
   console.log("Deploy DAO...")
   const EnergyDao = await ethers.getContractFactory("EnergyDao")
 
-  const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, craftsmanPeriod, quotationPeriod, votingPeriod, voteExpire, ethers.utils.parseEther("75"))
+  const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, craftsmanPeriod, quotationPeriod, votingPeriod, voteExpire, ethers.utils.parseEther("75"), nbMaxProject, nbMaxQuotations)
 
   await energyDao.deployed()
   console.log("Deployed DAO to", energyDao.address)
