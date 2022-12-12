@@ -11,10 +11,10 @@ Once period of proposal is done voters can vote for quotations.
 Finally the best quotation is revealed and the benficiary has the choice to accept it or reject it.
 
 ## Media
-TBD
+https://app.videas.fr/v/6abff012-85aa-46cc-af60-4c9c3f76c926/
 
 ## Website
-TBD
+https://vercel.com/philippepaulos/voting-dapp
 
 ## Voting contract
 
