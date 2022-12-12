@@ -5,7 +5,7 @@ import { ProposalState, ProposalStateCodes } from "../../../../common/enums"
 import StartIcon from '@mui/icons-material/Start';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import GroupsIcon from '@mui/icons-material/Groups'
-
+import CloseIcon from '@mui/icons-material/Close';
 
 function VoteIcon({state}){
 
@@ -15,8 +15,11 @@ function VoteIcon({state}){
     else if(state === ProposalState.Defeated) {
         return <CancelIcon  />
     } 
-    else if(state === ProposalState.Pending) {
+    else if(state === ProposalState.Pending || state === ProposalState.Finished) {
         return <HourglassFullIcon />
+    }
+    else if (state === ProposalState.Defeated) {
+        return <CloseIcon/>
     }
     else if(state === ProposalState.Active) {
         return <HowToVoteIcon />

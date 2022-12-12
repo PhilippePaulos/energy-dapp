@@ -24,7 +24,6 @@ function DisplayCraftsman({ isCraftsman }) {
     const [craftsman, setCraftsman] = useState({})
     const { profile: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
     const [quorum, setQuorum] = useState()
-    const { chain } = useNetwork()
 
 
     useBlockNumber({

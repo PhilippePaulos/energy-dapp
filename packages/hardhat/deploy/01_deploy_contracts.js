@@ -105,7 +105,7 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   const PHOTOS_IPFS = `${IPFS_FOLDER}/photos.jpg`
   const DPE_IPFS = `${IPFS_FOLDER}/dpe.gif`
 
-  await energyDao.connect(addr6).addProject("Citya Pau", "Rénovation immeuble année 1980 - 10 étages", 64, 1, [PHOTOS_IPFS], DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
+  await energyDao.connect(addr6).addProject("Citya Pau", "Rénovation immeuble année 1980 - 10 étages", 64, 1, PHOTOS_IPFS, DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
   console.log(await energyDao.projects(0));
   await energyDao.connect(addr2).proposeQuotation(0, "Devis - Construction 2000", `${IPFS_FOLDER}/Certification Devis-01.jpg`, 720, 200000)
   await energyDao.connect(addr3).proposeQuotation(0, "Devis - Renov", `${IPFS_FOLDER}/Devis-03.jpeg`, 720, 200000)
@@ -120,8 +120,7 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr6).accept(0)
 
   console.log("PROJET 2");
-  console.log(PHOTOS_IPFS);
-  await energyDao.connect(addr7).addProject("Immo City", "Devis - Rénovation entreprise paprem Marseille", 13, 0, [PHOTOS_IPFS], DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
+  await energyDao.connect(addr7).addProject("Immo City", "Devis - Rénovation entreprise paprem Marseille", 13, 0, PHOTOS_IPFS, DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
   await energyDao.connect(addr2).proposeQuotation(1, "Devis - Paul SARL", `${IPFS_FOLDER}/Certification Devis-01.jpg`, 6500, 250000)
   await energyDao.connect(addr3).proposeQuotation(1, "Devis - Construct2001", `${IPFS_FOLDER}/Devis-03.jpeg`, 900, 300000)
   await energyDao.connect(addr4).proposeQuotation(1, "Devis - Aqui Renov ", `${IPFS_FOLDER}/Devis-03.jpeg`, 900, 300000)

@@ -46,7 +46,7 @@ contract EnergyDao is Ownable {
         string description;
         uint32 department;
         Sector sector;
-        string[] photos;
+        string photos;
         string diagnostic;
         string plan;
         VoteInfo voteInfo;
@@ -233,7 +233,7 @@ contract EnergyDao is Ownable {
      * @param _desc  description of project
      * @param _department  deparment of project
      * @param _sector  sector enum of project
-     * @param _photos  list of photos document of project
+     * @param _photos  photos document of project
      * @param _diagnostic  diagnostic document of project
      * @param _plan  plan document of project
      */
@@ -242,15 +242,14 @@ contract EnergyDao is Ownable {
         string calldata _desc,
         uint8 _department,
         Sector _sector,
-        string[] memory _photos,
+        string memory _photos,
         string calldata _diagnostic,
         string calldata _plan
     ) external {
         require(projects.length < numberProject, "Project list is full");
 
         require(isNotEmptyString(_name)  && isNotEmptyString(_desc) && isNotEmptyString(_diagnostic)
-        && isNotEmptyString(_plan) && _department != 0 && _photos.length > 0, "You must fill all fields");
-        require( _photos.length < 5, "You can't upload more than 5 documents");
+        && isNotEmptyString(_plan) && _department != 0, "You must fill all fields");
 
         Project memory  project;
         project.name = _name;

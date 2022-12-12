@@ -2,7 +2,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0x447BaF148049f9a99EAC5d36C4F26C9Cb9b129F8",
+        "addr": "0x88bd8eE84eE19D58dd94e45a219509dcD171cB27",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0x2f0117307e3090b63744205A84F4c81eb5493952",
+        "addr": "0x7D09E9F0C2d40593faDa26B6d48359C171e51802",
         "abi": [
           {
             "inputs": [
@@ -896,7 +896,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x7Ce73F8f636C6bD3357A0A8a59e0ab6462C955B0",
+        "addr": "0xF357118EBd576f3C812c7875B1A1651a7f140E9C",
         "abi": [
           {
             "inputs": [
@@ -1144,9 +1144,9 @@
                 "type": "uint8"
               },
               {
-                "internalType": "string[]",
+                "internalType": "string",
                 "name": "_photos",
-                "type": "string[]"
+                "type": "string"
               },
               {
                 "internalType": "string",
@@ -1416,6 +1416,11 @@
                 "internalType": "enum EnergyDao.Sector",
                 "name": "sector",
                 "type": "uint8"
+              },
+              {
+                "internalType": "string",
+                "name": "photos",
+                "type": "string"
               },
               {
                 "internalType": "string",
@@ -1742,7 +1747,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0x403Cac44DE71FeB39Fb0844cf42A4c2919bcE5D9",
+        "addr": "0xEDB78CC2669B68e51EA18aB4DD2689Cd105BC2Be",
         "abi": [
           {
             "inputs": [
