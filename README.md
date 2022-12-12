@@ -37,7 +37,7 @@ The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c
 ### Contract
 You can deploy the contract in your local environment using the following comands:
 ```sh 
-cd hardhat && npx hardhat run deploy/01_deploy_contracts.js --network localhost
+cd hardhat && npm run deployLocal
 ```
 
 Make sure that you have a local blockchain running in your machine and feel free to update the hardhat.config.js file in order to match your local configuration:
