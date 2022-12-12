@@ -95,7 +95,7 @@ async function prepareData() {
     await eedToken.connect(beneficiary1).approve(dao.address, ethers.utils.parseEther("10"));
     await eedToken.connect(craftsman1).approve(dao.address, ethers.utils.parseEther("10"));
 
-    await dao.connect(beneficiary1).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+    await dao.connect(beneficiary1).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)
     
     await dao.connect(craftsman1).proposeQuotation(0, "devis Construct2000", IPFS_IMG, 720, 200000)
     console.log(nbTokenToStake);
@@ -143,29 +143,25 @@ async function prepareData() {
         it("Enough project", async function () {
            const {dao, beneficiary2, craftsman1,  eedToken} = await loadFixture(deployFixture);
            await eedToken.connect(beneficiary2).approve(dao.address, ethers.utils.parseEther("0.75"));
-           await dao.connect(beneficiary2).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+           await dao.connect(beneficiary2).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)
            await eedToken.connect(craftsman1).approve(dao.address, ethers.utils.parseEther("0.75"));
-           await expect(dao.connect(craftsman1).addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)).to.be.revertedWith("Project list is full");
+           await expect(dao.connect(craftsman1).addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)).to.be.revertedWith("Project list is full");
         });
         it("Name not empty", async function () {
             const {dao} = await loadFixture(deployFixture);
-            await expect(dao.addProject("", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)).to.be.revertedWith("You must fill all fields");
-         });
-         it("Not more than 5 documents", async function () {
-            const {dao} = await loadFixture(deployFixture);
-            await expect(dao.addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG, IPFS_IMG, IPFS_IMG, IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)).to.be.revertedWith("You can't upload more than 5 documents");
+            await expect(dao.addProject("", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)).to.be.revertedWith("You must fill all fields");
          });
          it("Should return name of Project", async function () {
             const {dao, beneficiary2, eedToken} = await loadFixture(deployFixture);
             await eedToken.connect(beneficiary2).approve(dao.address, ethers.utils.parseEther("0.75"));
-            await dao.connect(beneficiary2).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+            await dao.connect(beneficiary2).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)
             const project = await dao.projects(1);
             expect(project.name).to.equal("Immo City");
         });
         it("Should event project added", async function () {
             const {dao, beneficiary2, eedToken} = await loadFixture(deployFixture);
             await eedToken.connect(beneficiary2).approve(dao.address, ethers.utils.parseEther("0.75"));
-            await expect(dao.connect(beneficiary2).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)).to.emit(dao, "ProjectRegistered").withArgs(beneficiary2.address, 1, "Immo City", 0);
+            await expect(dao.connect(beneficiary2).addProject("Immo City", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)).to.emit(dao, "ProjectRegistered").withArgs(beneficiary2.address, 1, "Immo City", 0);
         });
 
         
@@ -407,7 +403,7 @@ async function prepareData() {
         it("Should be rejected", async function () {
             const  {dao, beneficiary2, eedToken, voter1, craftsman1} = await loadFixture(deployFixture);
             await eedToken.connect(beneficiary2).approve(dao.address, ethers.utils.parseEther("10"));
-            await dao.connect(beneficiary2).addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+            await dao.connect(beneficiary2).addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0,IPFS_IMG, IPFS_IMG, IPFS_IMG)
             await dao.connect(craftsman1).proposeQuotation(1, "devis Construct2000", IPFS_IMG, 720, 200000)
             mineBlocks(2);
             await dao.connect(voter1).castVote(1, voter1.address, craftsman1.address);
@@ -467,7 +463,7 @@ async function prepareData() {
         it("should quotation exists", async function () {
             const {dao, beneficiary2, craftsman1, eedToken} = await loadFixture(deployFixture);
             await eedToken.connect(beneficiary2).approve(dao.address, ethers.utils.parseEther("10"));
-            await dao.connect(beneficiary2).addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0, [IPFS_IMG, IPFS_IMG], IPFS_IMG, IPFS_IMG)
+            await dao.connect(beneficiary2).addProject("Immo City2", "Renovation entreprise paprem Marseille", 13, 0, IPFS_IMG, IPFS_IMG, IPFS_IMG)
             await expect(dao.connect(craftsman1).removeQuotation(1)).to.be.revertedWith("No quotation for this project");
         });
     });
