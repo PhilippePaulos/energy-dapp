@@ -79,7 +79,7 @@ contract EnergyDao is Ownable {
     mapping(address => mapping(uint => address)) voters;
     
     EnergyGovernor public governor;
-    mapping (address => uint256) public locks;
+    mapping (address => uint) public locks;
 
     // Amount of tokens to mint
     uint256 public mintAmount;
@@ -97,6 +97,8 @@ contract EnergyDao is Ownable {
     uint256 nbTokenToLock;
     uint256 fees;
     uint amountToLock;
+    uint numberProject;
+    uint numberQuotation;
 
     event ProjectRegistered(
         address beneficiary,
@@ -135,7 +137,9 @@ contract EnergyDao is Ownable {
         uint _quotationPeriod,
         uint _votingPeriod,
         uint _voteExpire,
-        uint _nbTokenToLock 
+        uint _nbTokenToLock,
+        uint _numberProject,
+        uint _numberQuotation
     ) {
         // todo ajouter REQUIRE
         require(_mintAmount >= _saleAmount, "Mint amount should be higher than sale amount");
@@ -149,6 +153,8 @@ contract EnergyDao is Ownable {
         governor = new EnergyGovernor(token, 0, _craftsmanVotingPeriod);
         fees = _calculateFees(nbTokenToLock);
         amountToLock = nbTokenToLock - fees;
+        numberProject = _numberProject;
+        numberQuotation = _numberQuotation;
     }
 
     function registerCraftsman(
@@ -180,7 +186,7 @@ contract EnergyDao is Ownable {
         craftsmans[_addr].isValidated = true;
     }
 
-    function removeCrafsman(address _addr) public onlyGovernor {
+    function removeCraftsman(address _addr) public onlyGovernor {
         craftsmans[_addr].isValidated = false;
     }
 
@@ -197,7 +203,7 @@ contract EnergyDao is Ownable {
         string calldata _diagnostic,
         string calldata _plan
     ) external {
-        require(projects.length < 100000, "Project list is full");
+        require(projects.length < numberProject, "Project list is full");
 
         require(isNotEmptyString(_name)  && isNotEmptyString(_desc) && isNotEmptyString(_diagnostic)
         && isNotEmptyString(_plan) && _department != 0 && _photos.length > 0, "You must fill all fields");
@@ -239,7 +245,7 @@ contract EnergyDao is Ownable {
          && _price != 0 && _nbCee != 0, "You must fill all fields");
         require(_id < projects.length, "Project doesn't exists");
         require(
-            projects[_id].nbQuotations <= 10,
+            projects[_id].nbQuotations < numberQuotation,
             "Quotation list for this project is full"
         );
         require(
@@ -270,7 +276,10 @@ contract EnergyDao is Ownable {
     }
 
     function removeQuotation(uint _projectId) external onlyValidatedCraftsman {
+        require(_projectId < projects.length, "Project doesn't exists");
+        require(quotations[_projectId][msg.sender].craftsmanAddr != address(0), "No quotation for this project");
         quotations[_projectId][msg.sender].isDeleted = true;
+        projects[_projectId].nbQuotations -= 1;
     }
 
 
@@ -314,11 +323,9 @@ contract EnergyDao is Ownable {
         }
 
         uint voteStart = projects[_projectId].voteInfo.voteStart;
-
         if(voteStart >= _block) {
             return ProposalState.Pending;
         }
-
         uint voteEnd = projects[_projectId].voteInfo.voteEnd;
         if (voteEnd >= _block){
             return ProposalState.Active;
@@ -346,6 +353,12 @@ contract EnergyDao is Ownable {
                 weight = vote;
                 winner = craftsman;
             }
+            else if(vote == weight && vote > 0) {
+                if(quotations[_projectId][craftsman].nbCee >= quotations[_projectId][winner].nbCee){
+                    weight = vote;
+                    winner = craftsman;
+                }
+            }
         }
         return winner;
     }
@@ -363,13 +376,14 @@ contract EnergyDao is Ownable {
             projects[_projectId].voteInfo.accepted = true;
             craftsmans[winner].nbProjectsValidated += 1;
         }
+        
 
         emit QuotationAccepted(_projectId, winner);
     }
 
     function reject(uint _projectId) external onlyBeneficiary(_projectId) {
         ProposalState status = _state(_projectId, block.number);
-        require(status == ProposalState.Ended);
+        require(status == ProposalState.Ended, "Vote session is not ended");
         
         projects[_projectId].voteInfo.rejected = true;
 
@@ -377,9 +391,10 @@ contract EnergyDao is Ownable {
     }
 
     function lock() internal {
-        require(token.balanceOf(msg.sender) >= amountToLock + locks[msg.sender], "You don't have enough token in your account");
+        require(token.balanceOf(msg.sender) >= amountToLock + locks[msg.sender], "You don't have enough token to lock");
         token.transferFrom(msg.sender, address(this), fees);
-        locks[msg.sender] += amountToLock;  
+        locks[msg.sender] += amountToLock;
+        
     }
 
     function unlock(address _addr) internal {
