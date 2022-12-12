@@ -27,7 +27,7 @@ The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c
 ## Technologies
 * Solidity
 * Javascript
-* hardhat
+* Hardhat
 * React
 * Web3
 * Material UI
