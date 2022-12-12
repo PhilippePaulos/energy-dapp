@@ -13,14 +13,15 @@ async function prepareData() {
   const mintAmount = ethers.utils.parseEther('100')
   const allowanceAmount = ethers.utils.parseEther('10')
   const rate = 2
-  return { closingTime, owner, otherAccount, mintAmount, allowanceAmount, rate }
+  const nbTokenToStake = ethers.utils.parseEther('75')
+  return { closingTime, owner, otherAccount, mintAmount, allowanceAmount, rate, nbTokenToStake }
 }
 
 async function deployFixture() {
-  const { closingTime, owner, otherAccount, mintAmount, allowanceAmount, rate } = await prepareData()
+  const { closingTime, owner, otherAccount, mintAmount, allowanceAmount, rate, nbTokenToStake } = await prepareData()
 
   const EEDToken = await ethers.getContractFactory("EEDToken")
-  const token = await EEDToken.deploy(mintAmount)
+  const token = await EEDToken.deploy(mintAmount, nbTokenToStake)
 
   const Sale = await ethers.getContractFactory("Sale")
 
@@ -68,9 +69,9 @@ describe("Sale", function () {
     it("Should fail if closingTime is lower than current block timestamp", async function () {
       const { owner, mintAmount, rate } = await prepareData()
       const pastTime = await time.latest() - 1
-
+      const nbTokenToStake = ethers.utils.parseEther('75')
       const EEDToken = await ethers.getContractFactory("EEDToken")
-      const token = await EEDToken.deploy(mintAmount)
+      const token = await EEDToken.deploy(mintAmount, nbTokenToStake)
 
       const Sale = await ethers.getContractFactory("Sale")
       await expect(Sale.deploy(token.address, rate, pastTime, owner.address)).to.be.revertedWith("Closing time should be in the future")
@@ -80,9 +81,9 @@ describe("Sale", function () {
     it("Should fail if rate equals 0", async function () {
       const { owner, mintAmount, closingTime } = await prepareData()
       const rate = 0
-
+      const nbTokenToStake = ethers.utils.parseEther('75')
       const EEDToken = await ethers.getContractFactory("EEDToken")
-      const token = await EEDToken.deploy(mintAmount)
+      const token = await EEDToken.deploy(mintAmount, nbTokenToStake)
 
       const Sale = await ethers.getContractFactory("Sale")
       await expect(Sale.deploy(token.address, rate, closingTime, owner.address)).to.be.reverted
@@ -97,9 +98,9 @@ describe("Sale", function () {
 
     it("Should fail if token wallet is 0", async function () {
       const { mintAmount, rate, closingTime } = await prepareData()
-
+      const nbTokenToStake = ethers.utils.parseEther('75')
       const EEDToken = await ethers.getContractFactory("EEDToken")
-      const token = await EEDToken.deploy(mintAmount)
+      const token = await EEDToken.deploy(mintAmount, nbTokenToStake)
 
       const Sale = await ethers.getContractFactory("Sale")
       await expect(Sale.deploy(token.address, rate, closingTime, BURN_ADDRESS)).to.be.reverted
@@ -285,5 +286,12 @@ describe("Sale", function () {
 
     })
   })
+
+    it("Should get rate", async function () {
+        const {sale} = await loadFixture(deployFixture);
+        const rate = await sale.getRate();
+        await expect(rate).to.equal(2);
+    });
+
 
 })
