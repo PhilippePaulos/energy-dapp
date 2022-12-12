@@ -56,5 +56,5 @@ cd client && npm install && npm start
 ```
 
 ## Gas Reporter
-![alt test](https://github.com/PhilippePaulos/voting-dapp/blob/main/truffle/test/gas-reporter.PNG)
+![alt test](https://github.com/PhilippePaulos/energy-dapp/blob/main/gas_reporter.jpg)
 
