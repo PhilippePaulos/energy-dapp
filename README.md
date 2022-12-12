@@ -22,7 +22,7 @@ https://vercel.com/philippepaulos/voting-dapp
 [Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/main/Energy.md)
 
 ### Contract address
-The contract is deployed in the Goerli testnet at TBD
+The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c31f9e5275ed5
 
 ## Technologies
 * Solidity
