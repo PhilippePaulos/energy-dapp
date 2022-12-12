@@ -3,6 +3,7 @@ require("@nomiclabs/hardhat-ethers")
 require("solidity-coverage");
 require('dotenv').config();
 require("hardhat-gas-reporter");
+require('solidity-docgen');
 
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY === "undefined" ? process.env.ALCHEMY_KEY : ""
 const MNEMONIC = process.env.mnemonic === "undefined" ? process.env.mnemonic : ""
@@ -12,6 +13,7 @@ module.exports = {
   gasReporter: {
     enabled: true 
   },
+  docgen: {},
   networks: {
     localhost: {
       chainId: 31337
