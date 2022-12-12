@@ -11,3 +11,5 @@ artifacts
 
 #IDE
 .idea/
+
+/docs

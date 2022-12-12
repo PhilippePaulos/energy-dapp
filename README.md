@@ -19,7 +19,7 @@ TBD
 ## Voting contract
 
 ### Docs
-[Voting.md](https://github.com/PhilippePaulos/voting-dapp/blob/main/client/src/contracts/Voting.md)
+[Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/main/Energy.md)
 
 ### Contract address
 The contract is deployed in the Goerli testnet at TBD
@@ -40,7 +40,7 @@ You can deploy the contract in your local environment using the following comand
 cd hardhat && npx hardhat run deploy/01_deploy_contracts.js --network localhost
 ```
 
-Make sure that you have a local blockchain running in your machine and feel free to update the truffle-config.js file in order to match your local configuration:
+Make sure that you have a local blockchain running in your machine and feel free to update the hardhat.config.js file in order to match your local configuration:
 ```js
 networks: {
     localhost: {
@@ -56,5 +56,5 @@ cd client && npm install && npm start
 ```
 
 ## Gas Reporter
-![alt test](https://github.com/PhilippePaulos/voting-dapp/blob/main/truffle/test/gas-reporter.PNG)
+![alt test](https://github.com/PhilippePaulos/energy-dapp/blob/main/gas_reporter.jpg)
 

@@ -9,8 +9,11 @@ import "@openzeppelin/contracts/utils/Timers.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "hardhat/console.sol";
 
-
-
+/**
+ * @title Contract for EnergyDAO
+ * @author Baptiste and Philippe
+ * @notice Dao in order to find best project for energy economy
+ */
 contract EnergyDao is Ownable {
     using SafeCast for uint256;
 
@@ -157,6 +160,13 @@ contract EnergyDao is Ownable {
         numberQuotation = _numberQuotation;
     }
 
+       /**
+     * @notice register a craftman 
+     * @dev Can be called by anyone
+     * @param _name  name craftman
+     * @param _addressCompany  address of company
+     * @param _certification  document for certification
+     */
     function registerCraftsman(
         string calldata _name,
         string calldata _addressCompany,
@@ -178,22 +188,55 @@ contract EnergyDao is Ownable {
         emit CraftsmanRegistered(msg.sender);
     }
 
+    /**
+     * @notice check if craftman validated by quorum
+     * @dev Can be called by anyone
+     * @param _addr  address of craftsman 
+     * @return boolean
+     */
     function isCraftsmanValidated(address _addr) public view returns(bool) {
         return craftsmans[_addr].isValidated;
     }
 
+    /**
+     * @notice validate a craftman
+     * @dev Can only be called by the governor
+     * @param _addr  address of craftsman 
+     */
     function validateCraftsman(address _addr) public onlyGovernor {
         craftsmans[_addr].isValidated = true;
     }
 
+    /**
+     * @notice remove a craftman
+     * @dev Can only be called by the governor
+     * @param _addr  address of craftsman 
+     */
     function removeCraftsman(address _addr) public onlyGovernor {
         craftsmans[_addr].isValidated = false;
     }
 
+    /**
+     * @notice check if a string is empty
+     * @dev Can be called by anyone
+     * @param _str  string to check
+     * @return boolean
+     */
     function isNotEmptyString(string calldata _str) internal pure returns(bool) {
         return keccak256(abi.encode(_str)) != keccak256(abi.encode(""));
     }
 
+    /**
+     * @notice add a project 
+     * @dev Can be called by anyone if enough token to lock
+     * @param _name  name of project
+     * @param _desc  description of project
+     * @param _department  deparment of project
+     * @param _sector  sector enum of project
+     * @param _photos  list of photos document of project
+     * @param _diagnostic  diagnostic document of project
+     * @param _plan  plan document of project
+     */
     function addProject(
         string calldata _name,
         string calldata _desc,
@@ -234,6 +277,15 @@ contract EnergyDao is Ownable {
 
     // }
 
+    /**
+     * @notice add a quotation to a project
+     * @dev Can only be called by a validated craftsman
+     * @param _id  id of project
+     * @param _description  description of quotation
+     * @param _docHash  document of quotation
+     * @param _price  price of quotation
+     * @param _nbCee  number of CEE estimated
+     */
     function proposeQuotation(
         uint256 _id,
         string calldata _description,
@@ -275,6 +327,11 @@ contract EnergyDao is Ownable {
         emit QuotationRegistred(_id, msg.sender);
     }
 
+    /**
+     * @notice remove a quotation to a project
+     * @dev Can only be called by a validated craftsman
+     * @param _projectId  id of project
+     */
     function removeQuotation(uint _projectId) external onlyValidatedCraftsman {
         require(_projectId < projects.length, "Project doesn't exists");
         require(quotations[_projectId][msg.sender].craftsmanAddr != address(0), "No quotation for this project");
@@ -282,7 +339,13 @@ contract EnergyDao is Ownable {
         projects[_projectId].nbQuotations -= 1;
     }
 
-
+    /**
+     * @notice place a vote to a quotation on a project
+     * @dev Can be called by anyone
+     * @param _projectId  id of project
+     * @param _account  address of person to delegate the vote
+     * @param _craftsman  craftman chosen for the vote
+     */
     function castVote(uint _projectId, address _account, address _craftsman) external {
         require(_state(_projectId, block.number) == ProposalState.Active, "Vote session is not active");
         require(!hasVoted(_projectId, _account), "Vote already cast");
@@ -299,18 +362,46 @@ contract EnergyDao is Ownable {
         emit Voted(_account, _projectId, _craftsman, weight);
     }
 
+    /**
+     * @notice get weight votes for a quotation
+     * @dev Can be called by anyone
+     * @param _projectId  id of project
+     * @param _craftsmanAddr  craftman chosen for the vote
+     * @return uint weight of the vote
+     */
+
     function getVoteProject(uint _projectId, address _craftsmanAddr) public view returns (uint) {
         return quotations[_projectId][_craftsmanAddr].weightVote;
     }
 
+     /**
+     * @notice check if an address voted for a project
+     * @dev Can be called by anyone
+     * @param _projectId  id of project
+     * @param _account  craftman chosen for the vote
+     * @return bool weight of the vote
+     */
     function hasVoted(uint256 _projectId, address _account) public view returns (bool) {
         return voters[_account][_projectId] != address(0);
     }
 
+     /**
+     * @notice get state of the project
+     * @dev Can be called by anyone
+     * @param _projectId  id of project
+     * @return ProposalState enum of state
+     */
     function getState(uint _projectId) external view returns(ProposalState) {
         return _state(_projectId, block.number + 1);
     }
-
+         
+    /**
+     * @notice get state of the project
+     * @dev Called internally
+     * @param _projectId  id of project
+     * @param _block  currrent block number
+     * @return ProposalState enum of state
+     */
     function _state(uint _projectId, uint _block) internal view returns(ProposalState) {
         Project memory project = projects[_projectId];
 
@@ -339,6 +430,12 @@ contract EnergyDao is Ownable {
         return ProposalState.Expired;
     }
 
+    /**
+     * @notice compute calculation of weight, 
+     * @dev Called internally
+     * @param _projectId  id of project
+     * @return address address of wining craftsman
+     */
      function _computeProjectWinner(uint _projectId) internal view returns (address) {
         if (projects[_projectId].nbQuotations == 0){
             return address(0);
@@ -363,6 +460,11 @@ contract EnergyDao is Ownable {
         return winner;
     }
 
+    /**
+     * @notice beneficiary can accept the project
+     * @dev Can only be called by the beneficiary
+     * @param _projectId  id of project
+     */
     function accept(uint _projectId) external onlyBeneficiary(_projectId){
         ProposalState status = _state(_projectId, block.number);
         require(status == ProposalState.Ended, "Vote session is not ended");
@@ -377,10 +479,14 @@ contract EnergyDao is Ownable {
             craftsmans[winner].nbProjectsValidated += 1;
         }
         
-
         emit QuotationAccepted(_projectId, winner);
     }
 
+    /**
+     * @notice beneficiary can reject the project
+     * @dev Can only be called by the beneficiary
+     * @param _projectId  id of project
+     */
     function reject(uint _projectId) external onlyBeneficiary(_projectId) {
         ProposalState status = _state(_projectId, block.number);
         require(status == ProposalState.Ended, "Vote session is not ended");
@@ -390,6 +496,10 @@ contract EnergyDao is Ownable {
         emit QuotationRejected(_projectId);
     }
 
+    /**
+     * @notice lock an amount of token
+     * @dev Called internally
+     */
     function lock() internal {
         require(token.balanceOf(msg.sender) >= amountToLock + locks[msg.sender], "You don't have enough token to lock");
         token.transferFrom(msg.sender, address(this), fees);
@@ -397,25 +507,35 @@ contract EnergyDao is Ownable {
         
     }
 
+    /**
+     * @notice unlock an amount of token
+     * @dev Called internally
+     */
     function unlock(address _addr) internal {
         require(token.balanceOf(_addr) >= amountToLock, "You can't unlock that much");
         locks[_addr] -= amountToLock;    
     }
 
+    /**
+     * @notice calculate the fees
+     * @dev Called internally
+     */
     function _calculateFees(uint _amount) internal pure returns(uint) {
         return (1 * _amount) / 100;
     }
 
 
      /**
-     * @dev Gets funds from `sale` into the contract
+     * @notice Gets funds from `sale` into the contract
+     * @dev Can only be called by the owner
      */
     function getFunds() public onlyOwner {
         sale.withdrawFunds();
     }
 
     /**
-     * @dev Sends funds to a given `_receiver`
+     * @notice Sends funds to a given `_receiver`
+     * @dev Can only be called by the owner
      * @param _receiver Receiver address
      */
     function sendFunds(address _receiver) public onlyOwner {
@@ -423,6 +543,11 @@ contract EnergyDao is Ownable {
         require(sent, "Failed to send funds");
     }
 
+     /**
+     * @notice transfer to a given `_receiver`
+     * @param _receiver Receiver address
+     * @param amount amount to send
+     */
     function transfer(address _receiver, uint amount) public onlyOwner {
         token.transfer(_receiver, amount);
     }
