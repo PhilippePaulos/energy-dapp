@@ -16,9 +16,12 @@ import ProjectDetailsModal from "../Details/ProjectDetails"
 function DisplayProjects() {
 
     const { profile: { contracts: { EnergyDao } } } = useProfile()
+
     const [openCreate, setOpenCreate] = useState(false)
     const [openDetails, setOpenDetails] = useState(false)
+
     const { chain } = useNetwork()
+
     const [projects, setProjects] = useState([])
     const [project, setProject] = useState({})
     const [quotations, setQuotations] = useState([])
@@ -26,42 +29,33 @@ function DisplayProjects() {
     useContractEvent({
         address: EnergyDao.address,
         abi: getContractDescription('EnergyDao', chain.id).abi,
-        eventName: 'QuotationRegistred',
-        listener() {
-            fetchEvents(EnergyDao)
-        },
-    })
-
-    useContractEvent({
-        address: EnergyDao.address,
-        abi: getContractDescription('EnergyDao', chain.id).abi,
         eventName: 'ProjectRegistered',
         listener() {
-            fetchEvents(EnergyDao)
+            fetchProjects()
             setOpenCreate(false)
         },
     })
 
-    useEffect(() => {
-        fetchEvents(EnergyDao)
-    }, [])
+    
+    const retrieveState = useCallback(async(project) => {
+        return EnergyDao.getState(project.id).then((state) => {
+            return {...project, state: ProposalProjectStateCodes[state]}
+        })
+    }, [EnergyDao])
 
-    const fetchEvents = useCallback(async (contract) => {
-        let eventFilter = contract.filters.ProjectRegistered()
-        let events = await contract.queryFilter(eventFilter)
+    const fetchProjects = useCallback(async () => {
+        console.log("fetch all projects");
+        let eventFilter = EnergyDao.filters.ProjectRegistered()
+        let events = await EnergyDao.queryFilter(eventFilter)
         const ids = events.map((event) => {
             return event.args.id
         })
         const retrieveProject = (projectId) => {
-            return contract.projects(projectId).then((project) => {
+            return EnergyDao.projects(projectId).then((project) => {
                 return Object.assign({}, project, { id: projectId })
             })
         }
-        const retrieveState = (project) => {
-            return contract.getState(project.id).then((state) => {
-                return Object.assign({}, { state: ProposalProjectStateCodes[state] }, project)
-            })
-        }
+
         let promises = ids.map((id) => retrieveProject(id))
         let projects = await Promise.all(promises)
 
@@ -70,17 +64,22 @@ function DisplayProjects() {
 
         setProjects(projects)
 
-    }, [])
+    }, [EnergyDao, retrieveState])
+    
+    useEffect(() => {
+        fetchProjects()
+    }, [fetchProjects])
 
-    const fetchQuotationEvents = useCallback(async (contract, projectId) => {
-        let eventFilter = contract.filters.QuotationRegistred(projectId)
-        let events = await contract.queryFilter(eventFilter)
+
+    const fetchQuotations = useCallback(async (projectId) => {
+        let eventFilter = EnergyDao.filters.QuotationRegistred(projectId)
+        let events = await EnergyDao.queryFilter(eventFilter)
         const quotationsEvents = events.map((event) => {
             return event.args.craftsmanAddr
         })
 
         const retrieveQuotations = (addr) => {
-            return contract.quotations(projectId, addr).then((quotation) => {
+            return EnergyDao.quotations(projectId, addr).then((quotation) => {
                 return Object.assign({}, quotation, { id: addr })
             })
         }
@@ -89,7 +88,7 @@ function DisplayProjects() {
         let quotations = await Promise.all(promises)
 
         setQuotations(quotations)
-    }, [])
+    }, [EnergyDao])
 
     const handleClickCreate = () => {
         setOpenCreate(true)
@@ -97,14 +96,22 @@ function DisplayProjects() {
 
     const handleClickDetails = useCallback((row) => {
         setProject(row)
-        fetchQuotationEvents(EnergyDao, row.id)
+        fetchQuotations(row.id)
         setOpenDetails(true)
-    }, [fetchQuotationEvents])
+    }, [fetchQuotations])
 
     return (
         <>
             <CreateProjectModal open={openCreate} setOpen={setOpenCreate} />
-            {Object.keys(project).length !== 0 && <ProjectDetailsModal open={openDetails} setOpen={setOpenDetails} project={project} quotations={quotations} />}
+            {Object.keys(project).length !== 0 && 
+                <ProjectDetailsModal 
+                    open={openDetails} 
+                    setOpen={setOpenDetails} 
+                    project={project}
+                    fetchProjects={fetchProjects} 
+                    retrieveState={retrieveState}
+                    fetchQuotations={fetchQuotations}
+                    quotations={quotations} />}
             <Grid container pb={2}>
                 <Grid item xs={12} m={1} display="flex" justifyContent={"space-between"}>
                     <Typography variant='h4'>Liste des projets de rénovation énergétiques</Typography>
@@ -149,6 +156,7 @@ function DisplayProjects() {
                     </TableContainerUI>
                 </Grid>
             </Grid>
+            
         </>
     )
 }

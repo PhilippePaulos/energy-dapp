@@ -50,9 +50,6 @@ function CreateCraftsmanModal(props) {
                 console.log(error)
             }
         }
-        else {
-            console.log("not");
-        }
     }
 
     return (
