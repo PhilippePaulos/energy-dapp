@@ -36,6 +36,9 @@ function DisplayProjects() {
         },
     })
 
+    const updateProject = useCallback((p) => {
+        setProject(p)
+    }, [])
     
     const retrieveState = useCallback(async(project) => {
         return EnergyDao.getState(project.id).then((state) => {
@@ -79,12 +82,16 @@ function DisplayProjects() {
 
         const retrieveQuotations = (addr) => {
             return EnergyDao.quotations(projectId, addr).then((quotation) => {
-                return Object.assign({}, quotation, { id: addr })
+                return Object.assign({}, quotation, { id: addr, isWinner: false })
             })
         }
 
-        let promises = quotationsEvents.map((addr) => retrieveQuotations(addr))
-        let quotations = await Promise.all(promises)
+        const promises = quotationsEvents.map((addr) => retrieveQuotations(addr))
+        const quotations = await Promise.all(promises)
+        if (quotations.length > 0) {
+            quotations.sort((a, b) => b.weightVote - a.weightVote)
+            quotations[0].isWinner = true
+        }
 
         setQuotations(quotations)
     }, [EnergyDao])
@@ -107,8 +114,8 @@ function DisplayProjects() {
                     open={openDetails} 
                     setOpen={setOpenDetails} 
                     project={project}
+                    updateProject={updateProject}
                     fetchProjects={fetchProjects} 
-                    retrieveState={retrieveState}
                     fetchQuotations={fetchQuotations}
                     quotations={quotations} />}
             <Grid container pb={2}>

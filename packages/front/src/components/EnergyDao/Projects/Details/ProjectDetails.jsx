@@ -1,12 +1,12 @@
+
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt'
-import { Box, Grid, Step, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import { Box, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import Identicon from '@polkadot/react-identicon'
-import { BigNumber, ethers } from "ethers"
+import { BigNumber } from "ethers"
 import { formatEther } from 'ethers/lib/utils.js'
 import { useCallback, useEffect, useState } from 'react'
-import { useAccount, useBlockNumber, useContractEvent, useNetwork, useProvider, useSigner } from 'wagmi'
-import { ProposalProjectStates } from "../../../../common/enums"
+import { useBlockNumber, useContractEvent, useNetwork, useProvider, useSigner } from 'wagmi'
+import { ProposalProjectStateCodes, ProposalProjectStates } from "../../../../common/enums"
 import { formatAddress, getContractDescription, openIpfsLink } from "../../../../common/helpers/eth"
 import { useProfile } from '../../../../contexts/DaoContext'
 import SnackbarUI from '../../../SnackbarUI/SnackbarUI'
@@ -18,7 +18,7 @@ import PdfPicture from "../../../ui/PdfPicture"
 import RoundedGrid from "../../../ui/RoundedGrid"
 import TableContainerUI from "../../../ui/TableContainer"
 import CreateQuotationModal from '../Create/CreateQuotationModal'
-
+import DisplayStateIcon from './DisplayStateIcon'
 
 function DisplayVoteBlock({ state, voteEnd, voteStart, voteExpire }) {
 
@@ -67,21 +67,19 @@ function DisplayVoteBlock({ state, voteEnd, voteStart, voteExpire }) {
 
 function ProjectDetailsModal(props) {
 
-    const { project: currentProject, quotations, open, setOpen, fetchQuotations, retrieveState, fetchProjects } = props
+    const { project, updateProject, quotations, open, setOpen, fetchQuotations, fetchProjects } = props
 
-    const { state: { contracts: { EnergyDao}, votePower, isValidated} } = useProfile()
+    const { state: { contracts: { EnergyDao }, votePower }, state: profile } = useProfile()
 
     const [state, setState] = useState({
         openQuotation: false,
         hasVoted: false,
-        castVote:  false,
+        castVote: false,
         isLoading: false,
-        displayCreation: false,
-        stateProject: currentProject.state
+        displayCreation: false
     })
 
     const { data: signer } = useSigner()
-    const { address } = useAccount()
     const provider = useProvider()
     const { chain } = useNetwork()
 
@@ -90,21 +88,11 @@ function ProjectDetailsModal(props) {
         msg: ""
     })
 
-    const isBeneficiary = currentProject.beneficiaryAddr === address
+    const isBeneficiary = project.beneficiaryAddr === profile.address
 
     const setOpenNotif = (b) => {
         setNotif({ ...notif, open: b })
     }
-
-    useContractEvent({
-        address: EnergyDao.address,
-        abi: getContractDescription('EnergyDao', chain.id).abi,
-        eventName: 'QuotationRegistred',
-        listener() {
-            fetchData()
-            setNotif({ msg: "Devis enregistré!", open: true })
-        },
-    })
 
     useContractEvent({
         address: EnergyDao.address,
@@ -136,46 +124,56 @@ function ProjectDetailsModal(props) {
         },
     })
 
-    const fetchCraftsman = async () => {
-        const quotation = await EnergyDao.quotations(currentProject.id, address)
-        const currentBlock = await provider.getBlockNumber()
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyDao', chain.id).abi,
+        eventName: 'QuotationRegistred',
+        listener() {
+            fetchData()
+            setNotif({ msg: "Devis enregistré!", open: true })
+        },
+    })
 
-        if (currentProject.beneficiaryAddr !== address && address !== quotation.craftsmanAddr
-            && isValidated && currentProject.voteInfo.voteStart > BigNumber.from(currentBlock)) {
+    const fetchCraftsman = useCallback(async () => {
+        const currentBlock = await provider.getBlockNumber()
+        const quotation = await EnergyDao.quotations(project.id, profile.address)
+
+        if (project.beneficiaryAddr !== profile.address && profile.isValidated && profile.address !== quotation.craftsmanAddr
+            && project.voteInfo.voteStart > BigNumber.from(currentBlock)) {
             setState((s) => ({ ...s, displayCreation: true }))
         }
         else {
             setState((s) => ({ ...s, displayCreation: false }))
         }
-    }
+    }, [provider, EnergyDao, profile, project.id, project.beneficiaryAddr, project.voteInfo.voteStart])
 
-    const fetchUpdate = async () => {
-        const hasVoted = await EnergyDao.hasVoted(currentProject.id, address)
-        
-        const p = await retrieveState(currentProject)
-        fetchQuotations(p.id)
-        setState((s) => ({ ...s, stateProject: p.state}))
+    const fetchUpdate = useCallback(async () => {
+        const hasVoted = await EnergyDao.hasVoted(project.id, profile.address)
+
+        const state = await EnergyDao.getState(project.id).then((s) => ProposalProjectStateCodes[s])
+        const p = project
+        p.state = state
+        fetchQuotations(project.id)
+        updateProject(p)
 
         const castVote = !hasVoted && p.state === ProposalProjectStates.Active
+        setState((s) => ({ ...s, castVote: castVote }))
 
-        setState((s) => ({...s, castVote: castVote}))
-    }
+    }, [EnergyDao, profile, project, fetchQuotations, updateProject])
 
     const fetchData = useCallback(() => {
-        console.log("fetch data ");
         fetchCraftsman()
         fetchUpdate()
-    }, [fetchCraftsman, fetchUpdate, state.displayCreation])
+    }, [fetchCraftsman, fetchUpdate])
 
     useEffect(() => {
         fetchData()
-        console.log("USE EFFECT");
-    }, [provider, address])
+    }, [fetchData, profile, project])
 
     const handleClick = async (addr) => {
-        setState((s) => ({ ...state, isLoading: true }))
-        await EnergyDao.connect(signer).castVote(currentProject.id, address, addr)
-        setState((s) => ({ ...state, isLoading: false }))
+        setState((s) => ({ ...s, isLoading: true }))
+        await EnergyDao.connect(signer).castVote(project.id, profile.address, addr)
+        setState((s) => ({ ...s, isLoading: false }))
     }
 
     const handleClose = () => {
@@ -184,14 +182,14 @@ function ProjectDetailsModal(props) {
     }
 
     const handleDecision = async (accept) => {
-        setState({ ...state, isLoading: true })
+        setState((s) => ({ ...s, isLoading: true }))
         if (accept) {
-            await EnergyDao.connect(signer).accept(currentProject.id)
+            await EnergyDao.connect(signer).accept(project.id)
         }
         else {
-            await EnergyDao.connect(signer).reject(currentProject.id)
+            await EnergyDao.connect(signer).reject(project.id)
         }
-        setState({ ...state, isLoading: false })
+        setState((s) => ({ ...s, isLoading: false }))
     }
 
     const handleCreate = () => {
@@ -199,12 +197,12 @@ function ProjectDetailsModal(props) {
     }
 
     const setOpenQuotation = (bool) => {
-        setState({ ...state, openQuotation: bool })
+        setState((s) => ({ ...state, openQuotation: bool }))
     }
 
     return (
         <>
-            <CreateQuotationModal open={state.openQuotation} setOpen={setOpenQuotation} project={currentProject} fetchCraftsman={fetchCraftsman} />
+            <CreateQuotationModal open={state.openQuotation} setOpen={setOpenQuotation} project={project} fetchCraftsman={fetchCraftsman} />
             <CenteredModal
                 open={open}
                 onClose={() => handleClose()}>
@@ -220,43 +218,43 @@ function ProjectDetailsModal(props) {
                             <Box className="content">
                                 <Box className="line">
                                     <Typography variant="b">Nom</Typography>
-                                    <Typography>{currentProject.name}</Typography>
+                                    <Typography>{project.name}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Bénéficiaire</Typography>
                                     <Box display="flex" alignItems="center" gap="4px">
-                                        <Identicon className="identicon" value={currentProject.beneficiaryAddr} size={20} theme="ethereum" />
-                                        <Typography>{currentProject.beneficiaryAddr}</Typography>
+                                        <Identicon className="identicon" value={project.beneficiaryAddr} size={20} theme="ethereum" />
+                                        <Typography>{project.beneficiaryAddr}</Typography>
                                     </Box>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Description</Typography>
-                                    <Typography>{currentProject.description}</Typography>
+                                    <Typography>{project.description}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Département</Typography>
-                                    <Typography>{currentProject.department}</Typography>
+                                    <Typography>{project.department}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Photos</Typography>
-                                    <Typography><PdfPicture onClick={() => openIpfsLink(currentProject.photos)} /></Typography>
+                                    <Typography><PdfPicture onClick={() => openIpfsLink(project.photos)} /></Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Diagnostic (DPE)</Typography>
-                                    <Typography><PdfPicture onClick={() => openIpfsLink(currentProject.diagnostic)} /></Typography>
+                                    <Typography><PdfPicture onClick={() => openIpfsLink(project.diagnostic)} /></Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Plan</Typography>
-                                    <Typography><PdfPicture onClick={() => openIpfsLink(currentProject.plan)} /></Typography>
+                                    <Typography><PdfPicture onClick={() => openIpfsLink(project.plan)} /></Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Status</Typography>
-                                    <Typography>{state.stateProject}</Typography>
+                                    <Typography>{project.state}</Typography>
                                 </Box>
-                                <DisplayVoteBlock state={state.stateProject} 
-                                    voteStart={currentProject.voteInfo.voteStart} 
-                                    voteEnd={currentProject.voteInfo.voteEnd} 
-                                    voteExpire={currentProject.voteInfo.voteExpire}/>
+                                <DisplayVoteBlock state={project.state}
+                                    voteStart={project.voteInfo.voteStart}
+                                    voteEnd={project.voteInfo.voteEnd}
+                                    voteExpire={project.voteInfo.voteExpire} />
                             </Box>
                         </RoundedGrid>
                     </Grid>
@@ -272,6 +270,7 @@ function ProjectDetailsModal(props) {
                                             <TableCell align="right">Prix (€)</TableCell>
                                             <TableCell align="right">CEE émis</TableCell>
                                             <TableCell align="right">Votes</TableCell>
+                                            <TableCell align="right"></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -291,17 +290,12 @@ function ProjectDetailsModal(props) {
                                                 <TableCell align="right"><IconHover><PictureAsPdfIcon onClick={() => openIpfsLink(row.documentHash)} /></IconHover></TableCell>
                                                 <TableCell align="right">{BigNumber.from(row.price).toNumber()}</TableCell>
                                                 <TableCell align="right">{BigNumber.from(row.nbCee).toNumber()}</TableCell>
-                                                {
-                                                    state.castVote ?
-                                                        <TableCell align="right" sx={{ display: "flex", alignItems: "center", flexDirection: "inherit", gap: "4px" }}>
-                                                            {formatEther(row.weightVote)}
-                                                            <IconHover onClick={() => handleClick(row.craftsmanAddr)}><ThumbUpAltIcon /></IconHover>
-                                                        </TableCell> :
-                                                        <TableCell align="right" >
-                                                            {formatEther(row.weightVote)}
-
-                                                        </TableCell>
-                                                }
+                                                <TableCell align="right" >{formatEther(row.weightVote)}</TableCell>
+                                                <TableCell align="right">
+                                                    {
+                                                        <DisplayStateIcon castVote={state.castVote} project={project} handleClick={handleClick} quotation={row} />
+                                                    }
+                                                </TableCell>
 
                                             </TableRow>
                                         ))}
@@ -312,7 +306,7 @@ function ProjectDetailsModal(props) {
 
                             <CircularIndeterminate loading={state.isLoading} />
                         </Grid>
-                        {isBeneficiary && state.stateProject === ProposalProjectStates.Ended &&
+                        {isBeneficiary && project.state === ProposalProjectStates.Ended &&
                             <>
                                 <Box display="flex" gap="5px">
                                     <ButtonUI variant="contained" component="label" htmlFor="file-upload" onClick={() => handleDecision(true)}>
@@ -338,6 +332,7 @@ function ProjectDetailsModal(props) {
 
                     </Grid>
                 </Box>
+
             </CenteredModal>
             <SnackbarUI open={notif.open} msg={notif.msg} setOpen={setOpenNotif} />
 

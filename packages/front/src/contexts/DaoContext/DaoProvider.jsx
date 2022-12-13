@@ -1,6 +1,5 @@
-import { BigNumber, ethers } from "ethers"
-import React, { useEffect, useState } from "react"
-import { useCallback } from "react"
+import { ethers } from "ethers"
+import React, { useCallback, useEffect, useState } from "react"
 import { useAccount, useNetwork, useProvider } from "wagmi"
 import { initContract } from "../../common/helpers/eth"
 import DaoContext from "./DaoContext"
@@ -16,15 +15,9 @@ function DaoProvider({ children }) {
     votePower: 0,
     contracts: {},
     isValidated: false,
-    isCraftsman: false
+    isCraftsman: false,
+    address: null
   })
-
-  // const contracts = {
-  //   EnergyDao: initContract("EnergyDao", chain.id, provider),
-  //   EEDToken: initContract("EEDToken", chain.id, provider),
-  //   Sale: initContract("Sale", chain.id, provider),
-  //   EnergyGovernor: initContract("EnergyGovernor", chain.id, provider)
-  // }
 
   const init = useCallback(async () => {
     if (chain) {
@@ -42,12 +35,12 @@ function DaoProvider({ children }) {
       setState((s) => ({ ...s, votePower: ethers.utils.formatEther(votes) }))
       setState((s) => ({ ...s, isValidated: isValidated }))
       setState((s) => ({ ...s, contracts: contracts }))
-      setState((s) => ({ ...s, fetched: true }))
       setState((s) => ({ ...s, isCraftsman: addr.craftsmanAddr === address }))
-
+      setState((s) => ({ ...s, fetched: true }))
+      setState((s) => ({...s, address: address}))
     }
 
-  }, [address, chain, provider])
+  }, [chain, provider, address])
 
   useEffect(() => {
     const tryInit = async () => {
@@ -59,21 +52,21 @@ function DaoProvider({ children }) {
     };
 
     tryInit();
-  }, [init]);
+  }, [init, address]);
 
 
   useEffect(() => {
-    const events = ["chainChanged", "accountsChanged"]
+    // const events = ["chainChanged", "accountsChanged"]
 
-    const handleChange = () => {
-      // window.location.reload()
-      init()
-    }
+    // const handleChange = () => {
+    //   window.location.reload()
+    //   init()
+    // }
 
-    events.forEach(e => window.ethereum.on(e, handleChange))
-    return () => {
-      events.forEach(e => window.ethereum.removeListener(e, handleChange))
-    }
+    // events.forEach(e => window.ethereum.on(e, handleChange))
+    // return () => {
+    //   events.forEach(e => window.ethereum.removeListener(e, handleChange))
+    // }
   }, [init])
 
   return (

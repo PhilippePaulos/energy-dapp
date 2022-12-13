@@ -1,7 +1,6 @@
 import { Grid } from "@mui/material";
 import { useAccount } from "wagmi";
 import { useProfile } from "../../contexts/DaoContext";
-import DaoProvider from "../../contexts/DaoContext/DaoProvider";
 import NotConnected from "../Notices/NotConnected";
 import DaoRouter from "../routes/DaoRouter";
 

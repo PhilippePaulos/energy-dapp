@@ -3,6 +3,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import Identicon from '@polkadot/react-identicon'
 import { BigNumber } from 'ethers'
+import { useEffect } from 'react'
 import { useCallback, useState } from "react"
 import { useBlockNumber, useContractEvent, useNetwork } from 'wagmi'
 import { ProposalState, ProposalStateCodes } from '../../../../common/enums'
@@ -21,17 +22,42 @@ function DisplayCraftsman() {
     const [openCreate, setOpenCreate] = useState(false)
     const [openDisplay, setOpenDisplay] = useState(false)
     const [craftsmans, setCraftsmans] = useState([])
-    const [craftsman, setCraftsman] = useState({})
+    const [state, setState] = useState({
+        craftsman: {}
+    })
+
     const { state: { contracts: { EnergyDao, EnergyGovernor }, isCraftsman } } = useProfile()
     const [quorum, setQuorum] = useState()
-
+    const { chain } = useNetwork()
 
     useBlockNumber({
         onSuccess(data) {
-            fetchCraftsman(data)
+            fetchCraftsmans(data)
             fetchQuorum(data)
         },
     })
+
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyGovernor', chain.id).abi,
+        eventName: 'VoteCast',
+        listener() {
+            console.log("in event");
+        },
+    })
+
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyGovernor', chain.id).abi,
+        eventName: 'ProposalCreated',
+        listener() {
+            console.log("in event");
+        },
+    })
+
+    useEffect(() => {
+        console.log("USEFFECT DISPLAY");
+    }, [state.craftsman])
 
     const handleClickCreate = () => {
         setOpenCreate(true)
@@ -72,7 +98,11 @@ function DisplayCraftsman() {
 
     }, [EnergyGovernor])
 
-    const fetchCraftsman = useCallback(async (currentBlock) => {
+    // const fetchCraftsman = useCallback(async() => {
+        
+    // }, [])
+
+    const fetchCraftsmans = useCallback(async (currentBlock) => {
         let eventFilter = EnergyDao.filters.CraftsmanRegistered()
         let events = await EnergyDao.queryFilter(eventFilter)
         const addr = events.map((event) => {
@@ -118,8 +148,6 @@ function DisplayCraftsman() {
                         if (state === ProposalState.Active) {
                             state = ProposalState.Finished
                         }
-                    } else {
-                        state = state
                     }
                     return Object.assign({}, data, { state: state })
                 })
@@ -130,10 +158,14 @@ function DisplayCraftsman() {
         }
         promises = result.map((data) => computeDeadlineState(data))
         result = await Promise.all(promises)
-
         setCraftsmans(result)
+        console.log("FETCH CRAFTSMAN");
 
-    }, [fetchVotes])
+    }, [fetchVotes, EnergyDao, EnergyGovernor])
+
+    const setCraftsman = useCallback((row) => {
+        setState((s) => ({ ...s, craftsman: row }))
+    }, [])
 
     const fetchQuorum = useCallback(async (currentBlock) => {
         const quorum = await EnergyGovernor.quorum(currentBlock - 1)
@@ -154,8 +186,11 @@ function DisplayCraftsman() {
                 </Grid>
             </Grid>
 
-            <CreateCraftsmanModal open={openCreate} setOpen={setOpenCreate} fetchCraftsman={fetchCraftsman} />
-            {Object.keys(craftsman).length !== 0 && <CraftsmanDetailsModal open={openDisplay} setOpen={setOpenDisplay} craftsman={craftsman} quorum={quorum} fetchCraftsman={fetchCraftsman} />}
+            <CreateCraftsmanModal open={openCreate} setOpen={setOpenCreate} fetchCraftsman={fetchCraftsmans} />
+            {Object.keys(state.craftsman).length !== 0 && <CraftsmanDetailsModal open={openDisplay} setOpen={setOpenDisplay} craftsman={state.craftsman}
+                setCraftsman={setCraftsman}
+                quorum={quorum}
+                fetchCraftsmans={fetchCraftsmans} />}
             <Grid container >
                 <Grid item xs={12}>
                     <TableContainerUI component={Paper} sx={{ width: '100%', backgroundColor: theme.palette.background.grid, marginBottom: '10px', boxShadow: 'none' }}>

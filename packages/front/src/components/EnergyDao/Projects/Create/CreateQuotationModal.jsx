@@ -10,7 +10,7 @@ import CircularIndeterminate from "../../../ui/CircularIndeterminate";
 import TextFieldUI from "../../../ui/text-field";
 
 function CreateQuotationModal(props) {
-    const { open, setOpen, project, fetchCraftsman } = props
+    const { open, setOpen, project } = props
     const [isLoading, setIsLoading] = useState(false)
     const { state: { contracts: { EnergyDao } } } = useProfile()
     const { data: signer } = useSigner()

@@ -31,12 +31,10 @@ function CreateCraftsmanModal(props) {
     }
 
     const handleselectedFile = (e) => {
-        // setValues({ ...values, [event.target.name]: event.target.value });
         setValues({ ...values, [e.target.name]: e.target.files[0] })
     }
 
     const onSubmit = async () => {
-        console.log(values);
         if (isAllDefined(values)) {
             try {
                 setIsLoading(true)

@@ -2,6 +2,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Typography } from "@mui/material"
 import Identicon from "@polkadot/react-identicon"
 import { BigNumber, ethers } from "ethers"
+import { useEffect } from 'react'
 import { useState } from "react"
 import { useContractEvent, useNetwork, useSigner } from "wagmi"
 import { ProposalState } from "../../../../common/enums"
@@ -41,9 +42,9 @@ function VoteProposal({ state, handleDecision }) {
 }
 
 function CraftsmanDetailsModal(props) {
-    const { craftsman, open, setOpen, fetchCraftsman, quorum } = props
+    const { craftsman, setCraftsman, open, setOpen, fetchCraftsmans, quorum } = props
     const { data: signer } = useSigner()
-    const { state: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
+    const { state: { contracts: { EnergyDao, EnergyGovernor }, address } } = useProfile()
     const [isLoading, setIsLoading] = useState(false)
     const {chain} = useNetwork()
 
@@ -56,6 +57,10 @@ function CraftsmanDetailsModal(props) {
         },
     })
 
+    useEffect(() => {
+        console.log("USE EFFECT DETAILS");
+    }, [craftsman.votes, address])
+
     const handleProposal = async () => {
         setIsLoading(true)
         const encodedFunc = EnergyDao.interface.encodeFunctionData("validateCraftsman", [craftsman.craftsmanAddr])
@@ -65,9 +70,10 @@ function CraftsmanDetailsModal(props) {
         else if (craftsman.state === ProposalState.Succeeded) {
             await EnergyGovernor.connect(signer).execute([EnergyDao.address], [0], [encodedFunc], ethers.utils.id(craftsman.description))
         }
-        fetchCraftsman()
+        fetchCraftsmans()
         setOpen(false)
         setIsLoading(false)
+        window.location.reload(false);
     }
 
     return (
@@ -104,10 +110,10 @@ function CraftsmanDetailsModal(props) {
                         </Box>
                     </RoundedGrid>
                 </Grid>
-                <VoteProposal state={craftsman.state} handleDecision={handleProposal}/>
                 {
-                    craftsman.votes && <DisplayVotes craftsman={craftsman} quorum={quorum} />
+                    craftsman.votes && <DisplayVotes craftsman={craftsman} setCraftsman={setCraftsman} quorum={quorum} fetchCraftsmans={fetchCraftsmans} setOpen={setOpen}/>
                 }
+                <VoteProposal state={craftsman.state} handleDecision={handleProposal}/>
                 <CircularIndeterminate loading={isLoading} />
             </Box>
         </CenteredModal>

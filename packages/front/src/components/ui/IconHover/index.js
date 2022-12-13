@@ -1,4 +1,4 @@
-import { Icon, styled, SvgIcon } from "@mui/material"
+import { styled, SvgIcon } from "@mui/material"
 import { theme } from "../../theme"
 
 const IconHover = styled(SvgIcon)({
