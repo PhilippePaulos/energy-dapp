@@ -6,24 +6,12 @@ import DisplayProjects from "../Projects/Display/DisplayProjects";
 
 function Home() {
 
-    const { profile: { contracts: { EnergyDao } } } = useProfile()
-    const {address} = useAccount()
-
-    const [isCraftsman, setIsCraftsman] = useState(false)
-
-    const fetchCraftsman = useCallback(async() => {
-        const addr = await EnergyDao.craftsmans(address)
-        setIsCraftsman(addr.craftsmanAddr === address)
-    }, [EnergyDao])
-
-    useEffect(() => {
-        fetchCraftsman()
-    }, [fetchCraftsman])
+    const { state: { contracts: { EnergyDao } }, state } = useProfile()
 
     return (
         <>
             <DisplayProjects/>
-            <DisplayCraftsman isCraftsman={isCraftsman}/>
+            <DisplayCraftsman />
         </>
     )
 

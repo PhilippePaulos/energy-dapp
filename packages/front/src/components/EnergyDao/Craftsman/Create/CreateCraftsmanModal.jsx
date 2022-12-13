@@ -22,7 +22,7 @@ function CreateCraftsmanModal(props) {
         address: ""
     })
 
-    const { profile: { contracts: { EnergyDao } } } = useProfile()
+    const { state: { contracts: { EnergyDao } } } = useProfile()
 
     const [isLoading, setIsLoading] = useState(false)
 

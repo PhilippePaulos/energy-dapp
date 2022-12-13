@@ -17,12 +17,12 @@ import { CreateCraftsmanModal } from "../../Craftsman/Create"
 import CraftsmanDetailsModal from '../Details/CraftsmanDetailsModal'
 import VoteIcon from '../VoteIcon/VoteIcon.jsx'
 
-function DisplayCraftsman({ isCraftsman }) {
+function DisplayCraftsman() {
     const [openCreate, setOpenCreate] = useState(false)
     const [openDisplay, setOpenDisplay] = useState(false)
     const [craftsmans, setCraftsmans] = useState([])
     const [craftsman, setCraftsman] = useState({})
-    const { profile: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
+    const { state: { contracts: { EnergyDao, EnergyGovernor }, isCraftsman } } = useProfile()
     const [quorum, setQuorum] = useState()
 
 

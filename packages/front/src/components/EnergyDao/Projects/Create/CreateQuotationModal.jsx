@@ -12,7 +12,7 @@ import TextFieldUI from "../../../ui/text-field";
 function CreateQuotationModal(props) {
     const { open, setOpen, project, fetchCraftsman } = props
     const [isLoading, setIsLoading] = useState(false)
-    const { profile: { contracts: { EnergyDao } } } = useProfile()
+    const { state: { contracts: { EnergyDao } } } = useProfile()
     const { data: signer } = useSigner()
 
     const [values, setValues] = useState({

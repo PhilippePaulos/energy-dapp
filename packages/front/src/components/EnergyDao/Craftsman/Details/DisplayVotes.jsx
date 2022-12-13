@@ -15,7 +15,7 @@ import TableContainerUI from "../../../ui/TableContainer"
 
 function DisplayVotes({ craftsman, quorum }) {
 
-    const { profile: { contracts: { EnergyGovernor, EEDToken } } } = useProfile()
+    const { state: { contracts: { EnergyGovernor, EEDToken } } } = useProfile()
     const { data: signer } = useSigner()
     const { address } = useAccount()
     const [isLoading, setIsLoading] = useState(false)

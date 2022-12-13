@@ -69,23 +69,16 @@ function ProjectDetailsModal(props) {
 
     const { project: currentProject, quotations, open, setOpen, fetchQuotations, retrieveState, fetchProjects } = props
 
-    const { profile: { contracts: { EnergyDao, EEDToken } } } = useProfile()
+    const { state: { contracts: { EnergyDao}, votePower, isValidated} } = useProfile()
 
-    const [votePower, setVotePower] = useState(0)
-    const [project, setProject] = useState(currentProject)
-    const [castVote, setCastVote] = useState(false)
     const [state, setState] = useState({
         openQuotation: false,
-        project: currentProject,
-        votePower: 0,
         hasVoted: false,
         castVote:  false,
         isLoading: false,
         displayCreation: false,
         stateProject: currentProject.state
     })
-
-    const [stateProject, setStateProject] = useState(currentProject.state)
 
     const { data: signer } = useSigner()
     const { address } = useAccount()
@@ -97,7 +90,7 @@ function ProjectDetailsModal(props) {
         msg: ""
     })
 
-    const isBeneficiary = project.beneficiaryAddr === address
+    const isBeneficiary = currentProject.beneficiaryAddr === address
 
     const setOpenNotif = (b) => {
         setNotif({ ...notif, open: b })
@@ -123,61 +116,66 @@ function ProjectDetailsModal(props) {
         },
     })
 
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyDao', chain.id).abi,
+        eventName: 'QuotationAccepted',
+        listener() {
+            fetchData()
+            setNotif({ msg: "Devis accepté!", open: true })
+        },
+    })
 
+    useContractEvent({
+        address: EnergyDao.address,
+        abi: getContractDescription('EnergyDao', chain.id).abi,
+        eventName: 'QuotationRejected',
+        listener() {
+            fetchData()
+            setNotif({ msg: "Devis refusé!", open: true })
+        },
+    })
 
-    const fetchCraftsman = useCallback(async () => {
-        const isValidated = await EnergyDao.isCraftsmanValidated(address)
-        const quotation = await EnergyDao.quotations(project.id, address)
+    const fetchCraftsman = async () => {
+        const quotation = await EnergyDao.quotations(currentProject.id, address)
         const currentBlock = await provider.getBlockNumber()
-        if (project.beneficiaryAddr !== address && address !== quotation.craftsmanAddr
-            && isValidated && project.voteInfo.voteStart > BigNumber.from(currentBlock)) {
-            setState({ ...state, displayCreation: true })
+
+        if (currentProject.beneficiaryAddr !== address && address !== quotation.craftsmanAddr
+            && isValidated && currentProject.voteInfo.voteStart > BigNumber.from(currentBlock)) {
+            setState((s) => ({ ...s, displayCreation: true }))
         }
         else {
-            setState({ ...state, displayCreation: false })
+            setState((s) => ({ ...s, displayCreation: false }))
         }
-    }, [project, EnergyDao, address, provider])
+    }
 
-    const fetchVotePower = useCallback(async () => {
-        const votes = (await EEDToken.balanceOf(address))
-        setVotePower(ethers.utils.formatEther(votes))
-        // setState({ ...state, votePower: ethers.utils.formatEther(votes) })
-    }, [EEDToken, address])
-
-    const fetchUpdate = useCallback(async () => {
-        console.log("fetchUpdate");
-        const hasVoted = await EnergyDao.hasVoted(project.id, address)
+    const fetchUpdate = async () => {
+        const hasVoted = await EnergyDao.hasVoted(currentProject.id, address)
         
-        const p = await retrieveState(project)
+        const p = await retrieveState(currentProject)
         fetchQuotations(p.id)
-        setState({ ...state, stateProject: p.state})
-        setStateProject(p.state)
+        setState((s) => ({ ...s, stateProject: p.state}))
 
         const castVote = !hasVoted && p.state === ProposalProjectStates.Active
 
-        if (castVote){
-            fetchVotePower()
-        }
-
-        setState({...state, castVote: castVote})
-        setCastVote(castVote)
-    }, [fetchQuotations, address, EnergyDao, fetchVotePower, project, retrieveState])
+        setState((s) => ({...s, castVote: castVote}))
+    }
 
     const fetchData = useCallback(() => {
         console.log("fetch data ");
         fetchCraftsman()
         fetchUpdate()
-    }, [fetchCraftsman, fetchUpdate])
+    }, [fetchCraftsman, fetchUpdate, state.displayCreation])
 
     useEffect(() => {
         fetchData()
-        console.log("use effect");
-    }, [])
+        console.log("USE EFFECT");
+    }, [provider, address])
 
     const handleClick = async (addr) => {
-        setState({ ...state, isLoading: true })
-        await EnergyDao.connect(signer).castVote(project.id, address, addr)
-        setState({ ...state, isLoading: false })
+        setState((s) => ({ ...state, isLoading: true }))
+        await EnergyDao.connect(signer).castVote(currentProject.id, address, addr)
+        setState((s) => ({ ...state, isLoading: false }))
     }
 
     const handleClose = () => {
@@ -188,10 +186,10 @@ function ProjectDetailsModal(props) {
     const handleDecision = async (accept) => {
         setState({ ...state, isLoading: true })
         if (accept) {
-            await EnergyDao.connect(signer).accept(project.id)
+            await EnergyDao.connect(signer).accept(currentProject.id)
         }
         else {
-            await EnergyDao.connect(signer).reject(project.id)
+            await EnergyDao.connect(signer).reject(currentProject.id)
         }
         setState({ ...state, isLoading: false })
     }
@@ -206,7 +204,7 @@ function ProjectDetailsModal(props) {
 
     return (
         <>
-            <CreateQuotationModal open={state.openQuotation} setOpen={setOpenQuotation} project={project} fetchCraftsman={fetchCraftsman} />
+            <CreateQuotationModal open={state.openQuotation} setOpen={setOpenQuotation} project={currentProject} fetchCraftsman={fetchCraftsman} />
             <CenteredModal
                 open={open}
                 onClose={() => handleClose()}>
@@ -222,43 +220,43 @@ function ProjectDetailsModal(props) {
                             <Box className="content">
                                 <Box className="line">
                                     <Typography variant="b">Nom</Typography>
-                                    <Typography>{project.name}</Typography>
+                                    <Typography>{currentProject.name}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Bénéficiaire</Typography>
                                     <Box display="flex" alignItems="center" gap="4px">
-                                        <Identicon className="identicon" value={project.beneficiaryAddr} size={20} theme="ethereum" />
-                                        <Typography>{project.beneficiaryAddr}</Typography>
+                                        <Identicon className="identicon" value={currentProject.beneficiaryAddr} size={20} theme="ethereum" />
+                                        <Typography>{currentProject.beneficiaryAddr}</Typography>
                                     </Box>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Description</Typography>
-                                    <Typography>{project.description}</Typography>
+                                    <Typography>{currentProject.description}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Département</Typography>
-                                    <Typography>{project.department}</Typography>
+                                    <Typography>{currentProject.department}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Photos</Typography>
-                                    <Typography><PdfPicture onClick={() => openIpfsLink(project.photos)} /></Typography>
+                                    <Typography><PdfPicture onClick={() => openIpfsLink(currentProject.photos)} /></Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Diagnostic (DPE)</Typography>
-                                    <Typography><PdfPicture onClick={() => openIpfsLink(project.diagnostic)} /></Typography>
+                                    <Typography><PdfPicture onClick={() => openIpfsLink(currentProject.diagnostic)} /></Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Plan</Typography>
-                                    <Typography><PdfPicture onClick={() => openIpfsLink(project.plan)} /></Typography>
+                                    <Typography><PdfPicture onClick={() => openIpfsLink(currentProject.plan)} /></Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Status</Typography>
-                                    <Typography>{stateProject}</Typography>
+                                    <Typography>{state.stateProject}</Typography>
                                 </Box>
-                                <DisplayVoteBlock state={stateProject} 
-                                    voteStart={project.voteInfo.voteStart} 
-                                    voteEnd={project.voteInfo.voteEnd} 
-                                    voteExpire={project.voteInfo.voteExpire}/>
+                                <DisplayVoteBlock state={state.stateProject} 
+                                    voteStart={currentProject.voteInfo.voteStart} 
+                                    voteEnd={currentProject.voteInfo.voteEnd} 
+                                    voteExpire={currentProject.voteInfo.voteExpire}/>
                             </Box>
                         </RoundedGrid>
                     </Grid>
@@ -294,7 +292,7 @@ function ProjectDetailsModal(props) {
                                                 <TableCell align="right">{BigNumber.from(row.price).toNumber()}</TableCell>
                                                 <TableCell align="right">{BigNumber.from(row.nbCee).toNumber()}</TableCell>
                                                 {
-                                                    castVote ?
+                                                    state.castVote ?
                                                         <TableCell align="right" sx={{ display: "flex", alignItems: "center", flexDirection: "inherit", gap: "4px" }}>
                                                             {formatEther(row.weightVote)}
                                                             <IconHover onClick={() => handleClick(row.craftsmanAddr)}><ThumbUpAltIcon /></IconHover>
@@ -310,11 +308,11 @@ function ProjectDetailsModal(props) {
                                     </TableBody>
                                 </Table>
                             </TableContainerUI>
-                            {castVote && <Typography variant="p" pl={1} pb={1}>Votre poids de vote actuel est de {votePower} EED. Faites votre choix.</Typography>}
+                            {state.castVote && <Typography variant="p" pl={1} pb={1}>Votre poids de vote actuel est de {votePower} EED. Faites votre choix.</Typography>}
 
                             <CircularIndeterminate loading={state.isLoading} />
                         </Grid>
-                        {isBeneficiary && stateProject === ProposalProjectStates.Ended &&
+                        {isBeneficiary && state.stateProject === ProposalProjectStates.Ended &&
                             <>
                                 <Box display="flex" gap="5px">
                                     <ButtonUI variant="contained" component="label" htmlFor="file-upload" onClick={() => handleDecision(true)}>

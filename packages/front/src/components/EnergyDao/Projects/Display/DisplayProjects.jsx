@@ -15,7 +15,7 @@ import ProjectDetailsModal from "../Details/ProjectDetails"
 
 function DisplayProjects() {
 
-    const { profile: { contracts: { EnergyDao } } } = useProfile()
+    const { state: { contracts: { EnergyDao } } } = useProfile()
 
     const [openCreate, setOpenCreate] = useState(false)
     const [openDetails, setOpenDetails] = useState(false)
@@ -44,7 +44,6 @@ function DisplayProjects() {
     }, [EnergyDao])
 
     const fetchProjects = useCallback(async () => {
-        console.log("fetch all projects");
         let eventFilter = EnergyDao.filters.ProjectRegistered()
         let events = await EnergyDao.queryFilter(eventFilter)
         const ids = events.map((event) => {

@@ -43,7 +43,7 @@ function VoteProposal({ state, handleDecision }) {
 function CraftsmanDetailsModal(props) {
     const { craftsman, open, setOpen, fetchCraftsman, quorum } = props
     const { data: signer } = useSigner()
-    const { profile: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
+    const { state: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
     const [isLoading, setIsLoading] = useState(false)
     const {chain} = useNetwork()
 
@@ -52,7 +52,7 @@ function CraftsmanDetailsModal(props) {
         abi: getContractDescription('EnergyGovernor', chain.id).abi,
         eventName: 'VoteCastWithParams',
         listener() {
-            console.log("EVEEEEEEEEEEEEEEEEEEEENT");
+            console.log("vote cast");
         },
     })
 
