@@ -8,12 +8,14 @@ require('solidity-docgen');
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY // === "undefined" ? process.env.ALCHEMY_KEY : ""
 const MNEMONIC = process.env.MNEMONIC //=== "undefined" ? process.env.MNEMONIC : ""
 const GOERLI_PKEY = process.env.GOERLI_PKEY //=== "undefined" ? process.env.GOERLI_PKEY : ""
+
 module.exports = {
   solidity: "0.8.17",
   gasReporter: {
     enabled: true 
   },
   docgen: {},
+  defaultNetwork: "localhost",
   networks: {
     localhost: {
       chainId: 31337

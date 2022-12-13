@@ -19,7 +19,7 @@ https://energy-dapp.vercel.app/
 ## Voting contract
 
 ### Docs
-[Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/main/Energy.md)
+[Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/features/packages/hardhat/README.md)
 
 ### Contract address
 The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c31f9e5275ed5
@@ -28,8 +28,9 @@ The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c
 * Solidity
 * Javascript
 * Hardhat
+* Ethersjs
 * React
-* Web3
+* Wagmi
 * Material UI
 
 ## Local deployment

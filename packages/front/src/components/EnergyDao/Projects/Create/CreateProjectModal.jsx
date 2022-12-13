@@ -1,6 +1,6 @@
 import { Box, FormControl, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
-import { useNetwork, useSigner } from 'wagmi';
+import { useSigner } from 'wagmi';
 import { uploadIpfsFile } from '../../../../common/helpers/eth';
 import { useProfile } from "../../../../contexts/DaoContext";
 import ButtonUI from "../../../ui/button";
@@ -12,7 +12,7 @@ import TextFieldUI from "../../../ui/text-field";
 function CreateProjectModal(props) {
     const { open, setOpen } = props
     const [isLoading, setIsLoading] = useState(false)
-    const { profile: { contracts: { EnergyDao } } } = useProfile()
+    const { state: { contracts: { EnergyDao } } } = useProfile()
     const { data: signer } = useSigner() 
 
     const [values, setValues] = useState({
@@ -40,8 +40,7 @@ function CreateProjectModal(props) {
 
     const onSubmit = async () => {
         if (values.name !== "" && values.sector !== "" && values.department !== "" && values.description !== "" &&
-            values.diagnostic !== "" && values.plan !== "" && values.pictures != "") {
-
+            values.diagnostic !== "" && values.plan !== "" && values.pictures !== "") {
             setIsLoading(true)
             // upload files to IPFS
             const hashDiagnostic = await uploadIpfsFile(values.diagnostic)

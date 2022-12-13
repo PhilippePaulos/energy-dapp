@@ -2,8 +2,9 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Typography } from "@mui/material"
 import Identicon from "@polkadot/react-identicon"
 import { BigNumber, ethers } from "ethers"
+import { useEffect } from 'react'
 import { useState } from "react"
-import { useContractEvent, useNetwork, useSigner } from "wagmi"
+import { useBlockNumber, useContractEvent, useNetwork, useSigner } from "wagmi"
 import { ProposalState } from "../../../../common/enums"
 import { getContractDescription, openIpfsLink } from "../../../../common/helpers/eth"
 import { useProfile } from "../../../../contexts/DaoContext"
@@ -26,7 +27,7 @@ function State({ state }) {
 }
 
 function VoteProposal({ state, handleDecision }) {
-    
+
     const title = state === undefined ? "Initier vote" : "Accepter vote"
 
     if (state === undefined || state === ProposalState.Succeeded) {
@@ -41,20 +42,24 @@ function VoteProposal({ state, handleDecision }) {
 }
 
 function CraftsmanDetailsModal(props) {
-    const { craftsman, open, setOpen, fetchCraftsman, quorum } = props
+    const { craftsman, setCraftsman, open, setOpen, fetchCraftsmans, quorum } = props
     const { data: signer } = useSigner()
-    const { profile: { contracts: { EnergyDao, EnergyGovernor } } } = useProfile()
+    const { state: { contracts: { EnergyDao, EnergyGovernor }, address }, state } = useProfile()
+    const { data: currentBlock } = useBlockNumber()
     const [isLoading, setIsLoading] = useState(false)
-    const {chain} = useNetwork()
+    const { chain } = useNetwork()
 
     useContractEvent({
         address: EnergyDao.address,
         abi: getContractDescription('EnergyGovernor', chain.id).abi,
         eventName: 'VoteCastWithParams',
         listener() {
-            console.log("EVEEEEEEEEEEEEEEEEEEEENT");
+            console.log("vote cast");
         },
     })
+
+    useEffect(() => {
+    }, [craftsman.votes, address])
 
     const handleProposal = async () => {
         setIsLoading(true)
@@ -65,9 +70,10 @@ function CraftsmanDetailsModal(props) {
         else if (craftsman.state === ProposalState.Succeeded) {
             await EnergyGovernor.connect(signer).execute([EnergyDao.address], [0], [encodedFunc], ethers.utils.id(craftsman.description))
         }
-        fetchCraftsman()
+        fetchCraftsmans()
         setOpen(false)
         setIsLoading(false)
+        window.location.reload(false);
     }
 
     return (
@@ -101,13 +107,30 @@ function CraftsmanDetailsModal(props) {
                                 <Typography variant="b">Nombre de projets validés</Typography>
                                 <Typography>{BigNumber.from(craftsman.nbProjectsValidated).toNumber()}</Typography>
                             </Box>
+                            {craftsman.votes && 
+                            <>
+                                <Box className="line">
+                                    <Typography variant="b">Block actuel</Typography>
+                                    <Typography>{currentBlock}</Typography>
+                                </Box>
+                                <Box className="line">
+                                    <Typography variant="b">Vote se termine au block</Typography>
+                                    <Typography>{BigNumber.from(craftsman.endBlock).toNumber()}</Typography>
+                                </Box>
+                            </>
+                            }
                         </Box>
                     </RoundedGrid>
                 </Grid>
-                <VoteProposal state={craftsman.state} handleDecision={handleProposal}/>
                 {
-                    craftsman.votes && <DisplayVotes craftsman={craftsman} quorum={quorum} />
+                    craftsman.votes &&
+                    <DisplayVotes craftsman={craftsman}
+                        setCraftsman={setCraftsman}
+                        quorum={quorum}
+                        fetchCraftsmans={fetchCraftsmans}
+                        setOpen={setOpen} />
                 }
+                <VoteProposal state={craftsman.state} handleDecision={handleProposal} />
                 <CircularIndeterminate loading={isLoading} />
             </Box>
         </CenteredModal>

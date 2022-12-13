@@ -7,6 +7,7 @@ import EnergyDao from "./components/EnergyDao";
 import { Navbar } from "./components/Navbar";
 import { theme } from './components/theme';
 import { chain, configureChains, createClient, defaultChains, WagmiConfig } from "wagmi";
+import { DaoProvider } from "./contexts/DaoContext";
 
 const { chains, provider } = configureChains([chain.hardhat, ...defaultChains], [
   publicProvider(),
@@ -25,7 +26,9 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
           <Navbar />
-          <EnergyDao />
+          <DaoProvider>
+            <EnergyDao />
+          </DaoProvider>
       </ThemeProvider>
     </WagmiConfig>
 
