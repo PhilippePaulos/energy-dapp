@@ -12,7 +12,7 @@ async function main() {
   const mintAmount = ethers.utils.parseEther("1000000")
   const saleAmount = ethers.utils.parseEther("1000000")
   const craftsmanPeriod = 2
-  const quotationPeriod = 4
+  const quotationPeriod = 2
   const votingPeriod = 2
   const voteExpire = 2
   const nbMaxProject = 100
@@ -116,9 +116,6 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr2).proposeQuotation(0, "Devis - Construction 2000", `${IPFS_FOLDER}/Devis-01.jpg`, 25000, 210000)
   await energyDao.connect(addr3).proposeQuotation(0, "Devis - Renov", `${IPFS_FOLDER}/Devis-03.jpeg`, 21000, 306000)
 
-  await hre.network.provider.send("hardhat_mine")
-  await hre.network.provider.send("hardhat_mine")
-
   await energyDao.connect(addr1).castVote(0, addr1.address, addr2.address)
   await hre.network.provider.send("hardhat_mine")
 
@@ -128,7 +125,6 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr6).addProject("Immo City", "Devis - Rénovation entreprise paprem Marseille", 13, 0, PHOTOS_IPFS, DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
   await energyDao.connect(addr2).proposeQuotation(1, "Devis - Paul SARL", `${IPFS_FOLDER}/Devis-01.jpg`, 6500, 85000)
   await energyDao.connect(addr3).proposeQuotation(1, "Devis - Construct2001", `${IPFS_FOLDER}/Devis-03.jpeg`, 5700, 60000)
-  await hre.network.provider.send("hardhat_mine")
 }
 
 async function addCraftsman(governor, energyDao, signer, addr) {

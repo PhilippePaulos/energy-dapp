@@ -1,7 +1,7 @@
 import { Box, FormControl, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
 import { useSigner } from 'wagmi';
-import { uploadIpfsFile } from '../../../../common/helpers/eth';
+import { formatIpfsLink, uploadIpfsFile } from '../../../../common/helpers/eth';
 import { useProfile } from "../../../../contexts/DaoContext";
 import ButtonUI from "../../../ui/button";
 import CenteredModal from "../../../ui/CenteredModal";
@@ -43,11 +43,11 @@ function CreateProjectModal(props) {
             values.diagnostic !== "" && values.plan !== "" && values.pictures !== "") {
             setIsLoading(true)
             // upload files to IPFS
-            const hashDiagnostic = await uploadIpfsFile(values.diagnostic)
+            const hashDiagnostic = await uploadIpfsFile(values.diagnostic).then((link) => formatIpfsLink(link))
 
-            const hashPlan = await uploadIpfsFile(values.plan)
+            const hashPlan = await uploadIpfsFile(values.plan).then((link) => formatIpfsLink(link))
 
-            const hashPictures = await uploadIpfsFile(values.pictures)
+            const hashPictures = await uploadIpfsFile(values.pictures).then((link) => formatIpfsLink(link))
             
             await EnergyDao.connect(signer).addProject(values.name, values.description, values.department, values.sector, hashPictures, hashDiagnostic, hashPlan)
             setIsLoading(false)

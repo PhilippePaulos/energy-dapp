@@ -2,7 +2,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { Box, FormControl, Typography } from "@mui/material";
 import { useState } from "react";
 import { useSigner } from 'wagmi';
-import { uploadIpfsFile } from '../../../../common/helpers/eth';
+import { formatIpfsLink, uploadIpfsFile } from '../../../../common/helpers/eth';
 import { useProfile } from "../../../../contexts/DaoContext";
 import ButtonUI from "../../../ui/button";
 import CenteredModal from "../../../ui/CenteredModal";
@@ -37,7 +37,7 @@ function CreateQuotationModal(props) {
             setIsLoading(true)
             // upload files to IPFS
             const hash = await uploadIpfsFile(values.devis)
-            await EnergyDao.connect(signer).proposeQuotation(project.id, values.description, hash, values.price, values.nbCee)
+            await EnergyDao.connect(signer).proposeQuotation(project.id, values.description, formatIpfsLink(hash), values.price, values.nbCee)
             setIsLoading(false)
             setOpen(false)
         }

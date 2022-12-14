@@ -3,7 +3,7 @@ import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, FormControl, Typography } from "@mui/material";
 import { useState } from "react";
 import { useConnect, useSigner } from 'wagmi';
-import { isAllDefined, uploadIpfsFile } from "../../../../common/helpers/eth";
+import { formatIpfsLink, isAllDefined, uploadIpfsFile } from "../../../../common/helpers/eth";
 import { useProfile } from '../../../../contexts/DaoContext';
 import ButtonUI from "../../../ui/button";
 import CenteredModal from "../../../ui/CenteredModal";
@@ -39,7 +39,7 @@ function CreateCraftsmanModal(props) {
             try {
                 setIsLoading(true)
                 const hash = await uploadIpfsFile(values.certification)
-                await EnergyDao.connect(signer).registerCraftsman(values.name, values.address, hash)
+                await EnergyDao.connect(signer).registerCraftsman(values.name, values.address, formatIpfsLink(hash))
                 fetchCraftsman()
                 setIsLoading(false)
                 setOpen(false)
