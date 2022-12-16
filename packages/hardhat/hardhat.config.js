@@ -27,7 +27,8 @@ module.exports = {
     },
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_KEY}`,
-      accounts: [GOERLI_PKEY]
+      accounts: [GOERLI_PKEY],
+      chainId: 5
     },
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${MNEMONIC}`,
