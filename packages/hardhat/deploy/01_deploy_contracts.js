@@ -1,9 +1,13 @@
 const { ethers } = require("hardhat")
-/* const {
-  time,
-} = require("@nomicfoundation/hardhat-network-helpers") */
 const { proposeVote, Votes } = require('../helpers/governor')
 const { exportAbis, ONE_ETHER } = require("../helpers/common")
+const { Network, Alchemy } = require("alchemy-sdk")
+
+const settings = {
+  apiKey: process.env.ALCHEMY_KEY,
+  network: Network.ETH_GOERLI,
+}
+
 
 const IPFS_FOLDER = "ipfs/QmY1okHh4rc6NriBJYVqTComuprvaxpHqCbPk9jLF3eUE1"
 
@@ -40,18 +44,28 @@ async function main() {
   const Governor = await ethers.getContractFactory("EnergyGovernor")
   const governor = Governor.attach(energyDao.governor())
 
+  let latestBlock
   if (network.config.chainId === 31337) {
+    latestBlock = (await hre.ethers.provider.getBlock("latest")).number
     console.log("Prepare data")
     await prepareData(energyDao, eedToken, governor, sale)
+  } else {
+    const alchemy = new Alchemy(settings)
+    latestBlock = await alchemy.core.getBlockNumber()
   }
+  console.log("The latest block number is", latestBlock)
+
 
   console.log("Export ABIs to front folder...")
 
+  const contracts = [
+    { address: await sale.address, name: "Sale" },
+    { address: await eedToken.address, name: "EEDToken" },
+    { address: await energyDao.address, name: "EnergyDao" },
+    { address: await governor.address, name: "EnergyGovernor" }
+  ]
 
-  await exportAbis(await sale.address, "Sale")
-  await exportAbis(await eedToken.address, "EEDToken")
-  await exportAbis(await energyDao.address, "EnergyDao")
-  await exportAbis(await governor.address, "EnergyGovernor")
+  exportAbis(contracts, latestBlock)
   console.log("ABIs exported")
 
 }
@@ -69,8 +83,6 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await sale.buyTokens(addr8.address, { value: ethers.utils.parseEther('1') })
   await sale.buyTokens(addr9.address, { value: ethers.utils.parseEther('1') })
 
-  //const res = await eedToken.balanceOf(energyDao.address);
-  const res = await eedToken.balanceOf(addr1.address);
   console.log("Register craftsmans...")
   const certif = `${IPFS_FOLDER}/CertificationRGE-01.jpg`
   await energyDao.connect(addr1).registerCraftsman("Jean Massé", "7 rue du Maine - 75013 Paris", certif)
@@ -78,7 +90,7 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await energyDao.connect(addr3).registerCraftsman("Jacques Artan", "1 rue des Rameaux - 35000 Rennes", certif)
   await energyDao.connect(addr4).registerCraftsman("Charlotte Dieuzé", "12 avenue des Lilas - 29510 Edern", certif)
 
-  console.log("Delegates...");
+  console.log("Delegates...")
   await eedToken.connect(addr1).delegate(addr1.address)
   await eedToken.connect(addr2).delegate(addr2.address)
   await eedToken.connect(addr3).delegate(addr3.address)
@@ -89,30 +101,29 @@ async function prepareData(energyDao, eedToken, governor, sale) {
   await eedToken.connect(addr8).delegate(addr8.address)
   await eedToken.connect(addr9).delegate(addr9.address)
 
-  console.log("Execute craftsman proposals");
+  console.log("Execute craftsman proposals")
   await addCraftsman(governor, energyDao, addr1, addr1)
   await addCraftsman(governor, energyDao, addr1, addr2)
   await addCraftsman(governor, energyDao, addr1, addr3)
   await proposeVote(governor, [energyDao], ["validateCraftsman"], [[addr4.address]], [0], `validate ${addr4.address}`)
 
 
-  console.log("Approve tokens");
-  await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr4).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr5).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr6).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr7).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr8).approve(energyDao.address, ethers.utils.parseEther("10"));
-  await eedToken.connect(addr9).approve(energyDao.address, ethers.utils.parseEther("10"));
+  console.log("Approve tokens")
+  await eedToken.connect(addr1).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr2).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr3).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr4).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr5).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr6).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr7).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr8).approve(energyDao.address, ethers.utils.parseEther("10"))
+  await eedToken.connect(addr9).approve(energyDao.address, ethers.utils.parseEther("10"))
 
-  console.log("PROJET 1");
+  console.log("PROJECT 1")
   const PHOTOS_IPFS = `${IPFS_FOLDER}/photos.jpg`
   const DPE_IPFS = `${IPFS_FOLDER}/dpe.gif`
 
   await energyDao.connect(addr5).addProject("Citya Pau", "Rénovation immeuble année 1980 - 10 étages", 64, 1, PHOTOS_IPFS, DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
-  console.log(await energyDao.projects(0));
   await energyDao.connect(addr2).proposeQuotation(0, "Devis - Construction 2000", `${IPFS_FOLDER}/Devis-01.jpg`, 25000, 210000)
   await energyDao.connect(addr3).proposeQuotation(0, "Devis - Renov", `${IPFS_FOLDER}/Devis-03.jpeg`, 21000, 306000)
 
@@ -121,7 +132,7 @@ async function prepareData(energyDao, eedToken, governor, sale) {
 
   await energyDao.connect(addr5).accept(0)
 
-  console.log("PROJET 2");
+  console.log("PROJECT 2")
   await energyDao.connect(addr6).addProject("Immo City", "Devis - Rénovation entreprise paprem Marseille", 13, 0, PHOTOS_IPFS, DPE_IPFS, `${IPFS_FOLDER}/Plans-02.jpg`)
   await energyDao.connect(addr2).proposeQuotation(1, "Devis - Paul SARL", `${IPFS_FOLDER}/Devis-01.jpg`, 6500, 85000)
   await energyDao.connect(addr3).proposeQuotation(1, "Devis - Construct2001", `${IPFS_FOLDER}/Devis-03.jpeg`, 5700, 60000)

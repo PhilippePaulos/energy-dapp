@@ -4,7 +4,7 @@ import Identicon from '@polkadot/react-identicon'
 import { useCallback, useEffect, useState } from "react"
 import { useContractEvent, useNetwork } from "wagmi"
 import { ProposalProjectStateCodes, SectorCodes } from "../../../../common/enums"
-import { formatAddress, getContractDescription } from "../../../../common/helpers/eth"
+import { formatAddress, getContractDescription, getDeployBlock } from "../../../../common/helpers/eth"
 import { useProfile } from '../../../../contexts/DaoContext'
 import { theme } from "../../../theme"
 import IconHover from '../../../ui/IconHover'
@@ -48,7 +48,7 @@ function DisplayProjects() {
 
     const fetchProjects = useCallback(async () => {
         let eventFilter = EnergyDao.filters.ProjectRegistered()
-        let events = await EnergyDao.queryFilter(eventFilter)
+        let events = await EnergyDao.queryFilter(eventFilter, getDeployBlock(chain.id) - 1)
         const ids = events.map((event) => {
             return event.args.id
         })
@@ -57,9 +57,9 @@ function DisplayProjects() {
                 return Object.assign({}, project, { id: projectId })
             })
         }
-
         let promises = ids.map((id) => retrieveProject(id))
         let projects = await Promise.all(promises)
+        console.log(projects);
 
         promises = projects.map((id) => retrieveState(id))
         projects = await Promise.all(promises)
@@ -75,7 +75,7 @@ function DisplayProjects() {
 
     const fetchQuotations = useCallback(async (projectId) => {
         let eventFilter = EnergyDao.filters.QuotationRegistred(projectId)
-        let events = await EnergyDao.queryFilter(eventFilter)
+        let events = await EnergyDao.queryFilter(eventFilter, getDeployBlock(chain.id))
         const quotationsEvents = events.map((event) => {
             return event.args.craftsmanAddr
         })
@@ -120,7 +120,7 @@ function DisplayProjects() {
                     quotations={quotations} />}
             <Grid container pb={2}>
                 <Grid item xs={12} m={1} display="flex" justifyContent={"space-between"}>
-                    <Typography variant='h4'>Liste des projets de rénovation énergétiques</Typography>
+                    <Typography variant='h4'>Projets de rénovation énergétiques</Typography>
                     <Typography variant="contained" color="action" onClick={handleClickCreate} alignSelf="center" >
                         <IconHover sx={{ width: "50px" }}><AddBusinessIcon /></IconHover>
                     </Typography>

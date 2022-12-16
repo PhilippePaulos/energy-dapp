@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { useCallback, useState } from "react"
 import { useBlockNumber, useContractEvent, useNetwork } from 'wagmi'
 import { ProposalState, ProposalStateCodes } from '../../../../common/enums'
-import { formatAddress, getEthValue, openIpfsLink, getContractDescription } from "../../../../common/helpers/eth"
+import { formatAddress, getEthValue, openIpfsLink, getContractDescription, getDeployBlock } from "../../../../common/helpers/eth"
 import { leftJoin } from "../../../../common/helpers/utils.js"
 import { useProfile } from "../../../../contexts/DaoContext"
 import { theme } from "../../../theme"
@@ -69,7 +69,7 @@ function DisplayCraftsman() {
 
     const fetchVotes = useCallback(async () => {
         let eventFilter = EnergyGovernor.filters.ProposalCreated()
-        let events = await EnergyGovernor.queryFilter(eventFilter)
+        let events = await EnergyGovernor.queryFilter(eventFilter, getDeployBlock(chain.id))
 
         let proposals = events.flatMap((event) => {
             const description = event.args.description.toLowerCase()
@@ -103,7 +103,7 @@ function DisplayCraftsman() {
 
     const fetchCraftsmans = useCallback(async (currentBlock) => {
         let eventFilter = EnergyDao.filters.CraftsmanRegistered()
-        let events = await EnergyDao.queryFilter(eventFilter)
+        let events = await EnergyDao.queryFilter(eventFilter, getDeployBlock(chain.id))
         const addr = events.map((event) => {
             return event.args.craftsmanAddress
         })
@@ -175,7 +175,7 @@ function DisplayCraftsman() {
         <>
             <Grid container pb={2}>
                 <Grid item xs={12} m={1} display="flex" justifyContent={"space-between"}>
-                    <Typography variant='h4'>Liste des artisans</Typography>
+                    <Typography variant='h4'>Artisans</Typography>
                     {
                         !isCraftsman && <Typography variant="contained" color="action" onClick={handleClickCreate} alignSelf="center" >
                             <IconHover sx={{ width: "50px" }}><PersonAddIcon /></IconHover>

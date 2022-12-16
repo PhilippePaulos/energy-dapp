@@ -1,5 +1,6 @@
 import { ethers } from "ethers"
-import axios from 'axios';
+import axios from 'axios'
+const artifact = require("../../contracts/contracts.json")
 
 function initContract(contract, networkId, provider) {
     const { abi, addr } = getContractDescription(contract, networkId)
@@ -8,14 +9,17 @@ function initContract(contract, networkId, provider) {
 }
 
 async function isMetaMaskConnected() {
-    const { ethereum } = window;
-    const accounts = await ethereum.request({ method: 'eth_accounts' });
-    return accounts && accounts.length > 0;
+    const { ethereum } = window
+    const accounts = await ethereum.request({ method: 'eth_accounts' })
+    return accounts && accounts.length > 0
 }
 
 function getContractDescription(name, chainId) {
-    const artifact = require("../../contracts/contracts.json")
     return artifact[chainId].contracts[name]
+}
+
+function getDeployBlock(chainId) {
+    return artifact[chainId].block
 }
 
 function formatAddress(address) {
@@ -47,7 +51,7 @@ async function uploadIpfsFile(file) {
     const options = JSON.stringify({
         cidVersion: 0,
     })
-    formData.append('pinataOptions', options);
+    formData.append('pinataOptions', options)
 
     const resFile = await axios({
         method: "post",
@@ -58,8 +62,8 @@ async function uploadIpfsFile(file) {
             'pinata_secret_api_key': PINATA_SECRET_KEY,
             "Content-Type": "multipart/form-data"
         },
-    });
-    return `ipfs://${resFile.data.IpfsHash}`;
+    })
+    return `ipfs://${resFile.data.IpfsHash}`
 }
 
 function openIpfsLink(hash) {
@@ -71,7 +75,7 @@ function formatIpfsLink(link) {
 }
 
 async function proposeVote(governor, instances, funcs, args, values, description) {
-    let encodedFuncs = [];
+    let encodedFuncs = []
 
     for (let i = 0; i < instances.length; i++) {
         encodedFuncs.push(instances[i].interface.encodeFunctionData(funcs[i], args[i]))
@@ -82,4 +86,4 @@ async function proposeVote(governor, instances, funcs, args, values, description
 }
 
 
-export { getContractDescription, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected, initContract, formatIpfsLink, proposeVote}
+export { getContractDescription, getDeployBlock, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected, initContract, formatIpfsLink, proposeVote}
