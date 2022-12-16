@@ -20,14 +20,12 @@ import TableContainerUI from "../../../ui/TableContainer"
 import CreateQuotationModal from '../Create/CreateQuotationModal'
 import DisplayStateIcon from './DisplayStateIcon'
 
-function DisplayVoteBlock({ state, voteEnd, voteStart, voteExpire }) {
-
-    const { state: { currentBlock } } = useProfile()
+function DisplayVoteBlock({ state, voteEnd, voteStart, voteExpire, blockNumber }) {
 
     const currentDisplay =
         <Box className="line">
             <Typography variant="b">Current block</Typography>
-            <Typography>{currentBlock}</Typography>
+            <Typography>{blockNumber}</Typography>
         </Box>
 
     if (state === ProposalProjectStates.Pending) {
@@ -69,7 +67,7 @@ function ProjectDetailsModal(props) {
 
     const { project, updateProject, quotations, open, setOpen, fetchQuotations, fetchProjects } = props
 
-    const { state: { contracts: { EnergyDao }, votePower }, state: profile } = useProfile()
+    const { state: { contracts: { EnergyDao }, votePower, blockNumber }, state: profile } = useProfile()
 
     const [state, setState] = useState({
         openQuotation: false,
@@ -135,11 +133,10 @@ function ProjectDetailsModal(props) {
     })
 
     const fetchCraftsman = useCallback(async () => {
-        const currentBlock = await provider.getBlockNumber()
         const quotation = await EnergyDao.quotations(project.id, profile.address)
 
         if (project.beneficiaryAddr !== profile.address && profile.isValidated && profile.address !== quotation.craftsmanAddr
-            && project.voteInfo.voteStart > BigNumber.from(currentBlock)) {
+            && project.voteInfo.voteStart > BigNumber.from(blockNumber)) {
             setState((s) => ({ ...s, displayCreation: true }))
         }
         else {
@@ -254,7 +251,8 @@ function ProjectDetailsModal(props) {
                                 <DisplayVoteBlock state={project.state}
                                     voteStart={project.voteInfo.voteStart}
                                     voteEnd={project.voteInfo.voteEnd}
-                                    voteExpire={project.voteInfo.voteExpire} />
+                                    voteExpire={project.voteInfo.voteExpire} 
+                                    blockNumber={blockNumber} />
                             </Box>
                         </RoundedGrid>
                     </Grid>

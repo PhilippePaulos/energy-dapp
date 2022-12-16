@@ -2902,7 +2902,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xfd655BEB8852b7CBF1654D11C37ff6fE3FdBc28B",
+        "addr": "0xb0279Db6a2F1E01fbC8483FCCef0Be2bC6299cC3",
         "abi": [
           {
             "inputs": [
@@ -3141,7 +3141,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0x26A595dF80787198eE8489d8cA9555b9d68f0772",
+        "addr": "0x856e4424f806D16E8CBC702B3c0F2ede5468eae5",
         "abi": [
           {
             "inputs": [
@@ -3796,7 +3796,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0xcC4c41415fc68B2fBf70102742A83cDe435e0Ca7",
+        "addr": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
         "abi": [
           {
             "inputs": [
@@ -4673,7 +4673,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xa54F7cE47e5ebDd6C1c536d040F3CEdBd2DE371B",
+        "addr": "0x3dE2Da43d4c1B137E385F36b400507c1A24401f8",
         "abi": [
           {
             "inputs": [
@@ -5797,6 +5797,6 @@
         ]
       }
     },
-    "block": 688
+    "block": 5
   }
 }

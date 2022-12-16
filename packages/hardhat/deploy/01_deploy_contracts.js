@@ -38,7 +38,7 @@ const params = {
 async function main() {
   const chainId = network.config.chainId
   // 1ETH -> 10000 EED
-  const rate = 10000
+  const rate = 100000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
   const closingTime = Date.now() + ONE_DAY_IN_SECS
 
@@ -91,9 +91,9 @@ async function main() {
 async function prepareData(energyDao, eedToken, governor, sale) {
   const [owner, addr1, addr2, addr3, addr4, addr5, addr6, addr7, addr8, addr9] = await ethers.getSigners()
 
-  await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('2') })
+  await sale.buyTokens(addr1.address, { value: ethers.utils.parseEther('0.5') })
   for (const addr of [addr2, addr3, addr4, addr5, addr6, addr7, addr8, addr9]) {
-    await sale.buyTokens(addr.address, { value: ethers.utils.parseEther('1') })
+    await sale.buyTokens(addr.address, { value: ethers.utils.parseEther('0.3') })
   }
 
   console.log("Register craftsmans...")
