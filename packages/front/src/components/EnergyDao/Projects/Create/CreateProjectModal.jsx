@@ -67,7 +67,7 @@ function CreateProjectModal(props) {
             const hashPictures = await uploadIpfsFile(state.pictures).then((link) => formatIpfsLink(link))
 
             await EnergyDao.connect(signer).addProject(state.name, state.description, state.department,
-                state.sector, hashPictures, hashDiagnostic, hashPlan, { value: fees })
+                state.sector, hashPictures, hashDiagnostic, hashPlan)
 
             setIsLoading(false)
         }
