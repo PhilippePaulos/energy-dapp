@@ -85,5 +85,4 @@ async function proposeVote(governor, instances, funcs, args, values, description
     await governor.propose(addresses, values, encodedFuncs, description)
 }
 
-
 export { getContractDescription, getDeployBlock, formatAddress, getEthValue, uploadIpfsFile, openIpfsLink, isAllDefined, isMetaMaskConnected, initContract, formatIpfsLink, proposeVote}

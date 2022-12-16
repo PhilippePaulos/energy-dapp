@@ -1,14 +1,15 @@
 import { ethers } from "ethers"
 import React, { useCallback, useEffect, useState } from "react"
-import { useAccount, useBlockNumber, useNetwork, useProvider } from "wagmi"
+import { useAccount, useBlockNumber, useContractRead, useNetwork, useProvider } from "wagmi"
 import { initContract } from "../../common/helpers/eth"
 import DaoContext from "./DaoContext"
+import { getContractDescription } from "../../common/helpers/eth"
 
 function DaoProvider({ children }) {
 
   const provider = useProvider()
   const { chain } = useNetwork()
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
 
   const [state, setState] = useState({
     fetched: false,
@@ -16,8 +17,36 @@ function DaoProvider({ children }) {
     contracts: {},
     isValidated: false,
     isCraftsman: false,
-    address: null
+    address: null,
+    balance: 0,
+    allowance: 0
   })
+
+  const { abi: tokenAbi, addr: tokenAddr } = !isConnected ? {} : getContractDescription('EEDToken', chain.id)
+  const { abi: daoAbi, addr: daoAddr } = !isConnected ? {} : getContractDescription('EnergyDao', chain.id)
+
+  useContractRead({
+    address: tokenAddr,
+    abi: tokenAbi,
+    functionName: "balanceOf",
+    args: [address],
+    watch: true,
+    onSuccess(balance) {
+      setState((s) => ({ ...s, balance: balance }))
+    },
+  })
+
+  useContractRead({
+    address: tokenAddr,
+    abi: tokenAbi,
+    functionName: "allowance",
+    args: [address, daoAddr],
+    watch: true,
+    onSuccess(allowance) {
+      setState((s) => ({ ...s, allowance: allowance }))
+    },
+  })
+
 
   const init = useCallback(async () => {
     if (chain) {
@@ -31,15 +60,21 @@ function DaoProvider({ children }) {
       const votes = await contracts.EEDToken.getVotes(address)
       const isValidated = await contracts.EnergyDao.isCraftsmanValidated(address)
       const addr = await contracts.EnergyDao.craftsmans(address)
+      const lock = await contracts.EnergyDao.amountToLock()
+      const fees = await contracts.EnergyDao.fees()
 
-      setState((s) => ({ ...s, votePower: ethers.utils.formatEther(votes) }))
-      setState((s) => ({ ...s, isValidated: isValidated }))
-      setState((s) => ({ ...s, contracts: contracts }))
-      setState((s) => ({ ...s, isCraftsman: addr.craftsmanAddr === address }))
-      setState((s) => ({ ...s, fetched: true }))
-      setState((s) => ({...s, address: address}))
+      setState((s) => ({
+        ...s,
+        votePower: ethers.utils.formatEther(votes),
+        isValidated: isValidated,
+        contracts: contracts,
+        isCraftsman: addr.craftsmanAddr === address,
+        fetched: true,
+        address: address,
+        lock: lock,
+        fees: fees
+      }))
     }
-
   }, [chain, provider, address])
 
   useEffect(() => {
@@ -56,17 +91,16 @@ function DaoProvider({ children }) {
 
 
   useEffect(() => {
-    // const events = ["chainChanged", "accountsChanged"]
+    const events = ["chainChanged"]
 
-    // const handleChange = () => {
-    //   window.location.reload()
-    //   init()
-    // }
+    const handleChange = () => {
+      init()
+    }
 
-    // events.forEach(e => window.ethereum.on(e, handleChange))
-    // return () => {
-    //   events.forEach(e => window.ethereum.removeListener(e, handleChange))
-    // }
+    events.forEach(e => window.ethereum.on(e, handleChange))
+    return () => {
+      events.forEach(e => window.ethereum.removeListener(e, handleChange))
+    }
   }, [init])
 
   return (

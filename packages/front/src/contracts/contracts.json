@@ -2876,7 +2876,7 @@
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0x4aE1C16402f704d7907BcA7cF7e5F73AdeCA5658",
+        "addr": "0x1d9946fC6b1613637C68B400082B09abb06D5662",
         "abi": [
           {
             "inputs": [
@@ -3115,7 +3115,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0x8e825311482e79454Ca24AE24570Ecd7d0A4282F",
+        "addr": "0xfaC68Fded9F4345dBA71B1509Cd02DF2E4f2d207",
         "abi": [
           {
             "inputs": [
@@ -3770,7 +3770,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x618fB9dbd2BD6eb968B4c1af36af6CB0b45310Ec",
+        "addr": "0x8bCe54ff8aB45CB075b044AE117b8fD91F9351aB",
         "abi": [
           {
             "inputs": [
@@ -4035,7 +4035,20 @@
             ],
             "name": "addProject",
             "outputs": [],
-            "stateMutability": "nonpayable",
+            "stateMutability": "payable",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "amountToLock",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
             "type": "function"
           },
           {
@@ -4100,6 +4113,19 @@
                 "internalType": "bool",
                 "name": "isValidated",
                 "type": "bool"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "fees",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
               }
             ],
             "stateMutability": "view",
@@ -4621,7 +4647,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xBd393f778eC78D7538f295818b167c934721CA40",
+        "addr": "0x88DbDF6efC62DFc06D76dCd8663F1fAD1436B29e",
         "abi": [
           {
             "inputs": [
@@ -5745,6 +5771,6 @@
         ]
       }
     },
-    "block": 1142
+    "block": 448
   }
 }

@@ -97,8 +97,8 @@ contract EnergyDao is Ownable {
     uint votingPeriod;
     uint voteExpire;
     uint256 nbTokenToLock;
-    uint256 fees;
-    uint amountToLock;
+    uint256 public fees;
+    uint public amountToLock;
     uint numberProject;
     uint numberQuotation;
 
@@ -254,11 +254,11 @@ contract EnergyDao is Ownable {
         string memory _photos,
         string calldata _diagnostic,
         string calldata _plan
-    ) external {
+    ) external payable {
         require(projects.length < numberProject, "Project list is full");
-
         require(isNotEmptyString(_name)  && isNotEmptyString(_desc) && isNotEmptyString(_diagnostic)
-        && isNotEmptyString(_plan) && _department != 0, "You must fill all fields");
+            && isNotEmptyString(_plan) && _department != 0, "You must fill all fields");
+        require(token.balanceOf(msg.sender) >= amountToLock + locks[msg.sender], "You don't have enough token to lock");        
 
         Project memory  project;
         project.name = _name;
@@ -509,10 +509,8 @@ contract EnergyDao is Ownable {
      * @dev Called internally
      */
     function lock() internal {
-        require(token.balanceOf(msg.sender) >= amountToLock + locks[msg.sender], "You don't have enough token to lock");
-        token.transferFrom(msg.sender, address(this), fees);
         locks[msg.sender] += amountToLock;
-        
+        token.transferFrom(msg.sender, address(this), fees);
     }
 
     /**

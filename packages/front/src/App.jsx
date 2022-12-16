@@ -25,8 +25,8 @@ function App() {
     <WagmiConfig client={client}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-          <Navbar />
           <DaoProvider>
+            <Navbar />
             <EnergyDao />
           </DaoProvider>
       </ThemeProvider>

@@ -7,23 +7,18 @@ import { InjectedConnector } from 'wagmi/connectors/injected'
 import { formatAddress, getContractDescription, getEthValue } from "../../common/helpers/eth"
 import ButtonUI from "../ui/button"
 import PopoverDisconnect from "./PopoverDisconnect"
+import { BigNumber } from 'ethers'
+import { useProfile } from "../../contexts/DaoContext"
+import { useEffect } from "react"
 
 function Navbar() {
     const { address, isConnected } = useAccount()
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     })
-    const { chain } = useNetwork()
 
-    const { abi, addr } = !isConnected ? {} : getContractDescription('EEDToken', chain.id)
+    const { state: { balance } } = useProfile()
 
-    const { data } = useContractRead({
-        address: addr,
-        abi: abi,
-        functionName: "balanceOf",
-        args: [address],
-        watch: true
-    })
 
     const [anchorEl, setAnchorEl] = useState(null)
 
@@ -40,7 +35,7 @@ function Navbar() {
 
     const formatedAddr = isConnected ? formatAddress(address) : null
     
-    const tokens = data ? getEthValue(data) : null
+    const tokens = balance ? getEthValue(balance) : null
 
     const connectBtn = <ButtonUI size="medium" variant="contained" onClick={() => connect()}>Connect</ButtonUI>
     const addressAvatar =
