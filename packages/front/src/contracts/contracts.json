@@ -2,7 +2,7 @@
   "5": {
     "contracts": {
       "Sale": {
-        "addr": "0xC40e37c49EafAe47A7B292C05538f38A0264785F",
+        "addr": "0x5DEFf8b05Cb710567EbF951F98616761077792f8",
         "abi": [
           {
             "inputs": [
@@ -241,7 +241,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0x5846bB0ca4DE5FCF8F593c484B3d11502394416E",
+        "addr": "0x00f4BC78C1507D7C9A3B7A2176Cc7E73E033154a",
         "abi": [
           {
             "inputs": [
@@ -896,7 +896,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0xE6Deb6111b41640dd26895E381127958589a4A69",
+        "addr": "0x1B631677B5a64689d63bb76c49cF5D7D438aA2f0",
         "abi": [
           {
             "inputs": [
@@ -1773,7 +1773,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xA34E685958D0b2453dE2DA51C9e08B00A804AD41",
+        "addr": "0x4AD7E7e7EA4663ea613b7236c2042A09AD8bcAc6",
         "abi": [
           {
             "inputs": [
@@ -2897,12 +2897,12 @@
         ]
       }
     },
-    "block": 8146475
+    "block": 8146688
   },
   "31337": {
     "contracts": {
       "Sale": {
-        "addr": "0xCF541115Ffb2fd060384f9ee2dFBd901FB5be6a7",
+        "addr": "0xfd655BEB8852b7CBF1654D11C37ff6fE3FdBc28B",
         "abi": [
           {
             "inputs": [
@@ -3141,7 +3141,7 @@
         ]
       },
       "EEDToken": {
-        "addr": "0x67B492e98AF5bb869dB56d1eAe32D410a7dA0324",
+        "addr": "0x26A595dF80787198eE8489d8cA9555b9d68f0772",
         "abi": [
           {
             "inputs": [
@@ -3796,7 +3796,7 @@
         ]
       },
       "EnergyDao": {
-        "addr": "0x1780bCf4103D3F501463AD3414c7f4b654bb7aFd",
+        "addr": "0xcC4c41415fc68B2fBf70102742A83cDe435e0Ca7",
         "abi": [
           {
             "inputs": [
@@ -4673,7 +4673,7 @@
         ]
       },
       "EnergyGovernor": {
-        "addr": "0xF817ad73601753DAF3FdEf2Fb6C25d585bE74341",
+        "addr": "0xa54F7cE47e5ebDd6C1c536d040F3CEdBd2DE371B",
         "abi": [
           {
             "inputs": [
@@ -5797,6 +5797,6 @@
         ]
       }
     },
-    "block": 506
+    "block": 688
   }
 }

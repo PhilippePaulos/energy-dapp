@@ -5,7 +5,7 @@ import Identicon from '@polkadot/react-identicon'
 import { BigNumber } from "ethers"
 import { formatEther } from 'ethers/lib/utils.js'
 import { useCallback, useEffect, useState } from 'react'
-import { useBlockNumber, useContractEvent, useNetwork, useProvider, useSigner } from 'wagmi'
+import { useContractEvent, useNetwork, useProvider, useSigner } from 'wagmi'
 import { ProposalProjectStateCodes, ProposalProjectStates } from "../../../../common/enums"
 import { formatAddress, getContractDescription, openIpfsLink } from "../../../../common/helpers/eth"
 import { useProfile } from '../../../../contexts/DaoContext'
@@ -22,7 +22,7 @@ import DisplayStateIcon from './DisplayStateIcon'
 
 function DisplayVoteBlock({ state, voteEnd, voteStart, voteExpire }) {
 
-    const { data: currentBlock } = useBlockNumber()
+    const { state: { currentBlock } } = useProfile()
 
     const currentDisplay =
         <Box className="line">

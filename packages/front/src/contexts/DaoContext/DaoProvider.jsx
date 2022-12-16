@@ -1,9 +1,8 @@
 import { ethers } from "ethers"
 import React, { useCallback, useEffect, useState } from "react"
 import { useAccount, useBlockNumber, useContractRead, useNetwork, useProvider } from "wagmi"
-import { initContract } from "../../common/helpers/eth"
+import { getContractDescription, initContract } from "../../common/helpers/eth"
 import DaoContext from "./DaoContext"
-import { getContractDescription } from "../../common/helpers/eth"
 
 function DaoProvider({ children }) {
 
@@ -19,11 +18,12 @@ function DaoProvider({ children }) {
     isCraftsman: false,
     address: null,
     balance: 0,
-    allowance: 0
+    allowance: 0,
+    blockNumber: null
   })
 
   const { abi: tokenAbi, addr: tokenAddr } = !isConnected ? {} : getContractDescription('EEDToken', chain.id)
-  const { abi: daoAbi, addr: daoAddr } = !isConnected ? {} : getContractDescription('EnergyDao', chain.id)
+  const { addr: daoAddr } = !isConnected ? {} : getContractDescription('EnergyDao', chain.id)
 
   useContractRead({
     address: tokenAddr,
@@ -45,6 +45,12 @@ function DaoProvider({ children }) {
     onSuccess(allowance) {
       setState((s) => ({ ...s, allowance: allowance }))
     },
+  })
+
+  useBlockNumber({
+    onSuccess(blockNumber) {
+      setState((s) => ({ ...s, blockNumber: blockNumber }))
+    }
   })
 
 

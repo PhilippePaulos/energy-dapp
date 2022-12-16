@@ -2,9 +2,8 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Typography } from "@mui/material"
 import Identicon from "@polkadot/react-identicon"
 import { BigNumber, ethers } from "ethers"
-import { useEffect } from 'react'
-import { useState } from "react"
-import { useBlockNumber, useContractEvent, useNetwork, useSigner } from "wagmi"
+import { useEffect, useState } from 'react'
+import { useContractEvent, useNetwork, useSigner } from "wagmi"
 import { ProposalState } from "../../../../common/enums"
 import { getContractDescription, openIpfsLink } from "../../../../common/helpers/eth"
 import { useProfile } from "../../../../contexts/DaoContext"
@@ -44,8 +43,7 @@ function VoteProposal({ state, handleDecision }) {
 function CraftsmanDetailsModal(props) {
     const { craftsman, setCraftsman, open, setOpen, fetchCraftsmans, quorum } = props
     const { data: signer } = useSigner()
-    const { state: { contracts: { EnergyDao, EnergyGovernor }, address }, state } = useProfile()
-    const { data: currentBlock } = useBlockNumber()
+    const { state: { contracts: { EnergyDao, EnergyGovernor }, address, blockNumber } } = useProfile()
     const [isLoading, setIsLoading] = useState(false)
     const { chain } = useNetwork()
 
@@ -111,7 +109,7 @@ function CraftsmanDetailsModal(props) {
                             <>
                                 <Box className="line">
                                     <Typography variant="b">Block actuel</Typography>
-                                    <Typography>{currentBlock}</Typography>
+                                    <Typography>{blockNumber}</Typography>
                                 </Box>
                                 <Box className="line">
                                     <Typography variant="b">Vote se termine au block</Typography>

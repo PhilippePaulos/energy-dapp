@@ -22,7 +22,6 @@ function DisplayVotes({ fetchCraftsmans, craftsman, setCraftsman, quorum }) {
     const [hasVoted, setHasVoted] = useState(false)
 
     const fetchHasVoted = useCallback(async () => {
-        console.log(craftsman.addr);
         const hasVoted = await EnergyGovernor.hasVoted(craftsman.proposalId, address)
         setHasVoted(hasVoted)
     }, [address])

@@ -11,16 +11,32 @@ const settings = {
 
 const IPFS_FOLDER = "ipfs/QmY1okHh4rc6NriBJYVqTComuprvaxpHqCbPk9jLF3eUE1"
 
-async function main() {
+const params = {
+  "5": {
+    mintAmount: ethers.utils.parseEther("1000000"),
+    saleAmount: ethers.utils.parseEther("1000000"),
+    craftsmanPeriod: 50,
+    quotationPeriod: 30,
+    votingPeriod: 20,
+    voteExpire: 10,
+    nbMaxProject: 100,
+    nbMaxQuotations: 10
+  },
 
-  const mintAmount = ethers.utils.parseEther("1000000")
-  const saleAmount = ethers.utils.parseEther("1000000")
-  const craftsmanPeriod = 2
-  const quotationPeriod = 4
-  const votingPeriod = 2
-  const voteExpire = 2
-  const nbMaxProject = 100
-  const nbMaxQuotations = 10
+  "31337": {
+    mintAmount: ethers.utils.parseEther("1000000"),
+    saleAmount: ethers.utils.parseEther("1000000"),
+    craftsmanPeriod: 2,
+    quotationPeriod: 4,
+    votingPeriod: 2,
+    voteExpire: 2,
+    nbMaxProject: 100,
+    nbMaxQuotations: 10
+  }
+}
+
+async function main() {
+  const chainId = network.config.chainId
   // 1ETH -> 10000 EED
   const rate = 10000
   const ONE_DAY_IN_SECS = 24 * 60 * 60
@@ -28,6 +44,8 @@ async function main() {
 
   console.log("Deploy DAO...")
   const EnergyDao = await ethers.getContractFactory("EnergyDao")
+  const { mintAmount, saleAmount, craftsmanPeriod, quotationPeriod, votingPeriod, voteExpire,
+    nbMaxProject, nbMaxQuotations } = params[chainId]
 
   const energyDao = await EnergyDao.deploy(mintAmount, saleAmount, rate, closingTime, craftsmanPeriod,
     quotationPeriod, votingPeriod, voteExpire, ethers.utils.parseEther("75"), nbMaxProject, nbMaxQuotations)
@@ -45,7 +63,7 @@ async function main() {
   const governor = Governor.attach(energyDao.governor())
 
   let latestBlock
-  if (network.config.chainId === 31337) {
+  if (chainId === 31337) {
     latestBlock = (await hre.ethers.provider.getBlock("latest")).number
     console.log("Prepare data")
     await prepareData(energyDao, eedToken, governor, sale)

@@ -3,11 +3,10 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import { Box, Grid, Paper, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material"
 import Identicon from '@polkadot/react-identicon'
 import { BigNumber } from 'ethers'
-import { useEffect } from 'react'
-import { useCallback, useState } from "react"
-import { useBlockNumber, useContractEvent, useNetwork } from 'wagmi'
+import { useCallback, useEffect, useState } from 'react'
+import { useContractEvent, useNetwork } from 'wagmi'
 import { ProposalState, ProposalStateCodes } from '../../../../common/enums'
-import { formatAddress, getEthValue, openIpfsLink, getContractDescription, getDeployBlock } from "../../../../common/helpers/eth"
+import { formatAddress, getContractDescription, getDeployBlock, getEthValue, openIpfsLink } from "../../../../common/helpers/eth"
 import { leftJoin } from "../../../../common/helpers/utils.js"
 import { useProfile } from "../../../../contexts/DaoContext"
 import { theme } from "../../../theme"
@@ -26,16 +25,9 @@ function DisplayCraftsman() {
         craftsman: {}
     })
 
-    const { state: { contracts: { EnergyDao, EnergyGovernor }, isCraftsman } } = useProfile()
+    const { state: { contracts: { EnergyDao, EnergyGovernor }, isCraftsman, blockNumber} } = useProfile()
     const [quorum, setQuorum] = useState()
     const { chain } = useNetwork()
-
-    useBlockNumber({
-        onSuccess(data) {
-            fetchCraftsmans(data)
-            fetchQuorum(data)
-        },
-    })
 
     useContractEvent({
         address: EnergyDao.address,
@@ -56,6 +48,8 @@ function DisplayCraftsman() {
     })
 
     useEffect(() => {
+        fetchCraftsmans(blockNumber)
+        fetchQuorum(blockNumber)
     }, [state.craftsman])
 
     const handleClickCreate = () => {
@@ -101,7 +95,7 @@ function DisplayCraftsman() {
         
     // }, [])
 
-    const fetchCraftsmans = useCallback(async (currentBlock) => {
+    const fetchCraftsmans = useCallback(async (blockNumber) => {
         let eventFilter = EnergyDao.filters.CraftsmanRegistered()
         let events = await EnergyDao.queryFilter(eventFilter, getDeployBlock(chain.id))
         const addr = events.map((event) => {
@@ -122,7 +116,7 @@ function DisplayCraftsman() {
             if (data.proposalId !== undefined) {
                 return EnergyGovernor.proposalSnapshot(data.proposalId).then((block) => {
                     let state = data.state
-                    if (BigNumber.from(block).toNumber() === currentBlock) {
+                    if (BigNumber.from(block).toNumber() === blockNumber) {
                         if (ProposalStateCodes[state] === ProposalState.Pending) {
                             state = ProposalState.Active
                         }
@@ -143,7 +137,7 @@ function DisplayCraftsman() {
             if (data.state !== undefined) {
                 return EnergyGovernor.proposalDeadline(data.proposalId).then((block) => {
                     let state = data.state
-                    if (BigNumber.from(block).toNumber() === currentBlock) {
+                    if (BigNumber.from(block).toNumber() === blockNumber) {
                         if (state === ProposalState.Active) {
                             state = ProposalState.Finished
                         }
@@ -165,8 +159,8 @@ function DisplayCraftsman() {
         setState((s) => ({ ...s, craftsman: row }))
     }, [])
 
-    const fetchQuorum = useCallback(async (currentBlock) => {
-        const quorum = await EnergyGovernor.quorum(currentBlock - 1)
+    const fetchQuorum = useCallback(async (blockNumber) => {
+        const quorum = await EnergyGovernor.quorum(blockNumber - 1)
         setQuorum(getEthValue(quorum))
     }, [EnergyGovernor])
 
