@@ -1,8 +1,8 @@
 # Energy DAO DApp project
 
 ## General Information
-This project has been done to in the context of final project of Alyra Trainee. 
-The smart contract developped consists on a DAO in order to validate projects sent by beneficiary and craftsmans to make energy economy.
+This project has been done in the context of final project of Alyra Trainee. 
+The DApp developed consists on a DAO in order to validate projects sent by beneficiary and craftsmans to make energy economy.
 First to participate people can buy token to vote or propose projects.
 People can register as Craftman with validated documents, finally a quorum  of the dao will validate the craftman to participate.
 Anyone who has enough token can propose a project and is called as beneficiary.
@@ -28,7 +28,7 @@ The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c
 * Solidity
 * Javascript
 * Hardhat
-* Ethersjs
+* Ethers.js
 * React
 * Wagmi
 * Material UI
