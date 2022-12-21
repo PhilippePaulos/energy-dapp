@@ -27,7 +27,8 @@
     "hardhat-gas-reporter": "^1.0.9",
     "install": "^0.13.0",
     "npm": "^9.1.2",
-    "solidity-coverage": "^0.7.22"
+    "solidity-coverage": "^0.7.22",
+    "solidity-docgen": "^0.6.0-beta.32"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.0",
@@ -35,6 +36,6 @@
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/v3-core": "^1.0.1",
     "alchemy-sdk": "^2.2.3",
-    "solidity-docgen": "^0.6.0-beta.32"
+    "ganache-cli": "^6.12.2"
   }
 }
