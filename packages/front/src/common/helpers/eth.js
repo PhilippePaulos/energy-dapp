@@ -2,6 +2,7 @@ import { ethers } from "ethers"
 import axios from 'axios'
 const artifact = require("../../contracts/contracts.json")
 
+
 function initContract(contract, networkId, provider) {
     const { abi, addr } = getContractDescription(contract, networkId)
     
@@ -34,10 +35,6 @@ function isAllDefined(values) {
     return Object.values(values).every(e => e !== null && e !== "")
 }
 
-// TODO do pinata stuff at backend
-const PINATA_KEY = "11ea9686eed0b13e98fd"
-const PINATA_SECRET_KEY = "9952d45035dda0fb55a2d8650371865d4421d008da908e493097065788cdfd98"
-
 async function uploadIpfsFile(file) {
     const formData = new FormData()
     formData.append("file", file)
@@ -58,8 +55,8 @@ async function uploadIpfsFile(file) {
         url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
         data: formData,
         headers: {
-            'pinata_api_key': PINATA_KEY,
-            'pinata_secret_api_key': PINATA_SECRET_KEY,
+            'pinata_api_key': process.env.REACT_APP_PINATA_KEY,
+            'pinata_secret_api_key': process.env.REACT_APP_PINATA_SECRET_KEY,
             "Content-Type": "multipart/form-data"
         },
     })

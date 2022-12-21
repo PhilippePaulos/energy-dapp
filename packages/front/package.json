@@ -25,7 +25,8 @@
     "url": "^0.11.0",
     "wagmi": "^0.8.6",
     "web-vitals": "^2.1.4",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "dotenv": "^16.0.3"
   },
   "scripts": {
     "start": "react-scripts start",

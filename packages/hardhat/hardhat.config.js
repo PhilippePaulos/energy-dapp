@@ -5,10 +5,6 @@ require('dotenv').config();
 require("hardhat-gas-reporter");
 require('solidity-docgen');
 
-const ALCHEMY_KEY = process.env.ALCHEMY_KEY // === "undefined" ? process.env.ALCHEMY_KEY : ""
-const MNEMONIC = process.env.MNEMONIC //=== "undefined" ? process.env.MNEMONIC : ""
-const GOERLI_PKEY = process.env.GOERLI_PKEY //=== "undefined" ? process.env.GOERLI_PKEY : ""
-
 module.exports = {
   solidity: "0.8.17",
   gasReporter: {
@@ -26,13 +22,13 @@ module.exports = {
       // }
     },
     goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_KEY}`,
-      accounts: [GOERLI_PKEY],
+      url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: [process.env.GOERLI_PKEY],
       chainId: 5
     },
     mumbai: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${MNEMONIC}`,
-      accounts: { mnemonic: MNEMONIC }
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MNEMONIC}`,
+      accounts: { mnemonic: process.env.MNEMONIC }
     }
   }
 }
