@@ -22,7 +22,7 @@ https://energy-dapp.vercel.app/
 [Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/features/packages/hardhat/README.md)
 
 ### Contract address
-The contract is deployed in the Goerli testnet at 0x55ecc2A7AE246B24e8485a9AAA6c31f9e5275ed5
+The contract is deployed in the Goerli testnet at [0x1B631677B5a64689d63bb76c49cF5D7D438aA2f0](https://goerli.etherscan.io/address/0x1B631677B5a64689d63bb76c49cF5D7D438aA2f0)
 
 ## Technologies
 * Solidity
