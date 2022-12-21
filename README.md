@@ -20,6 +20,7 @@ https://energy-dapp.vercel.app/
 
 ### Docs
 [Energy.md](https://github.com/PhilippePaulos/energy-dapp/blob/features/packages/hardhat/README.md)
+
 [Presentation.pdf](https://github.com/PhilippePaulos/energy-dapp/blob/main/presentation.pdf)
 
 ### Contract address
