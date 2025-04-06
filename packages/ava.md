@@ -4,7 +4,7 @@
 - **Date et Heure :**  
   - Lundi 6h ou Mardi 6h (heure de Paris), ce qui correspond à Minuit au Québec.
 - **Préparation :**  
-  - Vérifier que chaque membre a activé son mode AvA, qu'il a le bon rôle et dispose de ses potions AvA.
+  - Vérifier que chaque membre a activé son mode AvA, qu'il a le bon rôle qu'on lui a attribué et qu'il dispose de ses potions AvA.
   - Former et rappeler les consignes AvA avant le lancement.
 
 ## 2. Opérations Préliminaires
