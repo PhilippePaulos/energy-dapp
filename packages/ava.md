@@ -31,7 +31,8 @@
 
 ## 4. Suite des Opérations
 - **Fin du Recyclage :**
-  - Dès la fin du recyclage, l'alliance mule (Sato) lance l’attaque sur la zone prisme du Village des Eleveurs.
+  - Pose module de téléportation en -12,8
+  - L'alliance mule (Sato) lance l’attaque sur la zone prisme du Village des Eleveurs.
 - **Début de l’AvA :**
   - **Phase initiale (les 2-3 premières minutes) :**
     - Laisser l’alliance mule accumuler des points de domination (seul un membre défend : Yims).
